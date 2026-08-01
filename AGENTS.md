@@ -1,5 +1,26 @@
-<!-- BEGIN:nextjs-agent-rules -->
-# This is NOT the Next.js you know
+# Repository Guidelines
 
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
-<!-- END:nextjs-agent-rules -->
+## Structure
+- `src/app/[locale]/(site)/` — localized public pages (en unprefixed via middleware rewrite; pt under `/pt`)
+- `src/app/(ops)/` — admin + login (English-only)
+- `src/app/api/` — API/cron routes
+- `src/components/` — UI (`tools/`, `games/`, `jobs/`, `articles/`; `dashboard/` + `llm-wiki/` kept for reference, routes archived)
+- `src/content/blog/{en,pt}/` — Markdown posts per locale
+- `src/data/` — tools/games/projects configs (SEO keyed by `Language`)
+- `src/i18n/` — catalogs `{ en: '…', pt: '…' }` + `localizePath` / middleware helpers
+- `src/lib/` — blog, chat/rooms, supabase, exchange rates, userData
+- `supabase/migrations/` — schema + seed
+
+## Commands
+- `npm run dev` / `build` / `start`
+- `npm test` — Vitest + Testing Library (jsdom)
+- `npm run verify` — content quality
+
+## Conventions
+- TypeScript strict, 2-space, single quotes, semicolons
+- Path alias `@/*` → `src/*`
+- Public UI: English + pt-BR via `/pt` URL prefix; admin English-only
+- No Firebase — use Supabase clients in `src/lib/supabase/` and `src/lib/rooms.ts`
+
+## Secrets
+Use `.env.example`. Never commit service-role keys or cron secrets.
