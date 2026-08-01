@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { GoogleAnalytics } from '@next/third-parties/google';
 import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import { SITE_NAME, SITE_URL, SITE_DESCRIPTION, SITE_AUTHOR } from '@/lib/site';
 import './globals.css';
 
@@ -29,7 +30,12 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: [{ url: '/favicon.svg', type: 'image/svg+xml' }],
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/icon-192.png', type: 'image/png', sizes: '192x192' },
+      { url: '/icon-512.png', type: 'image/png', sizes: '512x512' },
+    ],
+    apple: [{ url: '/apple-touch-icon.png', type: 'image/png', sizes: '180x180' }],
   },
 };
 
@@ -86,6 +92,7 @@ export default function RootLayout({
       <body className="min-h-screen flex flex-col font-sans">
         {children}
         <Analytics />
+        <SpeedInsights />
         {gaId ? <GoogleAnalytics gaId={gaId} /> : null}
       </body>
     </html>

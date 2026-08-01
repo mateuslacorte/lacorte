@@ -7,7 +7,7 @@ Personal developer site — blog, online tools, games, projects, anonymous chat,
 - **Next.js** (App Router) + React 19 + TypeScript
 - **Tailwind CSS** with class-based dark mode
 - **Supabase** — Postgres + RLS + Realtime + anonymous/magic-link auth
-- **Vercel** — hosting, Analytics, Cron; Blob optional for assets
+- **Vercel** — hosting, Analytics, Speed Insights, Cron; Blob optional for assets
 - **PeerJS** — P2P anonymous chat transport (signaling via Supabase)
 
 ## Setup

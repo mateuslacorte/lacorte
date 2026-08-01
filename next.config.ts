@@ -23,7 +23,8 @@ const nextConfig: NextConfig = {
       { source: '/skills', destination: '/about', permanent: true },
       { source: '/lore', destination: '/about', permanent: true },
       { source: '/feed.xml', destination: '/rss.xml', permanent: true },
-      { source: '/icon', destination: '/favicon.svg', permanent: true },
+      { source: '/icon', destination: '/favicon.ico', permanent: true },
+      { source: '/favicon.svg', destination: '/favicon.ico', permanent: true },
       { source: '/admin/edit/:slug', destination: '/admin/content', permanent: true },
 
       // Old pagination (/posts/page/2); page index is now a single /posts list

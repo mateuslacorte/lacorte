@@ -7,15 +7,15 @@ interface SiteLogoMarkProps {
 export function SiteLogoMark({ className = '' }: SiteLogoMarkProps) {
   return (
     <span
-      className={`relative flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-lg gradient-bg shadow-lg shadow-primary-500/20 ${className}`}
+      className={`relative flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-lg shadow-lg shadow-primary-500/20 ${className}`}
       aria-hidden
     >
       <Image
-        src="/favicon.svg"
+        src="/icon-192.png"
         alt=""
-        width={22}
-        height={22}
-        className="h-[22px] w-[22px]"
+        width={32}
+        height={32}
+        className="h-8 w-8 object-cover"
         priority
       />
     </span>

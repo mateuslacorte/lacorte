@@ -76,8 +76,8 @@ export const pageTranslations = {
     } as T,
     s2Heading: { en: '2. Analytics', pt: '2. Analytics' } as T,
     s2Body: {
-      en: "We use Google Analytics to understand how the site is used. Cookies or similar technologies may process visit data such as pages viewed, approximate region, browser and device info, and referral path. Google's handling of data follows Google's privacy policy and product settings.",
-      pt: 'Usamos o Google Analytics para entender como o site é usado. Cookies ou tecnologias semelhantes podem processar dados de visita, como páginas visualizadas, região aproximada, informações de navegador e dispositivo, e caminho de referência. O tratamento de dados pelo Google segue a política de privacidade e as configurações do produto da Google.',
+      en: 'We use Vercel Analytics and Speed Insights, plus Google Analytics, to understand how the site is used and how pages perform. Cookies or similar technologies may process visit data such as pages viewed, approximate region, browser and device info, referral path, and Core Web Vitals. Google and Vercel handle this data under their respective privacy policies and product settings.',
+      pt: 'Usamos Vercel Analytics e Speed Insights, além do Google Analytics, para entender como o site é usado e o desempenho das páginas. Cookies ou tecnologias semelhantes podem processar dados de visita, como páginas visualizadas, região aproximada, informações de navegador e dispositivo, caminho de referência e Core Web Vitals. Google e Vercel tratam esses dados conforme as respectivas políticas de privacidade e configurações dos produtos.',
     } as T,
     s3Heading: { en: '3. Advertising', pt: '3. Publicidade' } as T,
     s3Body: {
