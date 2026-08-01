@@ -13,4 +13,4 @@ Next.js App Router, React 19, Tailwind, Supabase (Postgres + Realtime + Auth), V
 - Favorites/recents sync through `src/lib/userData.ts` (localStorage + anon auth)
 
 ## Commands
-`npm run dev` · `npm run build` · `npm test` · `npm run verify`
+`npm run dev` · `npm run build` · `npm run verify`

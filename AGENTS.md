@@ -13,7 +13,6 @@
 
 ## Commands
 - `npm run dev` / `build` / `start`
-- `npm test` — Vitest + Testing Library (jsdom)
 - `npm run verify` — content quality
 
 ## Conventions

@@ -31,7 +31,6 @@ Set `OPENROUTER_API_KEY` for OpenRouter content curation (admin → Content tab;
 |---------|---------|
 | `npm run dev` | Dev server |
 | `npm run build` | Production build |
-| `npm test` | Vitest |
 | `npm run verify` | Content quality checks |
 
 Public UI is bilingual: English at `/…` and Brazilian Portuguese at `/pt/…`.
