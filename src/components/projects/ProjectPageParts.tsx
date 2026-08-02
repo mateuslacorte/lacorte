@@ -63,14 +63,7 @@ export function ProjectBreadcrumb({ items }: { items: { label: string; href?: st
   );
 }
 
-export function JsonLd({ data }: { data: object }) {
-  return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
-    />
-  );
-}
+export { default as JsonLd } from '@/components/JsonLd';
 
 export function FeatureCard({ title, description }: { title: string; description: string }) {
   return (

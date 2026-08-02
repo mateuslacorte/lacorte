@@ -8,6 +8,12 @@ import type { NextConfig } from 'next';
  * More specific sources must appear before catch-alls.
  */
 const nextConfig: NextConfig = {
+  async rewrites() {
+    return [
+      // Alias for crawlers / tools that expect /site.xml
+      { source: '/site.xml', destination: '/sitemap.xml' },
+    ];
+  },
   async redirects() {
     return [
       // Force apex → www (canonical host for Search Console)

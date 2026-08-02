@@ -1,9 +1,12 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import GamePageClient from '@/components/games/GamePageClient';
+import JsonLd from '@/components/JsonLd';
 import { getGameComponent } from '@/components/games/registry';
 import { gamesConfig, getGameConfig } from '@/data/games';
-import { parseLocale } from '@/i18n';
+import { parseLocale, t } from '@/i18n';
+import { commonTranslations } from '@/i18n/translations/common';
+import { breadcrumbJsonLd, webApplicationJsonLd } from '@/lib/jsonLd';
 import { localeAlternates, localeOpenGraph } from '@/lib/localeMetadata';
 
 interface GamePageProps {
@@ -45,13 +48,35 @@ export default async function GamePage({ params }: GamePageProps) {
   }
 
   const seo = game.seo[lang];
+  const nav = commonTranslations.nav;
+
+  const structuredData = [
+    webApplicationJsonLd({
+      lang,
+      path: `/games/${slug}`,
+      name: seo.title,
+      description: seo.description,
+      applicationCategory: 'GameApplication',
+    }),
+    breadcrumbJsonLd(
+      [
+        { name: t(nav.home, lang), path: '/' },
+        { name: t(nav.games, lang), path: '/games' },
+        { name: seo.title, path: `/games/${slug}` },
+      ],
+      lang,
+    ),
+  ];
 
   return (
-    <GamePageClient
-      slug={slug}
-      title={seo.title}
-      icon={game.icon}
-      description={seo.description}
-    />
+    <>
+      <JsonLd data={structuredData} />
+      <GamePageClient
+        slug={slug}
+        title={seo.title}
+        icon={game.icon}
+        description={seo.description}
+      />
+    </>
   );
 }

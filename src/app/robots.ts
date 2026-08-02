@@ -10,7 +10,7 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ['/admin', '/login', '/api'],
       },
     ],
-    sitemap: `${SITE_URL}/sitemap.xml`,
+    sitemap: [`${SITE_URL}/sitemap.xml`, `${SITE_URL}/site.xml`],
     host: 'www.lacorte.dev',
   };
 }

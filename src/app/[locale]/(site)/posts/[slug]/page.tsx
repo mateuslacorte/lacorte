@@ -3,11 +3,13 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import BlogComments from '@/components/blog/BlogComments';
 import BlogPostActions from '@/components/blog/BlogPostActions';
+import JsonLd from '@/components/JsonLd';
 import MarkdownBody from '@/components/MarkdownBody';
 import { formatPostDate, parseLocale, t } from '@/i18n';
 import { localizePath } from '@/i18n/urlUtils';
 import { commonTranslations } from '@/i18n/translations/common';
 import { getAllPosts, getPostBySlug } from '@/lib/blog';
+import { blogPostingJsonLd, breadcrumbJsonLd } from '@/lib/jsonLd';
 import { localeAlternates, localeOpenGraph } from '@/lib/localeMetadata';
 import { SITE_NAME } from '@/lib/site';
 
@@ -66,8 +68,30 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const blog = commonTranslations.blog;
   const nav = commonTranslations.nav;
 
+  const structuredData = [
+    blogPostingJsonLd({
+      lang,
+      slug,
+      title: post.data.title,
+      description: post.data.description,
+      datePublished: post.data.date,
+      dateModified: post.data.updated,
+      tags: post.data.tags,
+      image: post.data.image,
+    }),
+    breadcrumbJsonLd(
+      [
+        { name: t(nav.home, lang), path: '/' },
+        { name: t(blog.title, lang), path: '/posts' },
+        { name: post.data.title, path: `/posts/${slug}` },
+      ],
+      lang,
+    ),
+  ];
+
   return (
     <article className="py-16 md:py-20 px-6">
+      <JsonLd data={structuredData} />
       <div className="max-w-3xl mx-auto">
         <nav className="flex items-center gap-2 text-sm text-[var(--color-text-muted)] mb-6">
           <Link

@@ -3,6 +3,7 @@ import { GoogleAnalytics } from '@next/third-parties/google';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { SITE_NAME, SITE_URL, SITE_DESCRIPTION, SITE_AUTHOR } from '@/lib/site';
+import { websiteJsonLd } from '@/lib/jsonLd';
 import './globals.css';
 
 const gaId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
@@ -39,23 +40,6 @@ export const metadata: Metadata = {
   },
 };
 
-const websiteSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'WebSite',
-  name: SITE_NAME,
-  description: SITE_DESCRIPTION,
-  url: SITE_URL,
-  author: {
-    '@type': 'Person',
-    name: SITE_AUTHOR,
-  },
-  potentialAction: {
-    '@type': 'SearchAction',
-    target: `${SITE_URL}/posts?q={search_term_string}`,
-    'query-input': 'required name=search_term_string',
-  },
-};
-
 // Applied before hydration to prevent a flash of the wrong theme
 const themeScript = `
 (() => {
@@ -86,7 +70,7 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd()) }}
         />
       </head>
       <body className="min-h-screen flex flex-col font-sans">

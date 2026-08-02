@@ -10,6 +10,7 @@ export const LOCALE_EXCLUDED_PREFIXES = [
   '/auth',
   '/rss.xml',
   '/sitemap.xml',
+  '/site.xml',
   '/robots.txt',
   '/_next',
   '/favicon',

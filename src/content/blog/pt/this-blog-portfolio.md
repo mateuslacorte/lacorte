@@ -1,5 +1,5 @@
 ---
-title: 'Este Blog (Sim, Esse Que Você Está Lendo Agora)'
+title: 'Este Site (Sim, Esse Que Você Está Lendo Agora)'
 date: '2026-01-04'
 tags:
   - portfólio
@@ -7,136 +7,97 @@ tags:
   - vercel
   - meta
 description: >-
-  Um post meta sobre o blog que você está lendo agora. Porque nada diz "eu
-  tenho tempo demais" como escrever sobre o próprio blog.
+  Um post meta sobre o lacorte.dev — o site de desenvolvedor bilíngue em que
+  você está — e não o antigo blog com estética de terminal Fallout.
 ---
 
-
-Então, você está lendo um post de blog... *sobre o blog que você está lendo*. Que delicioso nível de meta. Bem-vindo ao ápice da contemplação do próprio umbigo, meu amigo.
-
+Então, você está lendo um post de blog... *sobre o site que você está lendo*. Que delicioso nível de meta. Bem-vindo ao ápice da contemplação do próprio umbigo — só que desta vez o umbigo se chama **lacorte.dev**, e não um cosplay de CRT verde.
 
 ## O Projeto
 
-Este é o meu blog. Eu construí ele. Estou escrevendo sobre ele. Nele. É tipo A Origem, mas bem menos legal e com significativamente menos pião girando.
+Este é o meu site pessoal de desenvolvedor. Eu construí ele. Estou escrevendo sobre ele. Nele. Continua meio *A Origem*, mas com menos pião girando e mais ferramentas no navegador.
 
+Eu tratava "portfólio" como código para "um blog com tema escuro." Isso não bastava. LinkedIn e GitHub provam que você existe; um site assim prova que você *entrega*. Então o lacorte.dev é um diário de aprender em público **mais** coisas que as pessoas de fato usam: ferramentas, jogos, feeds de artigos e vagas, e até chat anônimo. Se você veio só pelo post, o resto do menu é opcional. Se veio por um formatador de JSON às 2 da manhã — de nada, internet.
 
-Decidi criar esse blog porque, aparentemente, ter um perfil no LinkedIn e uma conta no GitHub não era suficiente para provar que eu existo na internet. Então aqui estamos, adicionando mais um site à já superlotada paisagem digital. De nada, internet.
-
+Comece em [`/pt/about`](/pt/about), passe por [`/pt/posts`](/pt/posts), ou vá direto para [`/pt/tools`](/pt/tools) e [`/pt/games`](/pt/games).
 
 ## A Stack de Tecnologia (Porque Todo Mundo Se Importa)
 
 ### Por Que Não WordPress?
 
-Você deve estar se perguntando: "Por que você simplesmente não usou WordPress como uma pessoa normal?" Bom, aqui está a questão! Eu realmente *uso* WordPress. Para sites de e-commerce, projetos de clientes, e todo esse blá-blá-blá. Tá tudo bem. Funciona. Cumpre o papel.
+Você deve estar se perguntando: "Por que você simplesmente não usou WordPress como uma pessoa normal?" Bom — eu *uso* WordPress. Para e-commerce, projetos de clientes e todo esse blá-blá-blá. Funciona. Cumpre o papel.
 
-
-Mas aqui está o pega: eu não gosto o suficiente dele para colocar meus dados pessoais lá. **11 em cada 10 instâncias de WordPress pegam vírus**... Sim, eu sei que isso é matematicamente impossível, mas o WordPress dá um jeito. É como aquele colega de trabalho confiável que sempre entrega rápido, todo mundo do RH e da gerência ama ele, mas tem um detalhe: ele também fode com a base de código toda com AI slop e código espaguete toda vez que encosta nela.
-
-
-Para meus clientes simplórios que pedem WordPress? Claro, por que não. Eles querem, eles ganham. É o dado deles, o problema é deles. Mas para o *meu* blog pessoal? Não. Vou ficar com minha solução feita à mão, onde eu sei exatamente o que está acontecendo e, quando quebra, eu sei exatamente de quem é a culpa... (spoiler: é minha).
-
-
-Então WordPress é ótimo para negócios, mas para coisas pessoais, eu prefiro algo que eu realmente controlo. Pode me chamar de exigente, mas eu gosto que meus projetos pessoais sejam... bem, pessoais.
-
+Mas eu não gosto o suficiente dele para estacionar minha marca pessoal lá. WordPress é o colega confiável que entrega rápido e que o RH ama — até o zoológico de plugins e o "ajuste rápido com IA" transformarem o código em espaguete. Para clientes que pedem WordPress? Claro. Dado deles, decisão deles. Para o *meu* site? Quero uma stack que eu explique de ponta a ponta. Quando quebra, sei de quem é a culpa (spoiler: minha).
 
 ### Por Que Não Ghost CMS?
 
-Ah, **Ghost CMS**. Meu amado. O que escapou. Ou melhor, o que eu fugi.
+O **Ghost** é bonito, limpo e moderno. Também é muita máquina para "Markdown numa pasta." Ótimo se você roda uma empresa de mídia. Para um site pessoal que também hospeda ferramentas e jogos? Exagero. Testei uma vez; o servidor fez barulhos que eu nem sabia que servidor conseguia fazer. O lacorte.dev fica no Next.js — não porque o Ghost seja ruim, mas porque eu quero um app só que faça mais do que um Blogspot com roupa nova.
 
+### Next.js, React, TypeScript
 
-O Ghost é lindo. É limpo. É moderno. Também é um devorador de recursos que faz meu servidor chorar. Por que ele precisa de tanta RAM e CPU só para exibir texto numa tela? É como usar um carro de Fórmula 1 para ir ao mercado! Tecnicamente impressionante, mas completamente exagerado.
-
-
-Testei o Ghost uma vez. Meu servidor começou a fazer sons que eu nem sabia que servidor conseguia fazer. Estava usando mais recursos que um país pequeno, e para quê? Para ser um Blogspot com roupa nova? Não me entenda mal, o Ghost é ótimo se você está gerenciando uma empresa de mídia ou precisa de todos aqueles recursos chiques. Mas para um blog pessoal onde eu escrevo sobre... bem, meu blog? É como levar um lança-chamas para uma festa de aniversário.
-
-
-Então aqui estou eu, com meu blog leve em Next.js que provavelmente usa menos recursos que a tela de carregamento do Ghost. Às vezes a solução simples é a solução certa. Ou talvez eu seja só um pão-duro. Você decide.
-
-
-### Next.js
-
-Escolhi o **Next.js** porque sou um desenvolvedor básico que segue tendências. Além disso, porque ele é realmente muito bom. Server-side rendering? Marcado. Geração de site estático? Marcado. Rotas de API? Marcado. Minha sanidade? Discutível.
-
-
-Estou usando o App Router porque gosto de viver no limite (ou pelo menos, no limite que era estável há seis meses). O Pages Router é para covardes, e eu definitivamente não sou um covarde. Eu só... cheguei elegantemente atrasado na festa.
-
-
-### TypeScript
-
-Como JavaScript não era confuso o suficiente, eu adicionei tipos. Agora posso passar horas discutindo com minha IDE se `string | null | undefined` é a mesma coisa que `string?`. (Spoiler: não é, e o TypeScript vai fazer questão de você saber disso.)
-
+Escolhi o **Next.js** (App Router) porque encaixa de verdade: SSR e SSG onde ajudam, rotas de API e cron para agregadores, e um caminho de deploy que não luta contra mim. Este site roda em **Next.js 16**, **React 19** e **TypeScript** — porque JavaScript sozinho não era confuso o bastante, e discutir com a IDE sobre `string | null` constrói caráter.
 
 ### Markdown para os Posts
 
-Guardo os posts como arquivos Markdown porque eu sou old school desse jeito. Sem CMS chique, sem banco de dados, só bons e velhos arquivos `.md` sentados numa pasta. É tipo os anos 90, mas com um destaque de sintaxe melhor.
+Os posts ainda vivem como Markdown em `src/content/blog/{en,pt}/`. Sem CMS chique. Escreve no editor, faz commit, faz deploy. É tipo os anos 90 com destaque de sintaxe melhor — e uma pasta por idioma para o português não ser um "depois a gente traduz."
 
+### Supabase, PeerJS e Cia.
 
-A melhor parte? Posso escrever posts no VS Code, o que significa que consigo me sentir produtivo enquanto procrastino. É ganha-ganha.
+O site não é mais só estático. O **Supabase** cuida de Postgres, RLS, auth (incluindo sessões anônimas para favoritos/recentes) e realtime onde importa. O **PeerJS** carrega o tráfego do chat anônimo; a sinalização passa pelo Supabase, não pelo Firebase. Crons na Vercel mantêm feeds de artigos e vagas vivos. Blob opcional existe para assets quando precisamos.
 
+### Tailwind e Alternância de Tema
 
-### O Design: Estética de Terminal Fallout
+A UI é **Tailwind** com light/dark por classe — superfícies no tom zinc, primary violeta, Pretendard na tipografia. Sem flicker de terminal. Sem LARP de "invadindo o mainframe." A estética antiga de CRT Fallout foi divertida por um fim de semana; para um site que as pessoas usam como cinto de ferramentas, contraste legível e um toggle de tema ganham.
 
-Optei por um **design de terminal inspirado em Fallout** porque:
-1. Tenho um amigo, sim... um bom amigo mesmo...
-2. Ele ama a série Fallout, ele ama mesmo...
-3. Texto verde em fundo preto é mais fácil para os olhos às 3 da manhã
-4. Me faz sentir que estou invadindo um mainframe (não estou)
-5. É retrô, que é código para "eu não tive paciência de aprender design moderno"
+## Funcionalidades (As Que De Fato Existem)
 
-O CSS é uma bagunça linda de animações, keyframes e escolhas de cor questionáveis. Tem um efeito de flicker que faz parecer um monitor CRT antigo, o que é charmoso ou irritante dependendo de quanto café você já tomou.
+### UI Pública Bilíngue
 
+Inglês em `/…`, português brasileiro em `/pt/…`. Posts do blog traduzidos onde importa. Admin e login ficam só em inglês — operação não precisa de segundo locale.
 
-## Funcionalidades
+### Blog e Comentários
 
-### Sistema de Comentários
+Você está no blog. Posts em Markdown por locale. Comentários passam pelo Supabase nos posts que suportam — não um "quarto de hóspedes" que eu finjo que funciona na Vercel enquanto não funciona.
 
-Sim, tem um sistema de comentários. Não, ninguém usa. Mas ele está lá, e é isso que importa. É como ter um quarto de hóspedes no seu apartamento — você provavelmente nunca vai usar, mas te faz sentir um adulto responsável. (Nota: Não funciona de jeito nenhum na Vercel, onde isso está hospedado... De nada!)
+### Ferramentas e Jogos
 
+Dezenas de ferramentas no navegador (JSON, regex, bcrypt, imagens, timers e amigos) e um monte de jogos pequenos. Fazem parte do produto, não de um rodapé esquecido.
 
-### Formulário de Contato
+### Artigos e Vagas
 
-Tem um formulário de contato porque, aparentemente, endereços de e-mail são complicados demais para as pessoas usarem diretamente. Não estou julgando (estou totalmente julgando), mas ei, se isso facilita a vida de alguém, quem sou eu para reclamar? (Nota: Não funciona... AINDA!!!)
+Artigos de tech/dev agregados e vagas de TI a partir de páginas de carreira — atualizados sob demanda/agendamento para o site não depender só do meu ritmo de escrita.
 
+### Chat Anônimo
 
-### Inscrição na Newsletter
+Chat peer-to-peer com sinalização no Supabase. Mora na superfície de ferramentas, sem gritar o tempo todo no menu principal — mas é real.
 
-Porque o que é um blog sem uma newsletter que ninguém assina? É o equivalente moderno de um livro de visitas, mas com mais potencial para spam. (Nota: Mesma coisa, mas diferente! Não bem assim...)
+### Sobre, Contato, Privacidade
 
+Porque um site pessoal sem isso é só uma pasta de vibes. E-mail do jeito antigo quando formulário não é o ponto.
 
-### Web Workers e WebAssembly
+### SEO e Analytics
 
-Adicionei Web Workers e WebAssembly porque eu queria me sentir inteligente. Eu realmente preciso deles? Provavelmente não. Eles deixam o blog mais rápido? Marginalmente. Eles me fazem parecer que eu sei o que estou fazendo? Absolutamente.
-
-
-### Otimização de SEO
-
-Otimizei para SEO porque o Google precisa saber que eu existo. Adicionei sitemaps, robots.txt, e todo esse blá-blá-blá. Alguém vai achar esse blog pelo Google? Provavelmente não. Mas pelo menos eu tentei, e isso é o que conta, né?
-
+Sitemaps, `robots.txt`, imagens Open Graph, Vercel Analytics e Speed Insights. O Google vai ligar? Talvez. Eu configurei mesmo assim? Sim.
 
 ## Deploy: Vercel
 
-Fiz o deploy disso na **Vercel** porque:
-- É de graça (e eu sou pão-duro)
-- É fácil (e eu sou preguiçoso)
-- Funciona com Next.js direto da caixa (e eu sou básico)
+Faço deploy na **Vercel** porque encaixa no Next.js, o plano gratuito basta para um site pessoal, e um push ainda parece mágica — com mais variáveis de ambiente e menos coelhos.
 
-O processo de deploy é tão suave que chega a ser suspeito. Um push pro GitHub, e pum — seu site está no ar. É tipo mágica, mas com mais variáveis de ambiente e um pouco menos coelhos.
-
+Serverless tem trocas (filesystem efêmero, cold starts, "coloca isso no Blob"). Isso não é pegadinha só da Vercel; é o modelo. Para o lacorte.dev, a troca vale a pena: previews, crons, Analytics e um alias de produção entediantemente confiável em [www.lacorte.dev](https://www.lacorte.dev).
 
 ## O Que Eu Aprendi
 
-1. **Não pense demais no design** - Passei tempo demais em animações CSS que ninguém percebe
-2. **Markdown é seu amigo** - Simples é melhor. Sempre.
-3. **TypeScript vai te salvar** - Mesmo quando você odeia ele, está te salvando de você mesmo
-4. **Vercel é uma droga** - Sério, sistema de arquivos somente leitura? Eu entendo que é serverless, mas cara... é uma droga!
-5. **Ninguém mais lê blogs** - Mas aqui estamos de qualquer jeito, porque somos otimistas (ou masoquistas)
+1. **Não entregue nostalgia como design inteiro** — Verde de terminal era fofo; uma UI light/dark usável é o que as pessoas mantêm aberta.
+2. **Markdown ainda é seu amigo** — Conteúdo simples vence. Locales dobram o trabalho, e tudo bem.
+3. **TypeScript vai te salvar** — Mesmo quando você odeia ele, está te salvando de você mesmo.
+4. **Um "blog" pode ser uma plataforma** — Ferramentas e jogos não são scope creep se são o motivo de voltarem.
+5. **i18n é decisão de produto** — `/pt` desde o dia um ganha de "traduzimos depois."
+6. **Serverless é um contrato** — Projete para ele em vez de brigar com o filesystem.
 
 ## O Balanço da Realidade
 
-Sejamos honestos: esse blog provavelmente é over-engineered para o que ele faz. Eu poderia ter usado WordPress ou Medium ou literalmente qualquer outra plataforma. Mas onde estaria a graça nisso? Além disso, construir seu próprio blog é um rito de passagem para desenvolvedores, tipo ter seu primeiro momento "funciona na minha máquina".
+O lacorte.dev é over-engineered para "um lugar para escrever"? Provavelmente. Eu poderia ter usado o Medium? Claro. Construir o próprio site ainda é rito de passagem — e agora também é playground para experimentos que eu não quero jogar em cliente.
 
+É perfeito? Não. Vou continuar mexendo? Absolutamente. Algum dia vou ficar satisfeito? Provavelmente não. Esse é o trabalho.
 
-É perfeito? Não. Vou continuar mexendo nele? Absolutamente. Algum dia vou ficar satisfeito com ele? Provavelmente não. Mas essa é a beleza de ser desenvolvedor: nunca terminamos, só ficamos temporariamente sem ideias.
-
-
-Você pode encontrar o código dessa bagunça [aqui](https://github.com/mateuslacorte/blog).
+Você pode encontrar o código dessa bagunça [aqui](https://github.com/mateuslacorte/lacorte).

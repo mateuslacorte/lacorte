@@ -1,9 +1,12 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import JsonLd from '@/components/JsonLd';
 import ToolPageClient from '@/components/tools/ToolPageClient';
 import { getToolBySlug, toolsConfig } from '@/data/tools';
 import { getToolComponent } from '@/components/tools/registry';
-import { parseLocale } from '@/i18n';
+import { parseLocale, t } from '@/i18n';
+import { commonTranslations } from '@/i18n/translations/common';
+import { breadcrumbJsonLd, webApplicationJsonLd } from '@/lib/jsonLd';
 import { localeAlternates, localeOpenGraph } from '@/lib/localeMetadata';
 
 interface ToolPageProps {
@@ -45,15 +48,37 @@ export default async function ToolPage({ params }: ToolPageProps) {
   }
 
   const seo = tool.seo[lang];
+  const nav = commonTranslations.nav;
+
+  const structuredData = [
+    webApplicationJsonLd({
+      lang,
+      path: `/tools/${slug}`,
+      name: seo.title,
+      description: seo.description,
+      applicationCategory: 'UtilitiesApplication',
+    }),
+    breadcrumbJsonLd(
+      [
+        { name: t(nav.home, lang), path: '/' },
+        { name: t(nav.tools, lang), path: '/tools' },
+        { name: seo.title, path: `/tools/${slug}` },
+      ],
+      lang,
+    ),
+  ];
 
   return (
-    <ToolPageClient
-      slug={slug}
-      title={seo.title}
-      icon={tool.icon}
-      description={seo.description}
-      category={tool.category}
-      lang={lang}
-    />
+    <>
+      <JsonLd data={structuredData} />
+      <ToolPageClient
+        slug={slug}
+        title={seo.title}
+        icon={tool.icon}
+        description={seo.description}
+        category={tool.category}
+        lang={lang}
+      />
+    </>
   );
 }

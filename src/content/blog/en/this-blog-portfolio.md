@@ -1,5 +1,5 @@
 ---
-title: 'This Blog (Yes, The One You''re Reading Right Now)'
+title: 'This Site (Yes, The One You''re Reading Right Now)'
 date: '2026-01-04'
 tags:
   - portfolio
@@ -7,136 +7,97 @@ tags:
   - vercel
   - meta
 description: >-
-  A meta post about the blog you're currently reading. Because nothing says 'I
-  have too much time' like writing about your own blog.
+  A meta post about lacorte.dev — the bilingual developer site you're on —
+  not the old Fallout-terminal blog that used to live in my head.
 ---
 
-
-So, you're reading a blog post... *about the blog you're reading it on*. How delightfully meta of us. Welcome to peak navel gazing, my friend.
-
+So, you're reading a blog post... *about the site you're reading it on*. How delightfully meta of us. Welcome to peak navel gazing, my friend — except this time the navel is called **lacorte.dev**, not a green CRT cosplay.
 
 ## The Project
 
-This is my blog. I built it. I'm writing about it. On it. It's like Inception, but way less cool and with significantly fewer spinning tops.
+This is my personal developer site. I built it. I'm writing about it. On it. It's still Inception-adjacent, but with fewer spinning tops and more browser tools.
 
+I used to treat "portfolio" as code for "a blog with a dark theme." That wasn't enough. LinkedIn and GitHub prove you exist; a site like this proves you *ship*. So lacorte.dev is a learn-in-public journal **plus** small things people can actually use: tools, games, article and job feeds, and even anonymous chat. If you only came for the post, the rest of the nav is optional. If you came for a JSON formatter at 2 AM — you're welcome, internet.
 
-I decided to create this blog because apparently, having a LinkedIn profile and a GitHub account wasn't enough to prove I exist on the internet. So here we are, adding another website to the already overcrowded digital landscape. You're welcome, internet.
-
+Start at [`/about`](/about), skim [`/posts`](/posts), or skip straight to [`/tools`](/tools) and [`/games`](/games).
 
 ## The Tech Stack (Because Everyone Cares)
 
 ### Why Not WordPress?
 
-You might be wondering: "Why didn't you just use WordPress like a normal person?" Well, here's the thing! I actually *do* use WordPress. For e-commerce sites, client projects, and all that jazz. It's fine. It works. It gets the job done.
+You might be wondering: "Why didn't you just use WordPress like a normal person?" Well — I *do* use WordPress. For e-commerce sites, client projects, and all that jazz. It's fine. It works. It gets the job done.
 
-
-But here's the catch: I don't like it enough to put my personal data on it. **11 out of 10 WordPress instances catch viruses**... Yes, I know that's mathematically impossible, but WordPress finds a way. It's like that reliable coworker who always gets the job done fast, everybody from the HR and Management love him, but there is a catch, he also fuck up the whole codebase with AI slop and spaghetti code every time he touches it.
-
-
-For my simpleton clients who ask for WordPress? Sure, why not. They want it, they get it. It's their data, their problem. But for *my* personal blog? Nah. I'll stick with my custom built solution where I know exactly what's happening and when it breaks, I know exactly who to blame... (spoiler: it's me).
-
-
-So WordPress is great for business, but for personal stuff, I prefer something I actually control. Call me picky, but I like my personal projects to be... well, personal.
-
+But I don't like it enough to park my personal brand on it. WordPress is the reliable coworker who ships fast and that HR loves — until the plugin zoo and "quick AI fix" turn the codebase into spaghetti. For clients who want WordPress? Sure. Their data, their call. For *my* site? I want a stack I can explain end to end. When it breaks, I know who to blame (spoiler: me).
 
 ### Why Not Ghost CMS?
 
-Ah, **Ghost CMS**. My beloved. The one that got away. Or rather, the one I ran away from.
+**Ghost** is beautiful, clean, and modern. It's also a lot of machinery for "Markdown in a folder." Great if you're running a media company. For a personal site that also hosts tools and games? Overkill. I tried it once; my server made noises I didn't know servers could make. lacorte.dev stays on Next.js instead — not because Ghost is bad, but because I want one app that does more than a glorified Blogspot.
 
+### Next.js, React, TypeScript
 
-Ghost is beautiful. It's clean. It's modern. It's also a resource hog that makes my server cry. Why does it need so much RAM and CPU just to display text on a screen? It's like using a Formula 1 car to go to the grocery store! Technically impressive, but completely overkill.
-
-
-I tried Ghost once. My server started making sounds I didn't know servers could make. It was using more resources than a small country, and for what? To be a glorified Blogspot? Don't get me wrong, Ghost is great if you're running a media company or need all those fancy features. But for a personal blog where I write about... well, my blog? It's like bringing a flamethrower to a birthday party.
-
-
-So here I am, with my lightweight Next.js blog that probably uses less resources than Ghost's loading screen. Sometimes the simple solution is the right solution. Or maybe I'm just cheap. You decide.
-
-
-### Next.js
-
-I chose **Next.js** because I'm a basic developer who follows trends. Also, because it's actually pretty good. Server-side rendering? Check. Static site generation? Check. API routes? Check. My sanity? Debatable.
-
-
-I'm using the App Router because I like living on the edge (or at least, the edge that was stable six months ago). The Pages Router is for cowards, and I'm definitely not a coward. I'm just... fashionably late to the party.
-
-
-### TypeScript
-
-Because JavaScript wasn't confusing enough, I added types. Now I can spend hours arguing with my IDE about whether `string | null | undefined` is the same as `string?`. (Spoiler: it's not, and TypeScript will make sure you know it.)
-
+I chose **Next.js** (App Router) because it's actually a good fit: SSR and SSG where they help, API and cron routes for aggregators, and a deploy path that doesn't fight me. This site runs on **Next.js 16**, **React 19**, and **TypeScript** — because JavaScript alone wasn't confusing enough, and arguing with the IDE about `string | null` builds character.
 
 ### Markdown for Posts
 
-I store posts as Markdown files because I'm old school like that. No fancy CMS, no database, just good ol' `.md` files sitting in a folder. It's like the 90s, but with better syntax highlighting.
+Posts still live as Markdown under `src/content/blog/{en,pt}/`. No fancy CMS. Write in the editor, commit, deploy. It's the 90s with better syntax highlighting — and a locale folder so Portuguese isn't an afterthought.
 
+### Supabase, PeerJS, and Friends
 
-The best part? I can write posts in VS Code, which means I get to feel productive while procrastinating. It's a win-win.
+The site isn't static-only anymore. **Supabase** backs Postgres, RLS, auth (including anonymous sessions for favorites/recents), and realtime where it matters. **PeerJS** carries anonymous chat traffic; signaling goes through Supabase, not Firebase. Crons on Vercel keep article and job feeds from going stale. Optional Blob storage exists for assets when we need it.
 
+### Tailwind and Theme Toggle
 
-### The Design: Fallout Terminal Aesthetic
+UI is **Tailwind** with class-based light/dark mode — zinc-ish surfaces, a violet primary, Pretendard for type. No terminal flicker. No "hacking the mainframe" LARP. The old Fallout CRT aesthetic was fun for a weekend; for a site people use as a toolbelt, readable contrast and a theme toggle win.
 
-I went with a **Fallout-inspired terminal design** because:
-1. I have a friend, yes... a very good friend...
-2. He loves the Fallout series, he really do...
-3. Green text on black background is easier on the eyes at 3 AM
-4. It makes me feel like I'm hacking into a mainframe (I'm not)
-5. It's retro, which is code for "I couldn't be bothered to learn modern design"
+## Features (The Ones That Actually Exist)
 
-The CSS is a beautiful mess of animations, keyframes, and questionable color choices. There's a flicker effect that makes it look like an old CRT monitor, which is either charming or annoying depending on how much coffee you've had.
+### Bilingual Public UI
 
+English at `/…`, Brazilian Portuguese at `/pt/…`. Blog posts are translated where it matters. Admin and login stay English-only — ops don't need a second locale.
 
-## Features
+### Blog and Comments
 
-### Comments System
+You're in the blog. Posts are Markdown per locale. Comments are wired through Supabase for posts that support them — not a guest room I pretend works on Vercel while it doesn't.
 
-Yes, there's a comments system. No, nobody uses it. But it's there, and that's what matters. It's like having a guest room in your apartment—you'll probably never use it, but it makes you feel like a responsible adult. (Note: Does not work at all in Vercel where this is hosted... You're welcome!)
+### Tools and Games
 
+Dozens of browser tools (JSON, regex, bcrypt, image helpers, timers, and friends) and a pile of small games. They're part of the product, not a sidebar afterthought.
 
-### Contact Form
+### Articles and Jobs
 
-There's a contact form because apparently, email addresses are too complicated for people to use directly. I'm not judging (I'm totally judging), but hey, if it makes someone's life easier, who am I to complain? (Note: Does not work... YET!!!)
+Aggregated tech/dev articles and IT job listings from company career pages — refreshed on a schedule so the site is more than my own writing cadence.
 
+### Anonymous Chat
 
-### Newsletter Signup
+Peer-to-peer chat with Supabase signaling. It lives under the tools-ish surface, not always screaming from the main nav — but it's real.
 
-Because what's a blog without a newsletter that nobody subscribes to? It's the modern equivalent of a guestbook, but with more spam potential. (Note: Same-same, but different! Not actually...)
+### About, Contact, Privacy
 
+Because a personal site without those is just a vibes folder. Email works the old-fashioned way when forms aren't the point.
 
-### Web Workers & WebAssembly
+### SEO and Analytics
 
-I added Web Workers and WebAssembly because I wanted to feel smart. Do I actually need them? Probably not. Do they make the blog faster? Marginally. Do they make me look like I know what I'm doing? Absolutely.
-
-
-### SEO Optimization
-
-I optimized for SEO because Google needs to know that I exist. I added sitemaps, robots.txt, and all that jazz. Will anyone find this blog through Google? Probably not. But at least I tried, and that's what counts, right?
-
+Sitemaps, `robots.txt`, Open Graph images, Vercel Analytics and Speed Insights. Will Google care? Maybe. Did I still wire it? Yes.
 
 ## Deployment: Vercel
 
-I deployed this on **Vercel** because:
-- It's free (and I'm cheap)
-- It's easy (and I'm lazy)
-- It works with Next.js out of the box (and I'm basic)
+I deploy on **Vercel** because it fits Next.js, the free tier is honest enough for a personal site, and one push still feels like magic — with more environment variables and fewer rabbits.
 
-The deployment process is so smooth, it's almost suspicious. One push to GitHub, and boom—your site is live. It's like magic, but with more environment variables and slightly less rabbits.
-
+Serverless has tradeoffs (ephemeral filesystems, cold starts, "just put that in Blob"). That's not a gotcha unique to Vercel; it's the model. For lacorte.dev, the tradeoff is worth it: previews, crons, Analytics, and a boringly reliable production alias at [www.lacorte.dev](https://www.lacorte.dev).
 
 ## What I Learned
 
-1. **Don't overthink the design** - I spent way too much time on CSS animations that nobody notices
-2. **Markdown is your friend** - Simple is better. Always.
-3. **TypeScript will save you** - Even when you hate it, it's saving you from yourself
-4. **Vercel sucks** - Seriously, read-only filesystems? I get it's serverless, but man... It sucks!
-5. **Nobody reads blogs anymore** - But here we are anyway, because we're optimists (or masochists)
+1. **Don't ship nostalgia as the whole design** — Terminal green was cute; a usable light/dark UI is what people keep open.
+2. **Markdown is still your friend** — Simple content wins. Locales make it twice as much work, and that's fine.
+3. **TypeScript will save you** — Even when you hate it, it's saving you from yourself.
+4. **A "blog" can be a platform** — Tools and games aren't scope creep if they're why people return.
+5. **i18n is a product decision** — `/pt` from day one beats "we'll translate later."
+6. **Serverless is a contract** — Design for it instead of fighting the filesystem.
 
 ## The Reality Check
 
-Let's be honest: this blog is probably over-engineered for what it does. I could have used WordPress or Medium or literally any other platform. But where's the fun in that? Plus, building your own blog is a rite of passage for developers, like getting your first "it works on my machine" moment.
+Is lacorte.dev over-engineered for "a place to write"? Probably. Could I have used Medium? Sure. Building your own site is still a rite of passage — and now it's also a playground for experiments I don't want to dump on a client.
 
+Is it perfect? No. Will I keep tinkering? Absolutely. Will I ever be satisfied? Probably not. That's the job.
 
-Is it perfect? No. Will I keep tinkering with it? Absolutely. Will I ever be satisfied with it? Probably not. But that's the beauty of being a developer, we're never done, we're just temporarily out of ideas.
-
-
-You can find the code to this mess [here](https://github.com/mateuslacorte/blog).
+You can find the code for this mess [here](https://github.com/mateuslacorte/lacorte).
