@@ -107,7 +107,7 @@ export default function TextCounter({ lang: initialLang }: { lang?: Language } =
           className="px-4 py-2 bg-[var(--color-card)] hover:bg-[var(--color-card-hover)]
             border border-[var(--color-border)] rounded-lg transition-colors"
         >
-          {t({ en: 'Paste', pt: 'Paste' })}
+          {t(tt.paste)}
         </button>
       </div>
 
@@ -115,9 +115,9 @@ export default function TextCounter({ lang: initialLang }: { lang?: Language } =
       {stats.words > 0 && (
         <div className="p-4 rounded-lg bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800">
           <p className="text-center text-[var(--color-text)]">
-            {t({ en: 'Estimated reading time', pt: 'Estimated reading time' })}:{' '}
+            {t(tt.readingTime)}:{' '}
             <span className="font-bold text-primary-600 dark:text-primary-400">
-              {Math.ceil(stats.words / 200)} {t({ en: 'min', pt: 'min' })}
+              {Math.ceil(stats.words / 200)} {t(tc.min)}
             </span>
           </p>
         </div>

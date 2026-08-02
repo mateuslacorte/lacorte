@@ -53,6 +53,7 @@ export default async function ToolPage({ params }: ToolPageProps) {
       icon={tool.icon}
       description={seo.description}
       category={tool.category}
+      lang={lang}
     />
   );
 }

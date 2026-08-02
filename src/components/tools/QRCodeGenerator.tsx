@@ -215,7 +215,7 @@ export default function QRCodeGenerator({ lang: initialLang }: { lang?: Language
 
       {/* Info */}
       <p className="text-sm text-[var(--color-text-muted)] text-center">
-        {t({ en: 'Enter URL or text to generate QR code', pt: 'Enter URL or text to generate QR code' })}
+        {t(tt.aboutNote)}
       </p>
     </div>
   );

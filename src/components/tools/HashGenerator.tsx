@@ -277,7 +277,7 @@ export default function HashGenerator({ lang: initialLang }: { lang?: Language }
       {/* Info */}
       <div className="p-4 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800">
         <p className="text-sm text-yellow-800 dark:text-yellow-200">
-          {t({ en: '⚠️ MD5 and SHA-1 are not recommended for security purposes. Use bcrypt or Argon2 for password hashing.', pt: '⚠️ MD5 and SHA-1 are not recommended for security purposes. Use bcrypt or Argon2 for password hashing.' })}
+          {t(tt.securityWarning)}
         </p>
       </div>
     </div>

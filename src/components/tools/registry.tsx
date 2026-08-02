@@ -1,4 +1,7 @@
 import type { ComponentType } from 'react';
+import type { Language } from '@/i18n';
+
+type ToolComponentType = ComponentType<{ lang?: Language }>;
 import QRCodeGenerator from '@/components/tools/QRCodeGenerator';
 import PasswordGenerator from '@/components/tools/PasswordGenerator';
 import UuidGenerator from '@/components/tools/UuidGenerator';
@@ -16,6 +19,7 @@ import JsonFormatter from '@/components/tools/JsonFormatter';
 import RegexTester from '@/components/tools/RegexTester';
 import UrlEncoder from '@/components/tools/UrlEncoder';
 import JwtDecoder from '@/components/tools/JwtDecoder';
+import BcryptTool from '@/components/tools/BcryptTool';
 import CronGenerator from '@/components/tools/CronGenerator';
 import TimestampConverter from '@/components/tools/TimestampConverter';
 import LlmCostCalculator from '@/components/tools/LlmCostCalculator';
@@ -40,7 +44,7 @@ import CoinFlip from '@/components/tools/CoinFlip';
 import DiceRoller from '@/components/tools/DiceRoller';
 import { toolsConfig } from '@/data/tools';
 
-const toolComponents: Record<string, ComponentType> = {
+const toolComponents: Record<string, ToolComponentType> = {
   QRCodeGenerator,
   PasswordGenerator,
   UuidGenerator,
@@ -58,6 +62,7 @@ const toolComponents: Record<string, ComponentType> = {
   RegexTester,
   UrlEncoder,
   JwtDecoder,
+  BcryptTool,
   CronGenerator,
   TimestampConverter,
   LlmCostCalculator,
@@ -86,7 +91,7 @@ const slugToComponent = new Map(
   toolsConfig.map((tool) => [tool.slug, tool.component]),
 );
 
-export function getToolComponent(slug: string): ComponentType | undefined {
+export function getToolComponent(slug: string): ToolComponentType | undefined {
   const componentName = slugToComponent.get(slug);
   if (!componentName) return undefined;
   return toolComponents[componentName];

@@ -455,7 +455,7 @@ export default function AppStoreScreenshotResizer({ lang: initialLang }: { lang?
 
             {/* Target Size Info */}
             <div className="text-sm text-[var(--color-text-muted)] text-center">
-              {t({ en: 'Output size', pt: 'Output size' })}: <span className="font-medium text-[var(--color-text)]">{targetWidth} × {targetHeight}px</span>
+              {t(tt.outputSize)}: <span className="font-medium text-[var(--color-text)]">{targetWidth} × {targetHeight}px</span>
             </div>
           </div>
 
@@ -545,7 +545,7 @@ export default function AppStoreScreenshotResizer({ lang: initialLang }: { lang?
                 font-medium transition-colors"
             >
               {isProcessing
-                ? t({ en: 'Processing...', pt: 'Processing...' })
+                ? t(tt.processing)
                 : t(tt.processAll)}
             </button>
             <button
@@ -562,7 +562,7 @@ export default function AppStoreScreenshotResizer({ lang: initialLang }: { lang?
             <div className="space-y-4">
               <div className="flex justify-between items-center">
                 <span className="text-sm font-medium text-[var(--color-text)]">
-                  {t({ en: 'Processed Images', pt: 'Processed Images' })}
+                  {t(tt.processedImages)}
                 </span>
                 <button
                   onClick={downloadAll}

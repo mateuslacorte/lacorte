@@ -1,8 +1,13 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslation } from '../../i18n/useTranslation';
+import type { Language } from '../../i18n';
 
-export default function CoinFlip() {
+export default function CoinFlip({ lang: initialLang }: { lang?: Language } = {}) {
+  const { t, translations } = useTranslation(initialLang);
+  const tc = translations.tools.coinFlip;
+
   const [result, setResult] = useState<'heads' | 'tails' | null>(null);
   const [isFlipping, setIsFlipping] = useState(false);
   const [history, setHistory] = useState<Array<'heads' | 'tails'>>([]);
@@ -57,7 +62,7 @@ export default function CoinFlip() {
 
         {result && !isFlipping && (
           <p className="text-3xl font-bold text-[var(--color-text)]">
-            {result === 'heads' ? 'Heads!' : 'Tails!'}
+            {result === 'heads' ? t(tc.headsResult) : t(tc.tailsResult)}
           </p>
         )}
       </div>
@@ -69,7 +74,7 @@ export default function CoinFlip() {
         className="w-full py-4 bg-primary-500 hover:bg-primary-600 text-white rounded-xl
           font-bold text-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {isFlipping ? 'Flipping...' : '🪙 Flip Coin'}
+        {isFlipping ? t(tc.flipping) : t(tc.flipButton)}
       </button>
 
       {/* Statistics */}
@@ -78,8 +83,8 @@ export default function CoinFlip() {
           {/* Progress Bar */}
           <div className="space-y-2">
             <div className="flex justify-between text-sm text-[var(--color-text-muted)]">
-              <span>👑 Heads: {stats.heads} ({headsPercent.toFixed(1)}%)</span>
-              <span>🦅 Tails: {stats.tails} ({(100 - headsPercent).toFixed(1)}%)</span>
+              <span>👑 {t(tc.headsLabel)}: {stats.heads} ({headsPercent.toFixed(1)}%)</span>
+              <span>🦅 {t(tc.tailsLabel)}: {stats.tails} ({(100 - headsPercent).toFixed(1)}%)</span>
             </div>
             <div className="h-4 rounded-full overflow-hidden bg-gray-500/20">
               <div
@@ -92,12 +97,12 @@ export default function CoinFlip() {
           {/* History */}
           <div className="p-4 rounded-lg bg-[var(--color-card)] border border-[var(--color-border)]">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="font-medium text-[var(--color-text)]">History (last 20)</h3>
+              <h3 className="font-medium text-[var(--color-text)]">{t(tc.historyTitle)}</h3>
               <button
                 onClick={reset}
                 className="text-sm text-red-500 hover:underline"
               >
-                Reset
+                {t(translations.tools.common.reset)}
               </button>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -117,11 +122,11 @@ export default function CoinFlip() {
 
       {/* Info */}
       <div className="p-4 rounded-lg bg-[var(--color-card)] border border-[var(--color-border)]">
-        <h3 className="font-medium text-[var(--color-text)] mb-2">💡 Tips</h3>
+        <h3 className="font-medium text-[var(--color-text)] mb-2">{t(tc.tipsTitle)}</h3>
         <ul className="text-sm text-[var(--color-text-muted)] space-y-1">
-          <li>• Use this when you need help making a decision</li>
-          <li>• Uses a cryptographically secure random number generator</li>
-          <li>• Heads (👑) and tails (🦅) each have a 50% chance</li>
+          <li>• {t(tc.tip1)}</li>
+          <li>• {t(tc.tip2)}</li>
+          <li>• {t(tc.tip3)}</li>
         </ul>
       </div>
     </div>

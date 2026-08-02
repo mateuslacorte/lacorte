@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslation } from '../../i18n/useTranslation';
+import type { Language } from '../../i18n';
 
 interface DdayResult {
   days: number;
@@ -11,7 +13,10 @@ interface DdayResult {
   progress?: number;
 }
 
-export default function DdayCalculator() {
+export default function DdayCalculator({ lang: initialLang }: { lang?: Language } = {}) {
+  const { t, translations } = useTranslation(initialLang);
+  const tc = translations.tools.dday;
+
   const [targetDate, setTargetDate] = useState('');
   const [eventName, setEventName] = useState('');
   const [result, setResult] = useState<DdayResult | null>(null);
@@ -69,10 +74,10 @@ export default function DdayCalculator() {
   };
 
   const quickDates = [
-    { label: 'Lunar New Year', getDate: () => `${new Date().getFullYear() + 1}-01-29` },
-    { label: 'Christmas', getDate: () => `${new Date().getFullYear()}-12-25` },
-    { label: 'New Year', getDate: () => `${new Date().getFullYear() + 1}-01-01` },
-    { label: "Children's Day", getDate: () => `${new Date().getFullYear()}-05-05` },
+    { label: t({ en: 'Lunar New Year', pt: 'Ano-novo lunar' }), getDate: () => `${new Date().getFullYear() + 1}-01-29` },
+    { label: t({ en: 'Christmas', pt: 'Natal' }), getDate: () => `${new Date().getFullYear()}-12-25` },
+    { label: t({ en: 'New Year', pt: 'Ano-novo' }), getDate: () => `${new Date().getFullYear() + 1}-01-01` },
+    { label: t({ en: "Children's Day", pt: 'Dia das Crianças' }), getDate: () => `${new Date().getFullYear()}-05-05` },
   ];
 
   return (
@@ -80,13 +85,13 @@ export default function DdayCalculator() {
       {/* Event Name */}
       <div className="space-y-2">
         <label className="block text-sm font-medium text-[var(--color-text)]">
-          Event name (optional)
+          {t(tc.eventName)}
         </label>
         <input
           type="text"
           value={eventName}
           onChange={(e) => setEventName(e.target.value)}
-          placeholder="e.g. vacation, exam, birthday..."
+          placeholder={t({ en: 'e.g. vacation, exam, birthday...', pt: 'ex.: viagem, prova, aniversário...' })}
           className="w-full px-4 py-3 rounded-lg border border-[var(--color-border)]
             bg-[var(--color-card)] text-[var(--color-text)]
             focus:outline-none focus:ring-2 focus:ring-primary-500"
@@ -96,7 +101,7 @@ export default function DdayCalculator() {
       {/* Target Date */}
       <div className="space-y-2">
         <label className="block text-sm font-medium text-[var(--color-text)]">
-          Target date
+          {t(tc.targetDate)}
         </label>
         <input
           type="date"
@@ -142,7 +147,9 @@ export default function DdayCalculator() {
               D{result.isUpcoming ? '-' : '+'}{result.days}
             </p>
             <p className="text-[var(--color-text-muted)] mt-2">
-              {result.isUpcoming ? `${result.days} days remaining` : `${result.days} days ago`}
+              {result.isUpcoming
+                ? `${result.days} ${t(tc.daysRemaining).toLowerCase()}`
+                : `${result.days} ${t(tc.daysPassed).toLowerCase()}`}
             </p>
           </div>
 
@@ -150,15 +157,15 @@ export default function DdayCalculator() {
           <div className="grid grid-cols-3 gap-3">
             <div className="p-3 rounded-lg bg-[var(--color-card)] border border-[var(--color-border)] text-center">
               <p className="text-2xl font-bold text-[var(--color-text)]">{result.months}</p>
-              <p className="text-xs text-[var(--color-text-muted)]">months</p>
+              <p className="text-xs text-[var(--color-text-muted)]">{t({ en: 'months', pt: 'meses' })}</p>
             </div>
             <div className="p-3 rounded-lg bg-[var(--color-card)] border border-[var(--color-border)] text-center">
               <p className="text-2xl font-bold text-[var(--color-text)]">{result.weeks}</p>
-              <p className="text-xs text-[var(--color-text-muted)]">weeks</p>
+              <p className="text-xs text-[var(--color-text-muted)]">{t({ en: 'weeks', pt: 'semanas' })}</p>
             </div>
             <div className="p-3 rounded-lg bg-[var(--color-card)] border border-[var(--color-border)] text-center">
               <p className="text-2xl font-bold text-[var(--color-text)]">{result.hours.toLocaleString()}</p>
-              <p className="text-xs text-[var(--color-text-muted)]">hours</p>
+              <p className="text-xs text-[var(--color-text-muted)]">{t({ en: 'hours', pt: 'horas' })}</p>
             </div>
           </div>
 
@@ -169,7 +176,7 @@ export default function DdayCalculator() {
               className="w-full py-3 bg-primary-500 hover:bg-primary-600 text-white rounded-lg
                 font-medium transition-colors"
             >
-              Save D-Day
+              {t({ en: 'Save D-Day', pt: 'Salvar D-Day' })}
             </button>
           )}
         </div>
@@ -178,7 +185,7 @@ export default function DdayCalculator() {
       {/* Saved D-Days */}
       {savedDdays.length > 0 && (
         <div className="p-4 rounded-lg bg-[var(--color-card)] border border-[var(--color-border)]">
-          <h3 className="font-medium text-[var(--color-text)] mb-3">📌 Saved D-Days</h3>
+          <h3 className="font-medium text-[var(--color-text)] mb-3">📌 {t(tc.savedEvents)}</h3>
           <div className="space-y-2">
             {savedDdays.map((dday, index) => {
               const target = new Date(dday.date);

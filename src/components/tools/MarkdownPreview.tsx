@@ -186,7 +186,7 @@ export default function MarkdownPreview({ lang: initialLang }: { lang?: Language
       {/* Syntax Guide */}
       <div className="p-4 rounded-lg bg-[var(--color-card)] border border-[var(--color-border)]">
         <h3 className="text-sm font-medium text-[var(--color-text)] mb-2">
-          {t({ en: 'Markdown Syntax', pt: 'Markdown Syntax' })}
+          {t(tt.syntaxGuide)}
         </h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs text-[var(--color-text-muted)] font-mono">
           <span># H1</span>

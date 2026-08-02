@@ -1,8 +1,12 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { useTranslation } from '../../i18n/useTranslation';
+import { useTranslation, translations } from '../../i18n/useTranslation';
 import type { Language } from '../../i18n';
+
+type TranslateFn = (obj: { en: string } & Partial<Record<Language, string>>) => string;
+
+const tc = translations.tools.cron;
 
 interface CronParts {
   minute: string;
@@ -12,93 +16,108 @@ interface CronParts {
   dayOfWeek: string;
 }
 
-const PRESETS = [
-  { label: { en: 'Every minute', pt: 'Every minute' }, cron: '* * * * *' },
-  { label: { en: 'Every hour', pt: 'Every hour' }, cron: '0 * * * *' },
-  { label: { en: 'Every day at midnight', pt: 'Every day at midnight' }, cron: '0 0 * * *' },
-  { label: { en: 'Every day at noon', pt: 'Every day at noon' }, cron: '0 12 * * *' },
-  { label: { en: 'Every Monday', pt: 'Every Monday' }, cron: '0 0 * * 1' },
-  { label: { en: 'First of every month', pt: 'First of every month' }, cron: '0 0 1 * *' },
-  { label: { en: 'Weekdays at 9 AM', pt: 'Weekdays at 9 AM' }, cron: '0 9 * * 1-5' },
-  { label: { en: 'Every 5 minutes', pt: 'Every 5 minutes' }, cron: '*/5 * * * *' },
-  { label: { en: 'Every 30 minutes', pt: 'Every 30 minutes' }, cron: '*/30 * * * *' },
-];
+function getPresets(t: TranslateFn) {
+  return [
+    { label: t(tc.presetEveryMinute), cron: '* * * * *' },
+    { label: t(tc.presetEveryHour), cron: '0 * * * *' },
+    { label: t(tc.presetMidnight), cron: '0 0 * * *' },
+    { label: t(tc.presetNoon), cron: '0 12 * * *' },
+    { label: t(tc.presetMonday), cron: '0 0 * * 1' },
+    { label: t(tc.presetFirstOfMonth), cron: '0 0 1 * *' },
+    { label: t(tc.presetWeekdays9am), cron: '0 9 * * 1-5' },
+    { label: t(tc.presetEvery5min), cron: '*/5 * * * *' },
+    { label: t(tc.presetEvery30min), cron: '*/30 * * * *' },
+  ];
+}
 
-const DAYS_OF_WEEK = [
-  { value: '0', label: { en: 'Sun', pt: 'Sun' } },
-  { value: '1', label: { en: 'Mon', pt: 'Mon' } },
-  { value: '2', label: { en: 'Tue', pt: 'Tue' } },
-  { value: '3', label: { en: 'Wed', pt: 'Wed' } },
-  { value: '4', label: { en: 'Thu', pt: 'Thu' } },
-  { value: '5', label: { en: 'Fri', pt: 'Fri' } },
-  { value: '6', label: { en: 'Sat', pt: 'Sat' } },
-];
+function getDaysOfWeek(t: TranslateFn) {
+  return [
+    { value: '0', label: t(tc.sun) },
+    { value: '1', label: t(tc.mon) },
+    { value: '2', label: t(tc.tue) },
+    { value: '3', label: t(tc.wed) },
+    { value: '4', label: t(tc.thu) },
+    { value: '5', label: t(tc.fri) },
+    { value: '6', label: t(tc.sat) },
+  ];
+}
 
-const MONTHS = [
-  { value: '1', label: { en: 'Jan', pt: 'Jan' } },
-  { value: '2', label: { en: 'Feb', pt: 'Feb' } },
-  { value: '3', label: { en: 'Mar', pt: 'Mar' } },
-  { value: '4', label: { en: 'Apr', pt: 'Apr' } },
-  { value: '5', label: { en: 'May', pt: 'May' } },
-  { value: '6', label: { en: 'Jun', pt: 'Jun' } },
-  { value: '7', label: { en: 'Jul', pt: 'Jul' } },
-  { value: '8', label: { en: 'Aug', pt: 'Aug' } },
-  { value: '9', label: { en: 'Sep', pt: 'Sep' } },
-  { value: '10', label: { en: 'Oct', pt: 'Oct' } },
-  { value: '11', label: { en: 'Nov', pt: 'Nov' } },
-  { value: '12', label: { en: 'Dec', pt: 'Dec' } },
-];
+function getMonths(t: TranslateFn) {
+  return [
+    { value: '1', label: t(tc.jan) },
+    { value: '2', label: t(tc.feb) },
+    { value: '3', label: t(tc.mar) },
+    { value: '4', label: t(tc.apr) },
+    { value: '5', label: t(tc.mayShort) },
+    { value: '6', label: t(tc.jun) },
+    { value: '7', label: t(tc.jul) },
+    { value: '8', label: t(tc.aug) },
+    { value: '9', label: t(tc.sep) },
+    { value: '10', label: t(tc.oct) },
+    { value: '11', label: t(tc.nov) },
+    { value: '12', label: t(tc.dec) },
+  ];
+}
 
-function describeCron(parts: CronParts, t: (obj: { en: string; pt?: string }) => string): string {
+function fill(template: string, n: string): string {
+  return template.replace('{n}', n);
+}
+
+function describeCron(
+  parts: CronParts,
+  t: TranslateFn,
+  daysOfWeek: { value: string; label: string }[],
+  months: { value: string; label: string }[],
+): string {
   const { minute, hour, dayOfMonth, month, dayOfWeek } = parts;
 
   const descriptions: string[] = [];
 
   // Minute
   if (minute === '*') {
-    descriptions.push(t({ en: 'every minute', pt: 'every minute' }));
+    descriptions.push(t(tc.everyMinute));
   } else if (minute.startsWith('*/')) {
-    descriptions.push(t({ en: `every ${minute.slice(2)} minutes`, pt: `every ${minute.slice(2)} minutes` }));
+    descriptions.push(fill(t(tc.everyNMinutes), minute.slice(2)));
   } else {
-    descriptions.push(t({ en: `at minute ${minute}`, pt: `at minute ${minute}` }));
+    descriptions.push(fill(t(tc.atMinute), minute));
   }
 
   // Hour
   if (hour === '*') {
-    descriptions.push(t({ en: 'every hour', pt: 'every hour' }));
+    descriptions.push(t(tc.everyHour));
   } else if (hour.startsWith('*/')) {
-    descriptions.push(t({ en: `every ${hour.slice(2)} hours`, pt: `every ${hour.slice(2)} hours` }));
+    descriptions.push(fill(t(tc.everyNHours), hour.slice(2)));
   } else {
-    descriptions.push(t({ en: `at ${hour}:00`, pt: `at ${hour}:00` }));
+    descriptions.push(fill(t(tc.atHour), hour));
   }
 
   // Day of month
   if (dayOfMonth !== '*') {
     if (dayOfMonth.startsWith('*/')) {
-      descriptions.push(t({ en: `every ${dayOfMonth.slice(2)} days`, pt: `every ${dayOfMonth.slice(2)} days` }));
+      descriptions.push(fill(t(tc.everyNDays), dayOfMonth.slice(2)));
     } else {
-      descriptions.push(t({ en: `on day ${dayOfMonth}`, pt: `on day ${dayOfMonth}` }));
+      descriptions.push(fill(t(tc.onDay), dayOfMonth));
     }
   }
 
   // Month
   if (month !== '*') {
-    const monthNames = MONTHS.find((m) => m.value === month);
+    const monthNames = months.find((m) => m.value === month);
     if (monthNames) {
-      descriptions.push(t({ en: `in ${monthNames.label.en}`, pt: `in ${monthNames.label.en}` }));
+      descriptions.push(fill(t(tc.inMonth), monthNames.label));
     }
   }
 
   // Day of week
   if (dayOfWeek !== '*') {
     if (dayOfWeek === '1-5') {
-      descriptions.push(t({ en: 'on weekdays', pt: 'on weekdays' }));
+      descriptions.push(t(tc.onWeekdays));
     } else if (dayOfWeek === '0,6') {
-      descriptions.push(t({ en: 'on weekends', pt: 'on weekends' }));
+      descriptions.push(t(tc.onWeekends));
     } else {
-      const dayName = DAYS_OF_WEEK.find((d) => d.value === dayOfWeek);
+      const dayName = daysOfWeek.find((d) => d.value === dayOfWeek);
       if (dayName) {
-        descriptions.push(t({ en: `on ${dayName.label.en}`, pt: `on ${dayName.label.en}` }));
+        descriptions.push(fill(t(tc.onDayName), dayName.label));
       }
     }
   }
@@ -107,7 +126,11 @@ function describeCron(parts: CronParts, t: (obj: { en: string; pt?: string }) =>
 }
 
 export default function CronGenerator({ lang: initialLang }: { lang?: Language } = {}) {
-  const { t, lang } = useTranslation(initialLang);
+  const { t } = useTranslation(initialLang);
+
+  const PRESETS = useMemo(() => getPresets(t), [t]);
+  const DAYS_OF_WEEK = useMemo(() => getDaysOfWeek(t), [t]);
+  const MONTHS = useMemo(() => getMonths(t), [t]);
 
   const [parts, setParts] = useState<CronParts>({
     minute: '0',
@@ -123,8 +146,8 @@ export default function CronGenerator({ lang: initialLang }: { lang?: Language }
   }, [parts]);
 
   const description = useMemo(() => {
-    return describeCron(parts, t);
-  }, [parts, t]);
+    return describeCron(parts, t, DAYS_OF_WEEK, MONTHS);
+  }, [parts, t, DAYS_OF_WEEK, MONTHS]);
 
   const parseCron = (cron: string) => {
     const split = cron.split(' ');
@@ -154,13 +177,13 @@ export default function CronGenerator({ lang: initialLang }: { lang?: Language }
       {/* Result */}
       <div className="p-6 rounded-xl bg-[var(--color-card)] border border-[var(--color-border)]">
         <div className="flex items-center justify-between mb-4">
-          <span className="text-sm text-[var(--color-text-muted)]">Cron Expression</span>
+          <span className="text-sm text-[var(--color-text-muted)]">{t({ en: 'Cron Expression', pt: 'Expressão Cron' })}</span>
           <button
             onClick={copyToClipboard}
             className="px-3 py-1 text-sm bg-[var(--color-bg)] hover:bg-[var(--color-card-hover)]
               border border-[var(--color-border)] rounded transition-colors"
           >
-            {copied ? t({ en: 'Copied!', pt: 'Copied!' }) : t({ en: 'Copy', pt: 'Copy' })}
+            {copied ? t(translations.tools.common.copied) : t(translations.tools.common.copy)}
           </button>
         </div>
         <code className="block text-3xl font-mono text-center text-primary-500 py-4">
@@ -174,7 +197,7 @@ export default function CronGenerator({ lang: initialLang }: { lang?: Language }
       {/* Presets */}
       <div className="space-y-2">
         <label className="text-sm font-medium text-[var(--color-text)]">
-          {t({ en: 'Presets', pt: 'Presets' })}
+          {t(tc.presets)}
         </label>
         <div className="flex flex-wrap gap-2">
           {PRESETS.map((preset) => (
@@ -187,7 +210,7 @@ export default function CronGenerator({ lang: initialLang }: { lang?: Language }
                   : 'bg-[var(--color-card)] hover:bg-[var(--color-card-hover)] text-[var(--color-text)] border border-[var(--color-border)]'
                 }`}
             >
-              {t(preset.label)}
+              {preset.label}
             </button>
           ))}
         </div>
@@ -196,15 +219,15 @@ export default function CronGenerator({ lang: initialLang }: { lang?: Language }
       {/* Editor */}
       <div className="grid grid-cols-5 gap-2">
         {[
-          { key: 'minute', label: { en: 'Min', pt: 'Min' }, range: '0-59' },
-          { key: 'hour', label: { en: 'Hour', pt: 'Hour' }, range: '0-23' },
-          { key: 'dayOfMonth', label: { en: 'Day', pt: 'Day' }, range: '1-31' },
-          { key: 'month', label: { en: 'Month', pt: 'Month' }, range: '1-12' },
-          { key: 'dayOfWeek', label: { en: 'DoW', pt: 'DoW' }, range: '0-6' },
+          { key: 'minute', label: t(tc.min), range: '0-59' },
+          { key: 'hour', label: t(tc.hour), range: '0-23' },
+          { key: 'dayOfMonth', label: t(tc.day), range: '1-31' },
+          { key: 'month', label: t(tc.month), range: '1-12' },
+          { key: 'dayOfWeek', label: t(tc.dow), range: '0-6' },
         ].map(({ key, label, range }) => (
           <div key={key} className="space-y-1">
             <label className="block text-xs text-center text-[var(--color-text-muted)]">
-              {t(label)}
+              {label}
             </label>
             <input
               type="text"
@@ -226,26 +249,26 @@ export default function CronGenerator({ lang: initialLang }: { lang?: Language }
         {/* Day of Week Quick Select */}
         <div className="space-y-2">
           <label className="text-sm font-medium text-[var(--color-text)]">
-            {t({ en: 'Day of Week', pt: 'Day of Week' })}
+            {t(tc.dayOfWeek)}
           </label>
           <div className="flex flex-wrap gap-1">
             <button
               onClick={() => setParts({ ...parts, dayOfWeek: '*' })}
               className={`px-2 py-1 text-xs rounded ${parts.dayOfWeek === '*' ? 'bg-primary-500 text-white' : 'bg-[var(--color-card)] border border-[var(--color-border)]'}`}
             >
-              {t({ en: 'Every', pt: 'Every' })}
+              {t(tc.everyLabel)}
             </button>
             <button
               onClick={() => setParts({ ...parts, dayOfWeek: '1-5' })}
               className={`px-2 py-1 text-xs rounded ${parts.dayOfWeek === '1-5' ? 'bg-primary-500 text-white' : 'bg-[var(--color-card)] border border-[var(--color-border)]'}`}
             >
-              {t({ en: 'Weekdays', pt: 'Weekdays' })}
+              {t(tc.weekdays)}
             </button>
             <button
               onClick={() => setParts({ ...parts, dayOfWeek: '0,6' })}
               className={`px-2 py-1 text-xs rounded ${parts.dayOfWeek === '0,6' ? 'bg-primary-500 text-white' : 'bg-[var(--color-card)] border border-[var(--color-border)]'}`}
             >
-              {t({ en: 'Weekend', pt: 'Weekend' })}
+              {t(tc.weekend)}
             </button>
             {DAYS_OF_WEEK.map((day) => (
               <button
@@ -253,7 +276,7 @@ export default function CronGenerator({ lang: initialLang }: { lang?: Language }
                 onClick={() => setParts({ ...parts, dayOfWeek: day.value })}
                 className={`px-2 py-1 text-xs rounded ${parts.dayOfWeek === day.value ? 'bg-primary-500 text-white' : 'bg-[var(--color-card)] border border-[var(--color-border)]'}`}
               >
-                {t(day.label)}
+                {day.label}
               </button>
             ))}
           </div>
@@ -262,7 +285,7 @@ export default function CronGenerator({ lang: initialLang }: { lang?: Language }
         {/* Common Intervals */}
         <div className="space-y-2">
           <label className="text-sm font-medium text-[var(--color-text)]">
-            {t({ en: 'Minute Interval', pt: 'Minute Interval' })}
+            {t(tc.minuteInterval)}
           </label>
           <div className="flex flex-wrap gap-1">
             {['*', '0', '*/5', '*/10', '*/15', '*/30'].map((val) => (
@@ -271,7 +294,7 @@ export default function CronGenerator({ lang: initialLang }: { lang?: Language }
                 onClick={() => setParts({ ...parts, minute: val })}
                 className={`px-2 py-1 text-xs rounded ${parts.minute === val ? 'bg-primary-500 text-white' : 'bg-[var(--color-card)] border border-[var(--color-border)]'}`}
               >
-                {val === '*' ? t({ en: 'Every', pt: 'Every' }) : val}
+                {val === '*' ? t(tc.everyLabel) : val}
               </button>
             ))}
           </div>
@@ -281,13 +304,13 @@ export default function CronGenerator({ lang: initialLang }: { lang?: Language }
       {/* Reference */}
       <div className="p-4 rounded-lg bg-[var(--color-card)] border border-[var(--color-border)]">
         <h3 className="text-sm font-medium text-[var(--color-text)] mb-2">
-          {t({ en: 'Cron Syntax', pt: 'Cron Syntax' })}
+          {t(tc.cronSyntax)}
         </h3>
         <div className="text-xs text-[var(--color-text-muted)] space-y-1 font-mono">
-          <p><code>*</code> - {t({ en: 'any value', pt: 'any value' })}</p>
-          <p><code>,</code> - {t({ en: 'value separator (1,3,5)', pt: 'value separator (1,3,5)' })}</p>
-          <p><code>-</code> - {t({ en: 'range (1-5)', pt: 'range (1-5)' })}</p>
-          <p><code>/</code> - {t({ en: 'step (*/5 = every 5)', pt: 'step (*/5 = every 5)' })}</p>
+          <p><code>*</code> - {t(tc.anyValue)}</p>
+          <p><code>,</code> - {t(tc.valueSeparator)}</p>
+          <p><code>-</code> - {t(tc.rangeHint)}</p>
+          <p><code>/</code> - {t(tc.stepHint)}</p>
         </div>
       </div>
     </div>

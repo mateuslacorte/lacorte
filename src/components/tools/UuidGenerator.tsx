@@ -162,14 +162,14 @@ export default function UuidGenerator({ lang: initialLang }: { lang?: Language }
         >
           {copiedAll
             ? t(tc.copied)
-            : t({ en: 'Copy All', pt: 'Copy All' })}
+            : t(tt.copyAll)}
         </button>
       )}
 
       {/* Info */}
       <div className="p-4 rounded-lg bg-[var(--color-card)] border border-[var(--color-border)]">
         <p className="text-sm text-[var(--color-text-muted)]">
-          {t({ en: 'UUID v4 is randomly generated with an extremely low collision probability. Used for database IDs, session tokens, etc.', pt: 'UUID v4 is randomly generated with an extremely low collision probability. Used for database IDs, session tokens, etc.' })}
+          {t(tt.aboutNote)}
         </p>
       </div>
     </div>

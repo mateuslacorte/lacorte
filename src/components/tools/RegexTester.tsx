@@ -158,7 +158,7 @@ export default function RegexTester({ lang: initialLang }: { lang?: Language } =
       {/* Common Patterns */}
       <div className="space-y-2">
         <label className="text-sm text-[var(--color-text-muted)]">
-          {t({ en: 'Common Patterns', pt: 'Common Patterns' })}
+          {t(tt.commonPatterns)}
         </label>
         <div className="flex flex-wrap gap-2">
           {commonPatterns.map(({ name, pattern: p }) => (
@@ -189,7 +189,7 @@ export default function RegexTester({ lang: initialLang }: { lang?: Language } =
         <textarea
           value={testString}
           onChange={(e) => setTestString(e.target.value)}
-          placeholder={t({ en: 'Enter test string...', pt: 'Enter test string...' })}
+          placeholder={t(tt.testStringPlaceholder)}
           rows={4}
           className="w-full px-4 py-3 rounded-lg border border-[var(--color-border)]
             bg-[var(--color-card)] text-[var(--color-text)] resize-y
@@ -215,7 +215,7 @@ export default function RegexTester({ lang: initialLang }: { lang?: Language } =
       {matches.length > 0 && (
         <div className="space-y-2">
           <label className="block text-sm font-medium text-[var(--color-text)]">
-            {t({ en: 'Match Details', pt: 'Match Details' })}
+            {t(tt.matchDetails)}
           </label>
           <div className="max-h-60 overflow-y-auto space-y-2">
             {matches.map((match, index) => (

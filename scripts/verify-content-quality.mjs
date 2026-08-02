@@ -63,8 +63,16 @@ for (const trust of ['about', 'contact', 'privacy']) {
   if (/restato/i.test(text)) fail(`Restato reference in ${trust} page`);
 }
 
-if (!existsSync(join(ROOT, 'public/favicon.svg'))) {
-  fail('Missing public/favicon.svg');
+// Brand icons (IconKitchen web set) — layout metadata + redirects depend on these
+for (const asset of [
+  'public/favicon.ico',
+  'public/apple-touch-icon.png',
+  'public/icon-192.png',
+  'public/icon-512.png',
+]) {
+  if (!existsSync(join(ROOT, asset))) {
+    fail(`Missing ${asset}`);
+  }
 }
 
 if (errors.length) {

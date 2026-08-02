@@ -64,7 +64,8 @@ function getOffsetString(offset: number): string {
 }
 
 export default function WorldClock({ lang: initialLang }: { lang?: Language } = {}) {
-  const { t, lang } = useTranslation(initialLang);
+  const { t, lang, translations } = useTranslation(initialLang);
+  const tc = translations.tools.worldClock;
 
   // null until mount — avoid SSR/client clock mismatch (hydration can wipe html.dark).
   const [now, setNow] = useState<Date | null>(null);
@@ -168,7 +169,7 @@ export default function WorldClock({ lang: initialLang }: { lang?: Language } = 
       {/* Add Timezone */}
       <div className="space-y-2">
         <label className="text-sm font-medium text-[var(--color-text)]">
-          {t({ en: 'Add Timezone', pt: 'Add Timezone' })}
+          {t(tc.addTimezone)}
         </label>
         <div className="flex flex-wrap gap-2">
           {TIMEZONES.filter((z) => !selectedZones.includes(z.id)).map((zone) => (
@@ -187,13 +188,13 @@ export default function WorldClock({ lang: initialLang }: { lang?: Language } = 
       {/* Time Converter */}
       <div className="p-4 rounded-lg bg-[var(--color-card)] border border-[var(--color-border)] space-y-4">
         <h3 className="text-sm font-medium text-[var(--color-text)]">
-          {t({ en: 'Time Converter', pt: 'Time Converter' })}
+          {t(tc.timeConverter)}
         </h3>
 
         <div className="flex flex-wrap gap-4 items-end">
           <div className="space-y-1">
             <label className="text-xs text-[var(--color-text-muted)]">
-              {t({ en: 'Date', pt: 'Date' })}
+              {t(tc.date)}
             </label>
             <input
               type="date"
@@ -207,7 +208,7 @@ export default function WorldClock({ lang: initialLang }: { lang?: Language } = 
 
           <div className="space-y-1">
             <label className="text-xs text-[var(--color-text-muted)]">
-              {t({ en: 'Time', pt: 'Time' })}
+              {t(tc.time)}
             </label>
             <input
               type="time"
@@ -221,7 +222,7 @@ export default function WorldClock({ lang: initialLang }: { lang?: Language } = 
 
           <div className="space-y-1">
             <label className="text-xs text-[var(--color-text-muted)]">
-              {t({ en: 'Timezone', pt: 'Timezone' })}
+              {t(tc.timezone)}
             </label>
             <select
               value={inputZone}
@@ -243,7 +244,7 @@ export default function WorldClock({ lang: initialLang }: { lang?: Language } = 
             className="px-3 py-2 text-sm bg-primary-500 hover:bg-primary-600 text-white rounded-lg
               transition-colors"
           >
-            {t({ en: 'Now', pt: 'Now' })}
+            {t(tc.now)}
           </button>
         </div>
 

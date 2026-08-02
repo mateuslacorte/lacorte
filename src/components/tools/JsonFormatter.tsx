@@ -116,7 +116,7 @@ export default function JsonFormatter({ lang: initialLang }: { lang?: Language }
           className="px-4 py-2 bg-[var(--color-card)] hover:bg-[var(--color-card-hover)]
             border border-[var(--color-border)] rounded-lg transition-colors text-sm"
         >
-          {t({ en: 'Load Sample', pt: 'Load Sample' })}
+          {t(tt.loadSample)}
         </button>
 
         {/* Indent size */}

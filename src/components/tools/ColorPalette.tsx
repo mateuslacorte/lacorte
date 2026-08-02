@@ -280,7 +280,7 @@ export default function ColorPalette({ lang: initialLang }: { lang?: Language } 
           >
             {copiedColor === 'all'
               ? t(tc.copied)
-              : t({ en: 'Copy All Colors', pt: 'Copy All Colors' })}
+              : t(tt.copyAll)}
           </button>
         </div>
       </div>

@@ -144,7 +144,8 @@ async function parseExif(file: File): Promise<ExifData> {
 }
 
 export default function ExifViewer({ lang: initialLang }: { lang?: Language } = {}) {
-  const { t } = useTranslation(initialLang);
+  const { t, translations } = useTranslation(initialLang);
+  const tc = translations.tools.exif;
 
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [imageName, setImageName] = useState<string>('');
@@ -194,19 +195,19 @@ export default function ExifViewer({ lang: initialLang }: { lang?: Language } = 
       case 'ISO':
         return `ISO ${value}`;
       case 'Orientation':
-        const orientations: { [key: number]: string } = {
-          1: 'Normal',
-          2: 'Flipped horizontal',
-          3: 'Rotated 180°',
-          4: 'Flipped vertical',
-          5: 'Rotated 90° CW, flipped',
-          6: 'Rotated 90° CCW',
-          7: 'Rotated 90° CCW, flipped',
-          8: 'Rotated 90° CW',
+        const orientations: { [key: number]: { en: string; pt: string } } = {
+          1: tc.orientationNormal,
+          2: tc.orientationFlippedH,
+          3: tc.orientationRotated180,
+          4: tc.orientationFlippedV,
+          5: tc.orientationRotated90CwFlipped,
+          6: tc.orientationRotated90Ccw,
+          7: tc.orientationRotated90CcwFlipped,
+          8: tc.orientationRotated90Cw,
         };
-        return orientations[value as number] || String(value);
+        return orientations[value as number] ? t(orientations[value as number]) : String(value);
       case 'ResolutionUnit':
-        return value === 2 ? 'inches' : value === 3 ? 'centimeters' : String(value);
+        return value === 2 ? t(tc.unitInches) : value === 3 ? t(tc.unitCentimeters) : String(value);
       case 'XResolution':
       case 'YResolution':
         return `${value} dpi`;
@@ -217,40 +218,40 @@ export default function ExifViewer({ lang: initialLang }: { lang?: Language } = 
 
   const exifCategories = [
     {
-      name: t({ en: 'Camera Info', pt: 'Camera Info' }),
+      name: t(tc.cameraInfo),
       fields: ['Make', 'Model', 'Software'],
     },
     {
-      name: t({ en: 'Capture Settings', pt: 'Capture Settings' }),
+      name: t(tc.captureSettings),
       fields: ['ExposureTime', 'FNumber', 'ISO', 'FocalLength', 'FocalLengthIn35mmFilm'],
     },
     {
-      name: t({ en: 'Image Info', pt: 'Image Info' }),
+      name: t(tc.imageInfo),
       fields: ['ImageWidth', 'ImageHeight', 'Orientation', 'XResolution', 'YResolution', 'ResolutionUnit'],
     },
     {
-      name: t({ en: 'Date/Time', pt: 'Date/Time' }),
+      name: t(tc.dateTime),
       fields: ['DateTime', 'DateTimeOriginal'],
     },
   ];
 
   const fieldLabels: { [key: string]: { en: string; pt?: string } } = {
-    Make: { en: 'Make', pt: 'Make' },
-    Model: { en: 'Model', pt: 'Model' },
-    Software: { en: 'Software', pt: 'Software' },
-    ExposureTime: { en: 'Exposure Time', pt: 'Exposure Time' },
-    FNumber: { en: 'Aperture', pt: 'Aperture' },
-    ISO: { en: 'ISO', pt: 'ISO' },
-    FocalLength: { en: 'Focal Length', pt: 'Focal Length' },
-    FocalLengthIn35mmFilm: { en: '35mm Equivalent', pt: '35mm Equivalent' },
-    ImageWidth: { en: 'Width', pt: 'Width' },
-    ImageHeight: { en: 'Height', pt: 'Height' },
-    Orientation: { en: 'Orientation', pt: 'Orientation' },
-    XResolution: { en: 'X Resolution', pt: 'X Resolution' },
-    YResolution: { en: 'Y Resolution', pt: 'Y Resolution' },
-    ResolutionUnit: { en: 'Resolution Unit', pt: 'Resolution Unit' },
-    DateTime: { en: 'Modified', pt: 'Modified' },
-    DateTimeOriginal: { en: 'Date Taken', pt: 'Date Taken' },
+    Make: tc.fieldMake,
+    Model: tc.fieldModel,
+    Software: tc.fieldSoftware,
+    ExposureTime: tc.fieldExposureTime,
+    FNumber: tc.fieldAperture,
+    ISO: tc.fieldIso,
+    FocalLength: tc.fieldFocalLength,
+    FocalLengthIn35mmFilm: tc.field35mm,
+    ImageWidth: tc.fieldWidth,
+    ImageHeight: tc.fieldHeight,
+    Orientation: tc.fieldOrientation,
+    XResolution: tc.fieldXRes,
+    YResolution: tc.fieldYRes,
+    ResolutionUnit: tc.fieldResUnit,
+    DateTime: tc.fieldModified,
+    DateTimeOriginal: tc.fieldDateTaken,
   };
 
   return (
@@ -284,10 +285,10 @@ export default function ExifViewer({ lang: initialLang }: { lang?: Language } = 
           </svg>
           <div className="text-center">
             <p className="text-[var(--color-text)]">
-              {t({ en: 'Drag JPEG image or click to upload', pt: 'Drag JPEG image or click to upload' })}
+              {t(tc.dropzone)}
             </p>
             <p className="text-sm text-[var(--color-text-muted)] mt-1">
-              {t({ en: 'EXIF data is only extracted from JPEG files', pt: 'EXIF data is only extracted from JPEG files' })}
+              {t(tc.dropzoneHint)}
             </p>
           </div>
         </div>
@@ -298,7 +299,7 @@ export default function ExifViewer({ lang: initialLang }: { lang?: Language } = 
         <div className="flex items-center justify-center gap-2 p-8">
           <div className="w-5 h-5 border-2 border-primary-500 border-t-transparent rounded-full animate-spin" />
           <span className="text-[var(--color-text)]">
-            {t({ en: 'Analyzing...', pt: 'Analyzing...' })}
+            {t(tc.analyzing)}
           </span>
         </div>
       )}
@@ -321,7 +322,7 @@ export default function ExifViewer({ lang: initialLang }: { lang?: Language } = 
                 className="w-full mt-2 px-4 py-2 bg-[var(--color-card)] hover:bg-[var(--color-card-hover)]
                   border border-[var(--color-border)] rounded-lg transition-colors text-sm"
               >
-                {t({ en: 'Choose Another', pt: 'Choose Another' })}
+                {t(tc.chooseAnother)}
               </button>
             </div>
 
@@ -330,7 +331,7 @@ export default function ExifViewer({ lang: initialLang }: { lang?: Language } = 
               {exifData.error ? (
                 <div className="p-4 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800">
                   <p className="text-yellow-800 dark:text-yellow-200">
-                    {t({ en: 'No EXIF data found', pt: 'No EXIF data found' })}
+                    {t(tc.noData)}
                   </p>
                 </div>
               ) : (
@@ -370,7 +371,7 @@ export default function ExifViewer({ lang: initialLang }: { lang?: Language } = 
       {/* Info */}
       <div className="p-4 rounded-lg bg-[var(--color-card)] border border-[var(--color-border)]">
         <p className="text-sm text-[var(--color-text-muted)]">
-          {t({ en: 'EXIF (Exchangeable Image File Format) is metadata stored in images by digital cameras. It includes camera model, capture settings, date, and more.', pt: 'EXIF (Exchangeable Image File Format) is metadata stored in images by digital cameras. It includes camera model, capture settings, date, and more.' })}
+          {t(tc.aboutNote)}
         </p>
       </div>
     </div>

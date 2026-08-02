@@ -1,8 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslation } from '../../i18n/useTranslation';
+import type { Language } from '../../i18n';
 
-export default function DiscountCalculator() {
+export default function DiscountCalculator({ lang: initialLang }: { lang?: Language } = {}) {
+  const { t, translations } = useTranslation(initialLang);
+  const tc = translations.tools.discount;
+
   const [originalPrice, setOriginalPrice] = useState('');
   const [discountPercent, setDiscountPercent] = useState('');
   const [finalPrice, setFinalPrice] = useState('');
@@ -30,7 +35,7 @@ export default function DiscountCalculator() {
       {/* Original Price */}
       <div className="space-y-2">
         <label className="block text-sm font-medium text-[var(--color-text)]">
-          Original price
+          {t(tc.originalPrice)}
         </label>
         <div className="relative">
           <input
@@ -51,7 +56,7 @@ export default function DiscountCalculator() {
       {/* Discount Percent */}
       <div className="space-y-2">
         <label className="block text-sm font-medium text-[var(--color-text)]">
-          Discount rate
+          {t(tc.discountRate)}
         </label>
         <div className="relative">
           <input
@@ -94,7 +99,7 @@ export default function DiscountCalculator() {
           <div className="grid grid-cols-2 gap-4">
             {/* Saved Amount */}
             <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/20">
-              <p className="text-sm text-[var(--color-text-muted)] mb-1">Discount amount</p>
+              <p className="text-sm text-[var(--color-text-muted)] mb-1">{t(tc.discountAmount)}</p>
               <p className="text-2xl font-bold text-red-500">
                 -${savedAmount}
               </p>
@@ -102,7 +107,7 @@ export default function DiscountCalculator() {
 
             {/* Final Price */}
             <div className="p-4 rounded-lg bg-green-500/10 border border-green-500/20">
-              <p className="text-sm text-[var(--color-text-muted)] mb-1">Final price</p>
+              <p className="text-sm text-[var(--color-text-muted)] mb-1">{t(tc.finalPrice)}</p>
               <p className="text-2xl font-bold text-green-500">
                 ${finalPrice}
               </p>
@@ -112,7 +117,7 @@ export default function DiscountCalculator() {
           {/* Visual Comparison */}
           <div className="p-4 rounded-lg bg-[var(--color-card)] border border-[var(--color-border)]">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-[var(--color-text-muted)]">Original price</span>
+              <span className="text-sm text-[var(--color-text-muted)]">{t(tc.originalPrice)}</span>
               <span className="text-[var(--color-text)] line-through">
                 ${parseFloat(originalPrice).toLocaleString('en-US')}
               </span>
@@ -125,7 +130,7 @@ export default function DiscountCalculator() {
             </div>
             <div className="flex items-center justify-between mt-2">
               <span className="text-sm text-[var(--color-text-muted)]">
-                {discountPercent}% discount applied
+                {discountPercent}% {t({ en: 'discount applied', pt: 'de desconto aplicado' })}
               </span>
               <span className="text-green-500 font-bold">${finalPrice}</span>
             </div>
@@ -135,13 +140,13 @@ export default function DiscountCalculator() {
 
       {/* Common Discount Scenarios */}
       <div className="p-4 rounded-lg bg-[var(--color-card)] border border-[var(--color-border)]">
-        <h3 className="font-medium text-[var(--color-text)] mb-3">💡 Common discounts</h3>
+        <h3 className="font-medium text-[var(--color-text)] mb-3">💡 {t({ en: 'Common discounts', pt: 'Descontos comuns' })}</h3>
         <div className="grid grid-cols-2 gap-2 text-sm">
           {[
-            { label: 'Buy one get one', discount: 50 },
-            { label: 'Half off', discount: 50 },
-            { label: 'Black Friday sale', discount: 70 },
-            { label: 'New member offer', discount: 10 },
+            { label: t({ en: 'Buy one get one', pt: 'Compre um, leve outro' }), discount: 50 },
+            { label: t({ en: 'Half off', pt: 'Meio a meio' }), discount: 50 },
+            { label: t({ en: 'Black Friday sale', pt: 'Promoção Black Friday' }), discount: 70 },
+            { label: t({ en: 'New member offer', pt: 'Oferta para novos membros' }), discount: 10 },
           ].map((item) => (
             <button
               key={item.label}

@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useRef } from 'react';
+import { useTranslation } from '../../i18n/useTranslation';
+import type { Language } from '../../i18n';
 
 interface ExifData {
   // Basic
@@ -319,7 +321,10 @@ function detectDevice(make?: string, model?: string): { brand: string; icon: str
   return { brand: 'Unknown', icon: '❓', type: 'Unknown' };
 }
 
-export default function ImageMetadataViewer() {
+export default function ImageMetadataViewer({ lang: initialLang }: { lang?: Language } = {}) {
+  const { t, translations } = useTranslation(initialLang);
+  const tc = translations.tools.imageMetadata;
+
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [exifData, setExifData] = useState<ExifData | null>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -372,35 +377,35 @@ export default function ImageMetadataViewer() {
   const device = exifData ? detectDevice(exifData.make, exifData.model) : null;
 
   const exposurePrograms: { [key: number]: string } = {
-    0: 'Not defined',
-    1: 'Manual',
-    2: 'Program AE',
-    3: 'Aperture priority (A/Av)',
-    4: 'Shutter priority (S/Tv)',
-    5: 'Creative',
-    6: 'Action',
-    7: 'Portrait',
-    8: 'Landscape',
+    0: t(tc.expNotDefined),
+    1: t(tc.expManual),
+    2: t(tc.expProgramAe),
+    3: t(tc.expAperturePriority),
+    4: t(tc.expShutterPriority),
+    5: t(tc.expCreative),
+    6: t(tc.expAction),
+    7: t(tc.expPortrait),
+    8: t(tc.expLandscape),
   };
 
   const meteringModes: { [key: number]: string } = {
-    0: 'Unknown',
-    1: 'Average',
-    2: 'Center-weighted',
-    3: 'Spot',
-    4: 'Multi-spot',
-    5: 'Pattern',
-    6: 'Partial',
+    0: t(tc.meterUnknown),
+    1: t(tc.meterAverage),
+    2: t(tc.meterCenterWeighted),
+    3: t(tc.meterSpot),
+    4: t(tc.meterMultiSpot),
+    5: t(tc.meterPattern),
+    6: t(tc.meterPartial),
   };
 
   const flashModes: { [key: number]: string } = {
-    0: 'Flash did not fire',
-    1: 'Flash fired',
-    5: 'Flash fired (no strobe return detected)',
-    7: 'Flash fired (strobe return detected)',
-    16: 'Flash did not fire (forced)',
-    24: 'Flash did not fire (auto)',
-    25: 'Flash fired (auto)',
+    0: t(tc.flashDidNotFire),
+    1: t(tc.flashFired),
+    5: t(tc.flashFiredNoStrobeReturn),
+    7: t(tc.flashFiredStrobeReturn),
+    16: t(tc.flashDidNotFireForced),
+    24: t(tc.flashDidNotFireAuto),
+    25: t(tc.flashFiredAuto),
   };
 
   return (
@@ -433,10 +438,10 @@ export default function ImageMetadataViewer() {
           </svg>
           <div className="text-center">
             <p className="text-[var(--color-text)]">
-              Drag and drop an image or click to upload
+              {t(tc.dropzone)}
             </p>
             <p className="text-sm text-[var(--color-text-muted)] mt-1">
-              Supports JPEG, PNG, HEIC, and other image formats
+              {t(tc.dropzoneHint)}
             </p>
           </div>
         </div>
@@ -446,7 +451,7 @@ export default function ImageMetadataViewer() {
       {isLoading && (
         <div className="flex items-center justify-center gap-2 p-8">
           <div className="w-5 h-5 border-2 border-primary-500 border-t-transparent rounded-full animate-spin" />
-          <span className="text-[var(--color-text)]">Analyzing...</span>
+          <span className="text-[var(--color-text)]">{t(tc.analyzing)}</span>
         </div>
       )}
 
@@ -463,13 +468,13 @@ export default function ImageMetadataViewer() {
                     {device.brand} {device.type}
                   </h3>
                   <p className="text-sm text-[var(--color-text-muted)]">
-                    {exifData.model || 'No model info'}
+                    {exifData.model || t(tc.noModelInfo)}
                   </p>
                 </div>
                 {exifData.gpsLatitude && exifData.gpsLongitude && (
                   <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-green-500/10 text-green-600 dark:text-green-400">
                     <span>📍</span>
-                    <span className="text-sm font-medium">Location available</span>
+                    <span className="text-sm font-medium">{t(tc.locationAvailable)}</span>
                   </div>
                 )}
               </div>
@@ -493,7 +498,7 @@ export default function ImageMetadataViewer() {
                 className="w-full mt-2 px-4 py-2 bg-[var(--color-card)] hover:bg-[var(--color-card-hover)]
                   border border-[var(--color-border)] rounded-lg transition-colors text-sm"
               >
-                Choose another image
+                {t(tc.chooseAnother)}
               </button>
             </div>
 
@@ -502,10 +507,10 @@ export default function ImageMetadataViewer() {
               {/* Tabs */}
               <div className="flex gap-2 border-b border-[var(--color-border)] pb-2">
                 {[
-                  { id: 'basic', label: '📋 Basic' },
-                  { id: 'camera', label: '📷 Camera' },
-                  { id: 'gps', label: '📍 Location' },
-                  { id: 'all', label: '📑 All' },
+                  { id: 'basic', label: t(tc.tabBasic) },
+                  { id: 'camera', label: t(tc.tabCamera) },
+                  { id: 'gps', label: t(tc.tabGps) },
+                  { id: 'all', label: t(tc.tabAll) },
                 ].map((tab) => (
                   <button
                     key={tab.id}
@@ -527,14 +532,14 @@ export default function ImageMetadataViewer() {
                 {(activeTab === 'basic' || activeTab === 'all') && (
                   <div className="rounded-lg border border-[var(--color-border)] overflow-hidden">
                     <div className="px-4 py-2 bg-[var(--color-card)] border-b border-[var(--color-border)]">
-                      <h3 className="font-medium text-[var(--color-text)]">📋 File info</h3>
+                      <h3 className="font-medium text-[var(--color-text)]">{t(tc.fileInfo)}</h3>
                     </div>
                     <div className="divide-y divide-[var(--color-border)]">
-                      <Row label="File name" value={exifData.fileName} />
-                      <Row label="File size" value={exifData.fileSize ? formatFileSize(exifData.fileSize) : undefined} />
-                      <Row label="File type" value={exifData.fileType} />
-                      <Row label="Resolution" value={exifData.width && exifData.height ? `${exifData.width} × ${exifData.height}` : undefined} />
-                      <Row label="Date taken" value={exifData.dateTimeOriginal || exifData.dateTime} />
+                      <Row label={t(tc.fileName)} value={exifData.fileName} />
+                      <Row label={t(tc.fileSize)} value={exifData.fileSize ? formatFileSize(exifData.fileSize) : undefined} />
+                      <Row label={t(tc.fileType)} value={exifData.fileType} />
+                      <Row label={t(tc.resolution)} value={exifData.width && exifData.height ? `${exifData.width} × ${exifData.height}` : undefined} />
+                      <Row label={t(tc.dateTaken)} value={exifData.dateTimeOriginal || exifData.dateTime} />
                     </div>
                   </div>
                 )}
@@ -544,36 +549,36 @@ export default function ImageMetadataViewer() {
                   <>
                     <div className="rounded-lg border border-[var(--color-border)] overflow-hidden">
                       <div className="px-4 py-2 bg-[var(--color-card)] border-b border-[var(--color-border)]">
-                        <h3 className="font-medium text-[var(--color-text)]">📷 Camera/device info</h3>
+                        <h3 className="font-medium text-[var(--color-text)]">{t(tc.cameraInfo)}</h3>
                       </div>
                       <div className="divide-y divide-[var(--color-border)]">
-                        <Row label="Manufacturer" value={exifData.make} />
-                        <Row label="Model" value={exifData.model} />
-                        <Row label="Software" value={exifData.software} />
-                        <Row label="Lens" value={exifData.lensModel} />
+                        <Row label={t(tc.manufacturer)} value={exifData.make} />
+                        <Row label={t(tc.model)} value={exifData.model} />
+                        <Row label={t(tc.software)} value={exifData.software} />
+                        <Row label={t(tc.lens)} value={exifData.lensModel} />
                       </div>
                     </div>
 
                     <div className="rounded-lg border border-[var(--color-border)] overflow-hidden">
                       <div className="px-4 py-2 bg-[var(--color-card)] border-b border-[var(--color-border)]">
-                        <h3 className="font-medium text-[var(--color-text)]">⚙️ Capture settings</h3>
+                        <h3 className="font-medium text-[var(--color-text)]">{t(tc.captureSettings)}</h3>
                       </div>
                       <div className="divide-y divide-[var(--color-border)]">
                         <Row
-                          label="Exposure time"
+                          label={t(tc.exposureTime)}
                           value={exifData.exposureTime
                             ? exifData.exposureTime >= 1
                               ? `${exifData.exposureTime}s`
                               : `1/${Math.round(1 / exifData.exposureTime)}s`
                             : undefined}
                         />
-                        <Row label="Aperture" value={exifData.fNumber ? `f/${exifData.fNumber}` : undefined} />
-                        <Row label="ISO" value={exifData.iso ? `ISO ${exifData.iso}` : undefined} />
-                        <Row label="Focal length" value={exifData.focalLength ? `${exifData.focalLength}mm` : undefined} />
-                        <Row label="35mm equivalent" value={exifData.focalLength35mm ? `${exifData.focalLength35mm}mm` : undefined} />
-                        <Row label="Exposure program" value={exifData.exposureProgram !== undefined ? exposurePrograms[exifData.exposureProgram] : undefined} />
-                        <Row label="Metering mode" value={exifData.meteringMode !== undefined ? meteringModes[exifData.meteringMode] : undefined} />
-                        <Row label="Flash" value={exifData.flash !== undefined ? flashModes[exifData.flash] || `Flash code: ${exifData.flash}` : undefined} />
+                        <Row label={t(tc.aperture)} value={exifData.fNumber ? `f/${exifData.fNumber}` : undefined} />
+                        <Row label={t(tc.iso)} value={exifData.iso ? `ISO ${exifData.iso}` : undefined} />
+                        <Row label={t(tc.focalLength)} value={exifData.focalLength ? `${exifData.focalLength}mm` : undefined} />
+                        <Row label={t(tc.focalLength35mm)} value={exifData.focalLength35mm ? `${exifData.focalLength35mm}mm` : undefined} />
+                        <Row label={t(tc.exposureProgramLabel)} value={exifData.exposureProgram !== undefined ? exposurePrograms[exifData.exposureProgram] : undefined} />
+                        <Row label={t(tc.meteringModeLabel)} value={exifData.meteringMode !== undefined ? meteringModes[exifData.meteringMode] : undefined} />
+                        <Row label={t(tc.flashLabel)} value={exifData.flash !== undefined ? flashModes[exifData.flash] || `${t(tc.flashCode)}: ${exifData.flash}` : undefined} />
                       </div>
                     </div>
                   </>
@@ -583,14 +588,14 @@ export default function ImageMetadataViewer() {
                 {(activeTab === 'gps' || activeTab === 'all') && (
                   <div className="rounded-lg border border-[var(--color-border)] overflow-hidden">
                     <div className="px-4 py-2 bg-[var(--color-card)] border-b border-[var(--color-border)]">
-                      <h3 className="font-medium text-[var(--color-text)]">📍 Location info</h3>
+                      <h3 className="font-medium text-[var(--color-text)]">{t(tc.locationInfo)}</h3>
                     </div>
                     {exifData.gpsLatitude && exifData.gpsLongitude ? (
                       <div className="p-4 space-y-4">
                         <div className="divide-y divide-[var(--color-border)] -mx-4 -mt-4 border-b border-[var(--color-border)]">
-                          <Row label="Latitude" value={`${exifData.gpsLatitude.toFixed(6)}°`} />
-                          <Row label="Longitude" value={`${exifData.gpsLongitude.toFixed(6)}°`} />
-                          {exifData.gpsAltitude && <Row label="Altitude" value={`${exifData.gpsAltitude.toFixed(1)}m`} />}
+                          <Row label={t(tc.latitude)} value={`${exifData.gpsLatitude.toFixed(6)}°`} />
+                          <Row label={t(tc.longitude)} value={`${exifData.gpsLongitude.toFixed(6)}°`} />
+                          {exifData.gpsAltitude && <Row label={t(tc.altitude)} value={`${exifData.gpsAltitude.toFixed(1)}m`} />}
                         </div>
                         <div className="flex gap-2">
                           <a
@@ -599,7 +604,7 @@ export default function ImageMetadataViewer() {
                             rel="noopener noreferrer"
                             className="flex-1 px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg text-center text-sm font-medium transition-colors"
                           >
-                            View on Google Maps
+                            {t(tc.viewGoogleMaps)}
                           </a>
                           <a
                             href={`https://www.openstreetmap.org/?mlat=${exifData.gpsLatitude}&mlon=${exifData.gpsLongitude}#map=15/${exifData.gpsLatitude}/${exifData.gpsLongitude}`}
@@ -607,17 +612,16 @@ export default function ImageMetadataViewer() {
                             rel="noopener noreferrer"
                             className="flex-1 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg text-center text-sm font-medium transition-colors"
                           >
-                            View on OpenStreetMap
+                            {t(tc.viewOsm)}
                           </a>
                         </div>
                       </div>
                     ) : (
                       <div className="p-8 text-center text-[var(--color-text-muted)]">
                         <span className="text-4xl mb-2 block">📍</span>
-                        <p>No location information</p>
+                        <p>{t(tc.noLocation)}</p>
                         <p className="text-sm mt-1">
-                          The photo may not include GPS data,<br />
-                          or it may have been removed for privacy.
+                          {t(tc.noLocationHint)}
                         </p>
                       </div>
                     )}
@@ -633,10 +637,9 @@ export default function ImageMetadataViewer() {
               <div className="flex items-start gap-3">
                 <span className="text-xl">⚠️</span>
                 <div>
-                  <h4 className="font-medium text-yellow-800 dark:text-yellow-200">Privacy notice</h4>
+                  <h4 className="font-medium text-yellow-800 dark:text-yellow-200">{t(tc.privacyNotice)}</h4>
                   <p className="text-sm text-yellow-700 dark:text-yellow-300 mt-1">
-                    This photo includes location information from when it was taken.
-                    We recommend removing location data before uploading to social media or the web.
+                    {t(tc.privacyNoticeText)}
                   </p>
                 </div>
               </div>
@@ -647,12 +650,12 @@ export default function ImageMetadataViewer() {
 
       {/* Info */}
       <div className="p-4 rounded-lg bg-[var(--color-card)] border border-[var(--color-border)]">
-        <h3 className="font-medium text-[var(--color-text)] mb-2">💡 What you can inspect</h3>
+        <h3 className="font-medium text-[var(--color-text)] mb-2">{t(tc.tipsTitle)}</h3>
         <ul className="text-sm text-[var(--color-text-muted)] space-y-1">
-          <li>• <strong>Device info:</strong> Auto-detect iPhone, Galaxy, DSLR, and other capture devices</li>
-          <li>• <strong>Capture settings:</strong> Aperture, shutter speed, ISO, focal length, and more</li>
-          <li>• <strong>Location info:</strong> GPS coordinates and map links (when included)</li>
-          <li>• <strong>Date/time:</strong> When the photo was taken</li>
+          <li>• {t(tc.tipDevice)}</li>
+          <li>• {t(tc.tipCapture)}</li>
+          <li>• {t(tc.tipLocation)}</li>
+          <li>• {t(tc.tipDate)}</li>
         </ul>
       </div>
     </div>

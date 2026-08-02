@@ -1,7 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import Link from 'next/link';
 import { useTranslation } from '../../i18n/useTranslation';
+import { localizePath } from '@/i18n/urlUtils';
 import type { Language } from '../../i18n';
 
 interface Tool {
@@ -24,37 +26,34 @@ interface ToolsGridProps {
 }
 
 export default function ToolsGrid({ tools, categories, lang: routeLang }: ToolsGridProps) {
-  const { t, lang } = useTranslation(routeLang);
+  const { t, lang, translations } = useTranslation(routeLang);
+  const tp = translations.tools.toolsPage;
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const filteredTools =
+    selectedCategory === 'all'
+      ? tools
+      : tools.filter((tool) => tool.category === selectedCategory);
 
-  const filteredTools = selectedCategory === 'all'
-    ? tools
-    : tools.filter(tool => tool.category === selectedCategory);
+  const getLocalizedText = (obj: { en: string; pt?: string }) => obj[lang] || obj.en;
 
-  // Use English during SSR
-  const currentLang = routeLang ?? (mounted ? lang : 'en');
-
-  const getLocalizedText = (obj: { en: string; pt?: string }) => {
-    return obj[currentLang as Language] || obj.en;
+  const hrefFor = (slug: string) => {
+    if (slug.startsWith('/')) return localizePath(slug, lang);
+    return localizePath(`/tools/${slug}`, lang);
   };
 
   return (
     <div>
-      {/* Category Filters */}
       <div className="flex flex-wrap gap-2 mb-8">
         {categories.map((category) => (
           <button
             key={category.id}
             onClick={() => setSelectedCategory(category.id)}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors
-              ${selectedCategory === category.id
-                ? 'bg-primary-500 text-white'
-                : 'bg-[var(--color-card)] hover:bg-[var(--color-card-hover)] text-[var(--color-text)] border border-[var(--color-border)]'
+              ${
+                selectedCategory === category.id
+                  ? 'bg-primary-500 text-white'
+                  : 'bg-[var(--color-card)] hover:bg-[var(--color-card-hover)] text-[var(--color-text)] border border-[var(--color-border)]'
               }`}
           >
             {getLocalizedText(category.label)}
@@ -62,12 +61,11 @@ export default function ToolsGrid({ tools, categories, lang: routeLang }: ToolsG
         ))}
       </div>
 
-      {/* Tools Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {filteredTools.map((tool) => (
-          <a
+          <Link
             key={tool.slug}
-            href={tool.slug.startsWith('/') ? tool.slug : `/tools/${tool.slug}`}
+            href={hrefFor(tool.slug)}
             className="group p-6 rounded-xl bg-[var(--color-card)] border border-[var(--color-border)]
               hover:border-primary-500 hover:shadow-lg transition-all"
           >
@@ -81,19 +79,23 @@ export default function ToolsGrid({ tools, categories, lang: routeLang }: ToolsG
                   {getLocalizedText(tool.description)}
                 </p>
               </div>
-              <svg className="w-5 h-5 text-[var(--color-text-muted)] group-hover:text-primary-500 transition-colors flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg
+                className="w-5 h-5 text-[var(--color-text-muted)] group-hover:text-primary-500 transition-colors flex-shrink-0"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </div>
-          </a>
+          </Link>
         ))}
       </div>
 
-      {/* Tool Count */}
       <div className="mt-8 text-center text-[var(--color-text-muted)]">
-        {t({ en: 'Total', pt: 'Total' })}{' '}
+        {t(tp.totalPrefix)}{' '}
         <span className="font-bold text-[var(--color-text)]">{filteredTools.length}</span>
-        {t({ en: ' tools available.', pt: ' tools available.' })}
+        {t(tp.totalSuffix)}
       </div>
     </div>
   );

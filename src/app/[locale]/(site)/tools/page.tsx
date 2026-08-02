@@ -28,16 +28,18 @@ export async function generateMetadata({ params }: ToolsPageProps): Promise<Meta
   };
 }
 
-export default function ToolsPage() {
+export default async function ToolsPage({ params }: ToolsPageProps) {
+  const lang = parseLocale((await params).locale);
+
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
-      <ToolsPageHeader />
+      <ToolsPageHeader lang={lang} />
       <div className="mb-6">
-        <ToolSearch />
+        <ToolSearch lang={lang} />
       </div>
-      <RecentTools className="mb-8" />
-      <ToolsGrid tools={toolsGridItemsWithChat} categories={toolCategories} />
-      <ToolsPageInfo />
+      <RecentTools className="mb-8" lang={lang} />
+      <ToolsGrid tools={toolsGridItemsWithChat} categories={toolCategories} lang={lang} />
+      <ToolsPageInfo lang={lang} />
     </div>
   );
 }

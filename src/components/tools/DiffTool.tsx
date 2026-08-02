@@ -85,7 +85,9 @@ function getDiffStats(diff: DiffLine[]): { additions: number; deletions: number;
 }
 
 export default function DiffTool({ lang: initialLang }: { lang?: Language } = {}) {
-  const { t } = useTranslation(initialLang);
+  const { t, translations } = useTranslation(initialLang);
+  const tc = translations.tools.diff;
+  const common = translations.tools.common;
 
   const [text1, setText1] = useState('');
   const [text2, setText2] = useState('');
@@ -145,21 +147,21 @@ const name = "Universe";`);
           className="px-3 py-1.5 text-sm bg-[var(--color-card)] hover:bg-[var(--color-card-hover)]
             border border-[var(--color-border)] rounded-lg transition-colors"
         >
-          {t({ en: 'Load Example', pt: 'Load Example' })}
+          {t(common.loadExample)}
         </button>
         <button
           onClick={swapTexts}
           className="px-3 py-1.5 text-sm bg-[var(--color-card)] hover:bg-[var(--color-card-hover)]
             border border-[var(--color-border)] rounded-lg transition-colors"
         >
-          {t({ en: 'Swap', pt: 'Swap' })}
+          {t(tc.swap)}
         </button>
         <button
           onClick={clearAll}
           className="px-3 py-1.5 text-sm bg-[var(--color-card)] hover:bg-[var(--color-card-hover)]
             border border-[var(--color-border)] rounded-lg transition-colors"
         >
-          {t({ en: 'Clear', pt: 'Clear' })}
+          {t(common.clear)}
         </button>
 
         <div className="flex-1" />
@@ -172,7 +174,7 @@ const name = "Universe";`);
             className="w-4 h-4 rounded text-primary-500"
           />
           <span className="text-sm text-[var(--color-text)]">
-            {t({ en: 'Line numbers', pt: 'Line numbers' })}
+            {t(tc.lineNumbers)}
           </span>
         </label>
         <label className="flex items-center gap-2 cursor-pointer">
@@ -183,7 +185,7 @@ const name = "Universe";`);
             className="w-4 h-4 rounded text-primary-500"
           />
           <span className="text-sm text-[var(--color-text)]">
-            {t({ en: 'Ignore whitespace', pt: 'Ignore whitespace' })}
+            {t(tc.ignoreWhitespace)}
           </span>
         </label>
       </div>
@@ -192,12 +194,12 @@ const name = "Universe";`);
       <div className="grid md:grid-cols-2 gap-4">
         <div className="space-y-2">
           <label className="text-sm font-medium text-[var(--color-text)]">
-            {t({ en: 'Original Text', pt: 'Original Text' })}
+            {t(tc.originalText)}
           </label>
           <textarea
             value={text1}
             onChange={(e) => setText1(e.target.value)}
-            placeholder={t({ en: 'Enter original text...', pt: 'Enter original text...' })}
+            placeholder={t(tc.originalPlaceholder)}
             rows={10}
             className="w-full px-4 py-3 rounded-lg border border-[var(--color-border)]
               bg-[var(--color-card)] text-[var(--color-text)] font-mono text-sm resize-y
@@ -207,12 +209,12 @@ const name = "Universe";`);
         </div>
         <div className="space-y-2">
           <label className="text-sm font-medium text-[var(--color-text)]">
-            {t({ en: 'Changed Text', pt: 'Changed Text' })}
+            {t(tc.changedText)}
           </label>
           <textarea
             value={text2}
             onChange={(e) => setText2(e.target.value)}
-            placeholder={t({ en: 'Enter changed text...', pt: 'Enter changed text...' })}
+            placeholder={t(tc.changedPlaceholder)}
             rows={10}
             className="w-full px-4 py-3 rounded-lg border border-[var(--color-border)]
               bg-[var(--color-card)] text-[var(--color-text)] font-mono text-sm resize-y
@@ -226,13 +228,13 @@ const name = "Universe";`);
       {(text1 || text2) && (
         <div className="flex gap-4 justify-center">
           <span className="px-3 py-1 rounded bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 text-sm">
-            +{stats.additions} {t({ en: 'additions', pt: 'additions' })}
+            +{stats.additions} {t(tc.additions)}
           </span>
           <span className="px-3 py-1 rounded bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 text-sm">
-            -{stats.deletions} {t({ en: 'deletions', pt: 'deletions' })}
+            -{stats.deletions} {t(tc.deletions)}
           </span>
           <span className="px-3 py-1 rounded bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm">
-            {stats.unchanged} {t({ en: 'unchanged', pt: 'unchanged' })}
+            {stats.unchanged} {t(tc.unchanged)}
           </span>
         </div>
       )}
@@ -241,7 +243,7 @@ const name = "Universe";`);
       {diff.length > 0 && (text1 || text2) && (
         <div className="space-y-2">
           <label className="text-sm font-medium text-[var(--color-text)]">
-            {t({ en: 'Differences', pt: 'Differences' })}
+            {t(tc.differences)}
           </label>
           <div className="rounded-lg border border-[var(--color-border)] overflow-hidden bg-[var(--color-bg)]">
             <div className="overflow-x-auto">
@@ -300,7 +302,7 @@ const name = "Universe";`);
       {/* Info */}
       <div className="p-4 rounded-lg bg-[var(--color-card)] border border-[var(--color-border)]">
         <p className="text-sm text-[var(--color-text-muted)]">
-          {t({ en: 'Compare two texts and visually show differences. Useful for code review, document comparison, etc.', pt: 'Compare two texts and visually show differences. Useful for code review, document comparison, etc.' })}
+          {t(tc.aboutNote)}
         </p>
       </div>
     </div>

@@ -57,7 +57,9 @@ function isExpired(exp: number): boolean {
 }
 
 export default function JwtDecoder({ lang: initialLang }: { lang?: Language } = {}) {
-  const { t } = useTranslation(initialLang);
+  const { t, translations } = useTranslation(initialLang);
+  const tc = translations.tools.jwt;
+  const common = translations.tools.common;
 
   const [token, setToken] = useState('');
   const [copiedPart, setCopiedPart] = useState<string | null>(null);
@@ -108,14 +110,14 @@ export default function JwtDecoder({ lang: initialLang }: { lang?: Language } = 
       <div className="space-y-2">
         <div className="flex justify-between items-center">
           <label className="block text-sm font-medium text-[var(--color-text)]">
-            {t({ en: 'JWT Token', pt: 'JWT Token' })}
+            {t(tc.tokenLabel)}
           </label>
           <button
             onClick={loadExample}
             className="px-3 py-1 text-xs bg-[var(--color-card)] hover:bg-[var(--color-card-hover)]
               border border-[var(--color-border)] rounded transition-colors"
           >
-            {t({ en: 'Load Example', pt: 'Load Example' })}
+            {t(common.loadExample)}
           </button>
         </div>
         <textarea
@@ -143,13 +145,13 @@ export default function JwtDecoder({ lang: initialLang }: { lang?: Language } = 
           <div className="rounded-lg border border-[var(--color-border)] overflow-hidden">
             <div className="flex justify-between items-center px-4 py-2 bg-red-100 dark:bg-red-900/30">
               <span className="font-medium text-red-700 dark:text-red-300">
-                {t({ en: 'Header', pt: 'Header' })} (ALGORITHM & TOKEN TYPE)
+                {t(tc.header)} (ALGORITHM & TOKEN TYPE)
               </span>
               <button
                 onClick={() => copyToClipboard(JSON.stringify(decoded.header, null, 2), 'header')}
                 className="px-2 py-1 text-xs bg-white/50 dark:bg-black/20 rounded"
               >
-                {copiedPart === 'header' ? t({ en: 'Copied!', pt: 'Copied!' }) : t({ en: 'Copy', pt: 'Copy' })}
+                {copiedPart === 'header' ? t(common.copied) : t(common.copy)}
               </button>
             </div>
             <div className="p-4 bg-[var(--color-card)]">
@@ -170,13 +172,13 @@ export default function JwtDecoder({ lang: initialLang }: { lang?: Language } = 
           <div className="rounded-lg border border-[var(--color-border)] overflow-hidden">
             <div className="flex justify-between items-center px-4 py-2 bg-purple-100 dark:bg-purple-900/30">
               <span className="font-medium text-purple-700 dark:text-purple-300">
-                {t({ en: 'Payload', pt: 'Payload' })} (DATA)
+                {t(tc.payload)} (DATA)
               </span>
               <button
                 onClick={() => copyToClipboard(JSON.stringify(decoded.payload, null, 2), 'payload')}
                 className="px-2 py-1 text-xs bg-white/50 dark:bg-black/20 rounded"
               >
-                {copiedPart === 'payload' ? t({ en: 'Copied!', pt: 'Copied!' }) : t({ en: 'Copy', pt: 'Copy' })}
+                {copiedPart === 'payload' ? t(common.copied) : t(common.copy)}
               </button>
             </div>
             <div className="p-4 bg-[var(--color-card)]">
@@ -197,13 +199,13 @@ export default function JwtDecoder({ lang: initialLang }: { lang?: Language } = 
           <div className="rounded-lg border border-[var(--color-border)] overflow-hidden">
             <div className="flex justify-between items-center px-4 py-2 bg-cyan-100 dark:bg-cyan-900/30">
               <span className="font-medium text-cyan-700 dark:text-cyan-300">
-                {t({ en: 'Signature', pt: 'Signature' })} (VERIFY SIGNATURE)
+                {t(tc.signature)} (VERIFY SIGNATURE)
               </span>
               <button
                 onClick={() => copyToClipboard(decoded.signature, 'signature')}
                 className="px-2 py-1 text-xs bg-white/50 dark:bg-black/20 rounded"
               >
-                {copiedPart === 'signature' ? t({ en: 'Copied!', pt: 'Copied!' }) : t({ en: 'Copy', pt: 'Copy' })}
+                {copiedPart === 'signature' ? t(common.copied) : t(common.copy)}
               </button>
             </div>
             <div className="p-4 bg-[var(--color-card)]">
@@ -218,14 +220,14 @@ export default function JwtDecoder({ lang: initialLang }: { lang?: Language } = 
       {/* Info */}
       <div className="p-4 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800">
         <p className="text-sm text-yellow-800 dark:text-yellow-200">
-          {t({ en: '⚠️ This tool only decodes JWT. Signature verification is not performed. Use with caution for sensitive tokens.', pt: '⚠️ This tool only decodes JWT. Signature verification is not performed. Use with caution for sensitive tokens.' })}
+          {t(tc.warningNote)}
         </p>
       </div>
 
       {/* Common Claims Reference */}
       <div className="p-4 rounded-lg bg-[var(--color-card)] border border-[var(--color-border)]">
         <h3 className="text-sm font-medium text-[var(--color-text)] mb-2">
-          {t({ en: 'Common Claims', pt: 'Common Claims' })}
+          {t(tc.commonClaims)}
         </h3>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs text-[var(--color-text-muted)]">
           <span><code>iss</code> - Issuer</span>

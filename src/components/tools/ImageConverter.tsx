@@ -21,7 +21,9 @@ interface ConvertedImage {
 type OutputFormat = 'jpeg' | 'png' | 'webp';
 
 export default function ImageConverter({ lang: initialLang }: { lang?: Language } = {}) {
-  const { t } = useTranslation(initialLang);
+  const { t, translations } = useTranslation(initialLang);
+  const tc = translations.tools.imageConverter;
+  const common = translations.tools.common;
 
   const [images, setImages] = useState<ConvertedImage[]>([]);
   const [outputFormat, setOutputFormat] = useState<OutputFormat>('jpeg');
@@ -216,7 +218,7 @@ export default function ImageConverter({ lang: initialLang }: { lang?: Language 
       <div className="flex flex-wrap gap-4 items-center p-4 rounded-lg bg-[var(--color-card)] border border-[var(--color-border)]">
         <div className="flex items-center gap-2">
           <label className="text-sm text-[var(--color-text)]">
-            {t({ en: 'Output Format', pt: 'Output Format' })}:
+            {t(tc.outputFormat)}:
           </label>
           <select
             value={outputFormat}
@@ -233,7 +235,7 @@ export default function ImageConverter({ lang: initialLang }: { lang?: Language 
         {outputFormat !== 'png' && (
           <div className="flex items-center gap-2">
             <label className="text-sm text-[var(--color-text)]">
-              {t({ en: 'Quality', pt: 'Quality' })}:
+              {t(tc.quality)}:
             </label>
             <input
               type="range"
@@ -254,7 +256,7 @@ export default function ImageConverter({ lang: initialLang }: { lang?: Language 
             className="px-3 py-2 text-sm bg-primary-500 hover:bg-primary-600 text-white rounded-lg
               transition-colors disabled:opacity-50"
           >
-            {t({ en: 'Re-convert', pt: 'Re-convert' })}
+            {t(tc.reconvert)}
           </button>
         )}
       </div>
@@ -278,10 +280,10 @@ export default function ImageConverter({ lang: initialLang }: { lang?: Language 
         </svg>
         <div className="text-center">
           <p className="text-[var(--color-text)]">
-            {t({ en: 'Drag images or click to upload', pt: 'Drag images or click to upload' })}
+            {t(tc.dropzone)}
           </p>
           <p className="text-sm text-[var(--color-text-muted)] mt-1">
-            {t({ en: 'Supports JPEG, PNG, WebP, GIF, BMP, HEIC, AVIF', pt: 'Supports JPEG, PNG, WebP, GIF, BMP, HEIC, AVIF' })}
+            {t(tc.dropzoneHint)}
           </p>
         </div>
       </div>
@@ -291,7 +293,7 @@ export default function ImageConverter({ lang: initialLang }: { lang?: Language 
         <div className="flex items-center justify-center gap-2 p-4">
           <div className="w-5 h-5 border-2 border-primary-500 border-t-transparent rounded-full animate-spin" />
           <span className="text-[var(--color-text)]">
-            {t({ en: 'Converting...', pt: 'Converting...' })}
+            {t(tc.converting)}
           </span>
         </div>
       )}
@@ -310,14 +312,14 @@ export default function ImageConverter({ lang: initialLang }: { lang?: Language 
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                   d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
               </svg>
-              {t({ en: 'Download All', pt: 'Download All' })}
+              {t(tc.downloadAll)}
             </button>
             <button
               onClick={clearAll}
               className="px-4 py-2 bg-[var(--color-card)] hover:bg-[var(--color-card-hover)]
                 border border-[var(--color-border)] rounded-lg transition-colors"
             >
-              {t({ en: 'Clear All', pt: 'Clear All' })}
+              {t(tc.clearAll)}
             </button>
           </div>
 
@@ -350,7 +352,7 @@ export default function ImageConverter({ lang: initialLang }: { lang?: Language 
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-[var(--color-text)] truncate">{image.original.name}</p>
                   <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-[var(--color-text-muted)]">
-                    <span>{t({ en: 'Original', pt: 'Original' })}: {formatBytes(image.original.size)}</span>
+                    <span>{t(tc.original)}: {formatBytes(image.original.size)}</span>
                     {image.converted && (
                       <>
                         <span>→</span>
@@ -368,7 +370,7 @@ export default function ImageConverter({ lang: initialLang }: { lang?: Language 
                   </div>
                   {!image.converted && (
                     <p className="text-sm text-red-500">
-                      {t({ en: 'Conversion failed - unsupported format', pt: 'Conversion failed - unsupported format' })}
+                      {t(tc.conversionFailed)}
                     </p>
                   )}
                 </div>
@@ -379,7 +381,7 @@ export default function ImageConverter({ lang: initialLang }: { lang?: Language 
                     <button
                       onClick={() => downloadImage(image)}
                       className="p-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors"
-                      title={t({ en: 'Download', pt: 'Download' })}
+                      title={t(common.download)}
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
@@ -390,7 +392,7 @@ export default function ImageConverter({ lang: initialLang }: { lang?: Language 
                   <button
                     onClick={() => removeImage(index)}
                     className="p-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors"
-                    title={t({ en: 'Remove', pt: 'Remove' })}
+                    title={t(tc.remove)}
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
@@ -407,7 +409,7 @@ export default function ImageConverter({ lang: initialLang }: { lang?: Language 
       {/* Info */}
       <div className="p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
         <p className="text-sm text-blue-800 dark:text-blue-200">
-          {t({ en: 'ℹ️ All conversions are processed in browser and not sent to server. RAW files (CR2, NEF, ARW, etc.) may be converted depending on browser support.', pt: 'ℹ️ All conversions are processed in browser and not sent to server. RAW files (CR2, NEF, ARW, etc.) may be converted depending on browser support.' })}
+          {t(tc.aboutNote)}
         </p>
       </div>
     </div>

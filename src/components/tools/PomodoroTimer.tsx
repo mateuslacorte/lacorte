@@ -28,7 +28,9 @@ function formatTime(seconds: number): string {
 }
 
 export default function PomodoroTimer({ lang: initialLang }: { lang?: Language } = {}) {
-  const { t } = useTranslation(initialLang);
+  const { t, translations } = useTranslation(initialLang);
+  const tc = translations.tools.pomodoro;
+  const common = translations.tools.common;
 
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
   const [mode, setMode] = useState<TimerMode>('work');
@@ -110,9 +112,9 @@ export default function PomodoroTimer({ lang: initialLang }: { lang?: Language }
   };
 
   const modeLabels: Record<TimerMode, { en: string; pt?: string }> = {
-    work: { en: 'Focus', pt: 'Focus' },
-    shortBreak: { en: 'Short Break', pt: 'Short Break' },
-    longBreak: { en: 'Long Break', pt: 'Long Break' },
+    work: tc.focus,
+    shortBreak: tc.shortBreak,
+    longBreak: tc.longBreak,
   };
 
   return (
@@ -186,22 +188,22 @@ export default function PomodoroTimer({ lang: initialLang }: { lang?: Language }
             }`}
         >
           {isRunning
-            ? t({ en: 'Pause', pt: 'Pause' })
-            : t({ en: 'Start', pt: 'Start' })}
+            ? t(common.pause)
+            : t(common.start)}
         </button>
         <button
           onClick={resetTimer}
           className="px-6 py-3 rounded-full font-medium bg-[var(--color-card)] hover:bg-[var(--color-card-hover)]
             border border-[var(--color-border)] transition-colors"
         >
-          {t({ en: 'Reset', pt: 'Reset' })}
+          {t(common.reset)}
         </button>
       </div>
 
       {/* Session Counter */}
       <div className="flex justify-center items-center gap-2">
         <span className="text-[var(--color-text-muted)]">
-          {t({ en: 'Completed Sessions', pt: 'Completed Sessions' })}:
+          {t(tc.completedSessions)}:
         </span>
         <div className="flex gap-1">
           {Array.from({ length: settings.sessionsBeforeLongBreak }).map((_, i) => (
@@ -220,7 +222,7 @@ export default function PomodoroTimer({ lang: initialLang }: { lang?: Language }
           onClick={resetAll}
           className="ml-2 text-xs text-[var(--color-text-muted)] hover:text-[var(--color-text)]"
         >
-          ({t({ en: 'Reset All', pt: 'Reset All' })})
+          ({t(tc.resetAll)})
         </button>
       </div>
 
@@ -234,7 +236,7 @@ export default function PomodoroTimer({ lang: initialLang }: { lang?: Language }
             d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
         </svg>
-        {t({ en: 'Settings', pt: 'Settings' })}
+        {t(tc.settings)}
       </button>
 
       {/* Settings Panel */}
@@ -242,10 +244,10 @@ export default function PomodoroTimer({ lang: initialLang }: { lang?: Language }
         <div className="p-4 rounded-lg bg-[var(--color-card)] border border-[var(--color-border)] space-y-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
-              { key: 'workDuration', label: { en: 'Focus Time', pt: 'Focus Time' }, suffix: t({ en: 'min', pt: 'min' }) },
-              { key: 'shortBreakDuration', label: { en: 'Short Break', pt: 'Short Break' }, suffix: t({ en: 'min', pt: 'min' }) },
-              { key: 'longBreakDuration', label: { en: 'Long Break', pt: 'Long Break' }, suffix: t({ en: 'min', pt: 'min' }) },
-              { key: 'sessionsBeforeLongBreak', label: { en: 'Sessions', pt: 'Sessions' }, suffix: '' },
+              { key: 'workDuration', label: tc.focusTime, suffix: t(common.min) },
+              { key: 'shortBreakDuration', label: tc.shortBreak, suffix: t(common.min) },
+              { key: 'longBreakDuration', label: tc.longBreak, suffix: t(common.min) },
+              { key: 'sessionsBeforeLongBreak', label: tc.sessions, suffix: '' },
             ].map(({ key, label, suffix }) => (
               <div key={key} className="space-y-1">
                 <label className="text-xs text-[var(--color-text-muted)]">{t(label)}</label>
@@ -274,7 +276,7 @@ export default function PomodoroTimer({ lang: initialLang }: { lang?: Language }
             onClick={() => setSettings(DEFAULT_SETTINGS)}
             className="text-xs text-primary-500 hover:underline"
           >
-            {t({ en: 'Reset to defaults', pt: 'Reset to defaults' })}
+            {t(tc.resetDefaults)}
           </button>
         </div>
       )}
@@ -282,7 +284,7 @@ export default function PomodoroTimer({ lang: initialLang }: { lang?: Language }
       {/* Info */}
       <div className="p-4 rounded-lg bg-[var(--color-card)] border border-[var(--color-border)]">
         <p className="text-sm text-[var(--color-text-muted)]">
-          {t({ en: '🍅 Pomodoro Technique: 25 minutes of focus followed by a 5-minute break. After 4 sessions, take a longer break. A time management method to boost productivity.', pt: '🍅 Pomodoro Technique: 25 minutes of focus followed by a 5-minute break. After 4 sessions, take a longer break. A time management method to boost productivity.' })}
+          {t(tc.aboutNote)}
         </p>
       </div>
     </div>

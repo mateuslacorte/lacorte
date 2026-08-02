@@ -26,6 +26,8 @@ export const toolTranslations = {
     removeFromFavorite: { en: 'Remove from favorites', pt: 'Remover dos favoritos' },
     share: { en: 'Share', pt: 'Compartilhar' },
     copyLink: { en: 'Copy link', pt: 'Copiar link' },
+    loadExample: { en: 'Load Example', pt: 'Carregar exemplo' },
+    min: { en: 'min', pt: 'min' },
   },
 
   // QR Code Generator
@@ -35,6 +37,7 @@ export const toolTranslations = {
     inputPlaceholder: { en: 'Enter URL or text', pt: 'Digite a URL ou o texto' },
     size: { en: 'Size', pt: 'Tamanho' },
     downloadPng: { en: 'Download PNG', pt: 'Baixar PNG' },
+    aboutNote: { en: 'Enter URL or text to generate QR code', pt: 'Digite a URL ou o texto para gerar o QR Code' },
   },
 
   // Password Generator
@@ -51,6 +54,7 @@ export const toolTranslations = {
     medium: { en: 'Medium', pt: 'Média' },
     strong: { en: 'Strong', pt: 'Forte' },
     veryStrong: { en: 'Very Strong', pt: 'Muito forte' },
+    generatedPlaceholder: { en: 'Generated password', pt: 'Senha gerada' },
   },
 
   // Color Converter
@@ -87,6 +91,8 @@ export const toolTranslations = {
     sentences: { en: 'Sentences', pt: 'Frases' },
     paragraphs: { en: 'Paragraphs', pt: 'Parágrafos' },
     placeholder: { en: 'Enter your text...', pt: 'Digite seu texto...' },
+    paste: { en: 'Paste', pt: 'Colar' },
+    readingTime: { en: 'Estimated reading time', pt: 'Tempo estimado de leitura' },
   },
 
   // Base64
@@ -97,6 +103,7 @@ export const toolTranslations = {
     decode: { en: 'Decode', pt: 'Decodificar' },
     inputPlaceholder: { en: 'Enter text', pt: 'Digite o texto' },
     invalidBase64: { en: 'Invalid Base64', pt: 'Base64 inválido' },
+    aboutNote: { en: 'Base64 is a method to encode binary data as text', pt: 'Base64 é um método para codificar dados binários como texto' },
   },
 
   // JSON Formatter
@@ -109,6 +116,7 @@ export const toolTranslations = {
     valid: { en: 'Valid JSON', pt: 'JSON válido' },
     invalid: { en: 'Invalid JSON', pt: 'JSON inválido' },
     inputPlaceholder: { en: 'Enter JSON', pt: 'Digite o JSON' },
+    loadSample: { en: 'Load Sample', pt: 'Carregar exemplo' },
   },
 
   // Timer
@@ -132,6 +140,11 @@ export const toolTranslations = {
     count: { en: 'Count', pt: 'Quantidade' },
     uppercase: { en: 'Uppercase', pt: 'Maiúsculas' },
     hyphens: { en: 'Include hyphens', pt: 'Incluir hífens' },
+    copyAll: { en: 'Copy All', pt: 'Copiar tudo' },
+    aboutNote: {
+      en: 'UUID v4 is randomly generated with an extremely low collision probability. Used for database IDs, session tokens, etc.',
+      pt: 'O UUID v4 é gerado aleatoriamente com uma probabilidade de colisão extremamente baixa. Usado em IDs de banco de dados, tokens de sessão etc.',
+    },
   },
 
   // Hash Generator
@@ -140,6 +153,49 @@ export const toolTranslations = {
     description: { en: 'Generate MD5, SHA-1, SHA-256 hash', pt: 'Gere hash MD5, SHA-1 e SHA-256' },
     algorithm: { en: 'Algorithm', pt: 'Algoritmo' },
     inputPlaceholder: { en: 'Enter text to hash', pt: 'Digite o texto para gerar o hash' },
+    securityWarning: {
+      en: '⚠️ MD5 and SHA-1 are not recommended for security purposes. Use bcrypt or Argon2 for password hashing.',
+      pt: '⚠️ MD5 e SHA-1 não são recomendados para fins de segurança. Use bcrypt ou Argon2 para hash de senhas.',
+    },
+  },
+
+  bcrypt: {
+    hashTab: { en: 'Hash', pt: 'Hash' },
+    verifyTab: { en: 'Verify', pt: 'Verificar' },
+    password: { en: 'Password / text', pt: 'Senha / texto' },
+    passwordPlaceholder: { en: 'Enter password to hash or verify', pt: 'Digite a senha para gerar ou verificar o hash' },
+    costFactor: { en: 'Cost factor (rounds)', pt: 'Fator de custo (rounds)' },
+    costHint: {
+      en: 'Higher cost is slower but stronger. 10–12 is typical for passwords.',
+      pt: 'Custo maior é mais lento e mais forte. 10–12 é típico para senhas.',
+    },
+    hashButton: { en: 'Generate bcrypt hash', pt: 'Gerar hash bcrypt' },
+    hashing: { en: 'Hashing…', pt: 'Gerando hash…' },
+    hashOutput: { en: 'Bcrypt hash', pt: 'Hash bcrypt' },
+    bcryptHash: { en: 'Bcrypt hash', pt: 'Hash bcrypt' },
+    hashPlaceholder: {
+      en: '$2a$10$… or $2b$10$…',
+      pt: '$2a$10$… ou $2b$10$…',
+    },
+    verifyButton: { en: 'Verify password', pt: 'Verificar senha' },
+    verifying: { en: 'Verifying…', pt: 'Verificando…' },
+    match: { en: 'Match — password is correct for this hash.', pt: 'Coincide — a senha está correta para este hash.' },
+    noMatch: { en: 'No match — password does not match this hash.', pt: 'Não coincide — a senha não corresponde a este hash.' },
+    passwordRequired: { en: 'Enter a password first.', pt: 'Digite uma senha primeiro.' },
+    hashRequired: { en: 'Enter a bcrypt hash to verify against.', pt: 'Digite um hash bcrypt para comparar.' },
+    hashFailed: { en: 'Could not generate hash.', pt: 'Não foi possível gerar o hash.' },
+    verifyFailed: {
+      en: 'Could not verify. Check that the hash is a valid bcrypt string.',
+      pt: 'Não foi possível verificar. Confira se o hash é uma string bcrypt válida.',
+    },
+    aboutNote: {
+      en: 'Bcrypt is one-way: you hash a password and later verify it. There is no decode step — only comparison against an existing hash.',
+      pt: 'Bcrypt é unidirecional: você gera o hash da senha e depois verifica. Não há decodificação — só comparação com um hash existente.',
+    },
+    privacyNote: {
+      en: 'All hashing runs in your browser. Nothing is sent to a server.',
+      pt: 'Todo o hashing roda no seu navegador. Nada é enviado a um servidor.',
+    },
   },
 
   // Regex Tester
@@ -152,6 +208,9 @@ export const toolTranslations = {
     matches: { en: 'Matches', pt: 'Correspondências' },
     noMatch: { en: 'No match', pt: 'Nenhuma correspondência' },
     groups: { en: 'Groups', pt: 'Grupos' },
+    commonPatterns: { en: 'Common Patterns', pt: 'Padrões comuns' },
+    testStringPlaceholder: { en: 'Enter test string...', pt: 'Digite o texto de teste...' },
+    matchDetails: { en: 'Match Details', pt: 'Detalhes das correspondências' },
   },
 
   // Lorem Ipsum
@@ -163,6 +222,10 @@ export const toolTranslations = {
     words: { en: 'Words', pt: 'Palavras' },
     count: { en: 'Count', pt: 'Quantidade' },
     startWithLorem: { en: 'Start with "Lorem ipsum"', pt: 'Começar com "Lorem ipsum"' },
+    aboutNote: {
+      en: 'Lorem Ipsum is dummy text used in printing and typesetting industry.',
+      pt: 'Lorem Ipsum é um texto fictício usado na indústria gráfica e editorial.',
+    },
   },
 
   // Markdown Preview
@@ -172,6 +235,7 @@ export const toolTranslations = {
     editor: { en: 'Editor', pt: 'Editor' },
     preview: { en: 'Preview', pt: 'Pré-visualização' },
     placeholder: { en: 'Enter markdown...', pt: 'Digite o Markdown...' },
+    syntaxGuide: { en: 'Markdown Syntax', pt: 'Sintaxe do Markdown' },
   },
 
   // Color Palette
@@ -186,6 +250,7 @@ export const toolTranslations = {
     splitComplementary: { en: 'Split Complementary', pt: 'Complementar dividida' },
     tetradic: { en: 'Tetradic', pt: 'Tetrádica' },
     monochromatic: { en: 'Monochromatic', pt: 'Monocromática' },
+    copyAll: { en: 'Copy All Colors', pt: 'Copiar todas as cores' },
   },
 
   // Image Resizer
@@ -477,13 +542,43 @@ export const toolTranslations = {
   // Tools page
   toolsPage: {
     title: { en: 'Online Tools', pt: 'Ferramentas online' },
-    description: { en: 'Collection of useful web tools', pt: 'Coleção de ferramentas web úteis' },
+    description: {
+      en: 'A collection of useful web tools for developers, designers, marketers, and PMs. Free to use.',
+      pt: 'Coleção de ferramentas web úteis para desenvolvedores, designers, marketers e PMs. Grátis para usar.',
+    },
+    subtitle: { en: 'Collection of useful web tools', pt: 'Coleção de ferramentas web úteis' },
     allTools: { en: 'All Tools', pt: 'Todas as ferramentas' },
     generators: { en: 'Generators', pt: 'Geradores' },
     converters: { en: 'Converters', pt: 'Conversores' },
     text: { en: 'Text', pt: 'Texto' },
     developer: { en: 'Developer', pt: 'Desenvolvedor' },
     image: { en: 'Image', pt: 'Imagem' },
+    searchPlaceholder: { en: 'Search tools... (⌘K)', pt: 'Buscar ferramentas... (⌘K)' },
+    noResults: { en: 'No results found', pt: 'Nenhum resultado encontrado' },
+    noResultsHint: {
+      en: 'Try searching with different keywords',
+      pt: 'Tente buscar com outras palavras-chave',
+    },
+    recentlyUsed: { en: 'Recently used', pt: 'Usadas recentemente' },
+    totalPrefix: { en: 'Total', pt: 'Total' },
+    totalSuffix: { en: ' tools available.', pt: ' ferramentas disponíveis.' },
+    infoHeading: { en: 'Information', pt: 'Informações' },
+    infoBrowser: {
+      en: 'All tools run in your browser. No data is sent to any server.',
+      pt: 'Todas as ferramentas rodam no seu navegador. Nenhum dado é enviado a um servidor.',
+    },
+    infoFree: {
+      en: 'Free to use. No registration required.',
+      pt: 'Grátis para usar. Sem cadastro.',
+    },
+    infoDevices: {
+      en: 'Works on both mobile and desktop.',
+      pt: 'Funciona no celular e no computador.',
+    },
+    infoLocale: {
+      en: 'Available in English and Brazilian Portuguese.',
+      pt: 'Disponível em inglês e português do Brasil.',
+    },
   },
 
   // App Store Screenshot Resizer
@@ -500,6 +595,419 @@ export const toolTranslations = {
     applyToAll: { en: 'Apply to All', pt: 'Aplicar a todos' },
     downloadAll: { en: 'Download All', pt: 'Baixar todos' },
     processAll: { en: 'Process All', pt: 'Processar todos' },
+    outputSize: { en: 'Output size', pt: 'Tamanho de saída' },
+    processing: { en: 'Processing...', pt: 'Processando...' },
+    processedImages: { en: 'Processed Images', pt: 'Imagens processadas' },
+  },
+
+  // Pomodoro Timer
+  pomodoro: {
+    focus: { en: 'Focus', pt: 'Foco' },
+    shortBreak: { en: 'Short Break', pt: 'Pausa curta' },
+    longBreak: { en: 'Long Break', pt: 'Pausa longa' },
+    completedSessions: { en: 'Completed Sessions', pt: 'Sessões concluídas' },
+    resetAll: { en: 'Reset All', pt: 'Redefinir tudo' },
+    settings: { en: 'Settings', pt: 'Configurações' },
+    focusTime: { en: 'Focus Time', pt: 'Tempo de foco' },
+    sessions: { en: 'Sessions', pt: 'Sessões' },
+    resetDefaults: { en: 'Reset to defaults', pt: 'Redefinir para o padrão' },
+    aboutNote: {
+      en: '🍅 Pomodoro Technique: 25 minutes of focus followed by a 5-minute break. After 4 sessions, take a longer break. A time management method to boost productivity.',
+      pt: '🍅 Técnica Pomodoro: 25 minutos de foco seguidos de uma pausa de 5 minutos. Após 4 sessões, faça uma pausa mais longa. Um método de gestão de tempo para aumentar a produtividade.',
+    },
+  },
+
+  // World Clock
+  worldClock: {
+    addTimezone: { en: 'Add Timezone', pt: 'Adicionar fuso horário' },
+    timeConverter: { en: 'Time Converter', pt: 'Conversor de horário' },
+    date: { en: 'Date', pt: 'Data' },
+    time: { en: 'Time', pt: 'Horário' },
+    timezone: { en: 'Timezone', pt: 'Fuso horário' },
+    now: { en: 'Now', pt: 'Agora' },
+  },
+
+  // Cron Generator
+  cron: {
+    presets: { en: 'Presets', pt: 'Predefinições' },
+    dayOfWeek: { en: 'Day of Week', pt: 'Dia da semana' },
+    everyLabel: { en: 'Every', pt: 'Qualquer' },
+    weekdays: { en: 'Weekdays', pt: 'Dias de semana' },
+    weekend: { en: 'Weekend', pt: 'Fim de semana' },
+    minuteInterval: { en: 'Minute Interval', pt: 'Intervalo de minutos' },
+    cronSyntax: { en: 'Cron Syntax', pt: 'Sintaxe do Cron' },
+    anyValue: { en: 'any value', pt: 'qualquer valor' },
+    valueSeparator: { en: 'value separator (1,3,5)', pt: 'separador de valores (1,3,5)' },
+    rangeHint: { en: 'range (1-5)', pt: 'intervalo (1-5)' },
+    stepHint: { en: 'step (*/5 = every 5)', pt: 'passo (*/5 = a cada 5)' },
+    min: { en: 'Min', pt: 'Min' },
+    hour: { en: 'Hour', pt: 'Hora' },
+    day: { en: 'Day', pt: 'Dia' },
+    month: { en: 'Month', pt: 'Mês' },
+    dow: { en: 'DoW', pt: 'DS' },
+    // Description builder parts (use {n} as placeholder)
+    everyMinute: { en: 'every minute', pt: 'todo minuto' },
+    everyNMinutes: { en: 'every {n} minutes', pt: 'a cada {n} minutos' },
+    atMinute: { en: 'at minute {n}', pt: 'no minuto {n}' },
+    everyHour: { en: 'every hour', pt: 'toda hora' },
+    everyNHours: { en: 'every {n} hours', pt: 'a cada {n} horas' },
+    atHour: { en: 'at {n}:00', pt: 'às {n}:00' },
+    everyNDays: { en: 'every {n} days', pt: 'a cada {n} dias' },
+    onDay: { en: 'on day {n}', pt: 'no dia {n}' },
+    inMonth: { en: 'in {n}', pt: 'em {n}' },
+    onWeekdays: { en: 'on weekdays', pt: 'nos dias de semana' },
+    onWeekends: { en: 'on weekends', pt: 'nos fins de semana' },
+    onDayName: { en: 'on {n}', pt: 'em {n}' },
+    // Presets
+    presetEveryMinute: { en: 'Every minute', pt: 'Todo minuto' },
+    presetEveryHour: { en: 'Every hour', pt: 'Toda hora' },
+    presetMidnight: { en: 'Every day at midnight', pt: 'Todo dia à meia-noite' },
+    presetNoon: { en: 'Every day at noon', pt: 'Todo dia ao meio-dia' },
+    presetMonday: { en: 'Every Monday', pt: 'Toda segunda-feira' },
+    presetFirstOfMonth: { en: 'First of every month', pt: 'Primeiro dia de cada mês' },
+    presetWeekdays9am: { en: 'Weekdays at 9 AM', pt: 'Dias de semana às 9h' },
+    presetEvery5min: { en: 'Every 5 minutes', pt: 'A cada 5 minutos' },
+    presetEvery30min: { en: 'Every 30 minutes', pt: 'A cada 30 minutos' },
+    // Day/month abbreviations
+    sun: { en: 'Sun', pt: 'Dom' },
+    mon: { en: 'Mon', pt: 'Seg' },
+    tue: { en: 'Tue', pt: 'Ter' },
+    wed: { en: 'Wed', pt: 'Qua' },
+    thu: { en: 'Thu', pt: 'Qui' },
+    fri: { en: 'Fri', pt: 'Sex' },
+    sat: { en: 'Sat', pt: 'Sáb' },
+    jan: { en: 'Jan', pt: 'Jan' },
+    feb: { en: 'Feb', pt: 'Fev' },
+    mar: { en: 'Mar', pt: 'Mar' },
+    apr: { en: 'Apr', pt: 'Abr' },
+    mayShort: { en: 'May', pt: 'Mai' },
+    jun: { en: 'Jun', pt: 'Jun' },
+    jul: { en: 'Jul', pt: 'Jul' },
+    aug: { en: 'Aug', pt: 'Ago' },
+    sep: { en: 'Sep', pt: 'Set' },
+    oct: { en: 'Oct', pt: 'Out' },
+    nov: { en: 'Nov', pt: 'Nov' },
+    dec: { en: 'Dec', pt: 'Dez' },
+  },
+
+  // JWT Decoder
+  jwt: {
+    tokenLabel: { en: 'JWT Token', pt: 'Token JWT' },
+    header: { en: 'Header', pt: 'Cabeçalho' },
+    payload: { en: 'Payload', pt: 'Carga útil' },
+    signature: { en: 'Signature', pt: 'Assinatura' },
+    warningNote: {
+      en: '⚠️ This tool only decodes JWT. Signature verification is not performed. Use with caution for sensitive tokens.',
+      pt: '⚠️ Esta ferramenta apenas decodifica o JWT. A verificação da assinatura não é realizada. Use com cautela para tokens sensíveis.',
+    },
+    commonClaims: { en: 'Common Claims', pt: 'Claims comuns' },
+  },
+
+  // Diff Tool
+  diff: {
+    swap: { en: 'Swap', pt: 'Inverter' },
+    lineNumbers: { en: 'Line numbers', pt: 'Números de linha' },
+    ignoreWhitespace: { en: 'Ignore whitespace', pt: 'Ignorar espaços em branco' },
+    originalText: { en: 'Original Text', pt: 'Texto original' },
+    originalPlaceholder: { en: 'Enter original text...', pt: 'Digite o texto original...' },
+    changedText: { en: 'Changed Text', pt: 'Texto alterado' },
+    changedPlaceholder: { en: 'Enter changed text...', pt: 'Digite o texto alterado...' },
+    additions: { en: 'additions', pt: 'adições' },
+    deletions: { en: 'deletions', pt: 'exclusões' },
+    unchanged: { en: 'unchanged', pt: 'inalteradas' },
+    differences: { en: 'Differences', pt: 'Diferenças' },
+    aboutNote: {
+      en: 'Compare two texts and visually show differences. Useful for code review, document comparison, etc.',
+      pt: 'Compare dois textos e veja as diferenças visualmente. Útil para revisão de código, comparação de documentos etc.',
+    },
+  },
+
+  // URL Encoder/Decoder
+  urlEncoder: {
+    invalidInput: { en: 'Invalid input', pt: 'Entrada inválida' },
+    encode: { en: 'Encode', pt: 'Codificar' },
+    decode: { en: 'Decode', pt: 'Decodificar' },
+    fullEncoding: { en: 'Full encoding', pt: 'Codificação completa' },
+    keepUrlStructure: { en: 'Keep URL structure', pt: 'Manter estrutura da URL' },
+    inputPlaceholder: { en: 'Enter URL or text', pt: 'Digite a URL ou o texto' },
+    difference: { en: 'Difference', pt: 'Diferença' },
+    encodesAllChars: {
+      en: 'Encodes all special chars (for query params)',
+      pt: 'Codifica todos os caracteres especiais (para parâmetros de consulta)',
+    },
+    keepsUrlChars: {
+      en: 'Keeps URL structure chars (: / ? # etc)',
+      pt: 'Mantém os caracteres estruturais da URL (: / ? # etc.)',
+    },
+    exampleUrlSpaces: { en: 'URL with spaces', pt: 'URL com espaços' },
+    exampleAccented: { en: 'Accented text', pt: 'Texto acentuado' },
+    exampleSpecialChars: { en: 'Special chars', pt: 'Caracteres especiais' },
+    exampleEncodedUrl: { en: 'Encoded URL', pt: 'URL codificada' },
+  },
+
+  // Gradient Generator
+  gradient: {
+    angle: { en: 'Angle', pt: 'Ângulo' },
+    colorStops: { en: 'Color Stops', pt: 'Pontos de cor' },
+    add: { en: 'Add', pt: 'Adicionar' },
+    presets: { en: 'Presets', pt: 'Predefinições' },
+    random: { en: 'Random', pt: 'Aleatório' },
+    typeLinear: { en: 'Linear', pt: 'Linear' },
+    typeRadial: { en: 'Radial', pt: 'Radial' },
+    typeConic: { en: 'Conic', pt: 'Cônico' },
+  },
+
+  // Box Shadow Generator
+  boxShadow: {
+    boxColor: { en: 'Box Color', pt: 'Cor da caixa' },
+    radius: { en: 'Radius', pt: 'Raio' },
+    opacity: { en: 'Opacity', pt: 'Opacidade' },
+    presets: { en: 'Presets', pt: 'Predefinições' },
+    shadowLayers: { en: 'Shadow Layers', pt: 'Camadas de sombra' },
+    add: { en: 'Add', pt: 'Adicionar' },
+    layer: { en: 'Layer', pt: 'Camada' },
+    blur: { en: 'Blur', pt: 'Desfoque' },
+    spread: { en: 'Spread', pt: 'Espalhamento' },
+    color: { en: 'Color', pt: 'Cor' },
+    inset: { en: 'inset', pt: 'interno' },
+    presetSubtle: { en: 'Subtle', pt: 'Sutil' },
+    presetRegular: { en: 'Regular', pt: 'Regular' },
+    presetMedium: { en: 'Medium', pt: 'Médio' },
+    presetLarge: { en: 'Large', pt: 'Grande' },
+    presetSharp: { en: 'Sharp', pt: 'Nítido' },
+    presetInset: { en: 'Inset', pt: 'Interno' },
+    presetGlow: { en: 'Glow', pt: 'Brilho' },
+    presetLayered: { en: 'Layered', pt: 'Em camadas' },
+    preview: { en: 'Preview', pt: 'Pré-visualização' },
+  },
+
+  // EXIF Viewer
+  exif: {
+    cameraInfo: { en: 'Camera Info', pt: 'Informações da câmera' },
+    captureSettings: { en: 'Capture Settings', pt: 'Configurações de captura' },
+    imageInfo: { en: 'Image Info', pt: 'Informações da imagem' },
+    dateTime: { en: 'Date/Time', pt: 'Data/Hora' },
+    dropzone: { en: 'Drag JPEG image or click to upload', pt: 'Arraste uma imagem JPEG ou clique para enviar' },
+    dropzoneHint: { en: 'EXIF data is only extracted from JPEG files', pt: 'Os dados EXIF só são extraídos de arquivos JPEG' },
+    analyzing: { en: 'Analyzing...', pt: 'Analisando...' },
+    chooseAnother: { en: 'Choose Another', pt: 'Escolher outra' },
+    noData: { en: 'No EXIF data found', pt: 'Nenhum dado EXIF encontrado' },
+    aboutNote: {
+      en: 'EXIF (Exchangeable Image File Format) is metadata stored in images by digital cameras. It includes camera model, capture settings, date, and more.',
+      pt: 'EXIF (Exchangeable Image File Format) são metadados armazenados em imagens por câmeras digitais. Incluem modelo da câmera, configurações de captura, data e muito mais.',
+    },
+    fieldMake: { en: 'Make', pt: 'Marca' },
+    fieldModel: { en: 'Model', pt: 'Modelo' },
+    fieldSoftware: { en: 'Software', pt: 'Software' },
+    fieldExposureTime: { en: 'Exposure Time', pt: 'Tempo de exposição' },
+    fieldAperture: { en: 'Aperture', pt: 'Abertura' },
+    fieldIso: { en: 'ISO', pt: 'ISO' },
+    fieldFocalLength: { en: 'Focal Length', pt: 'Distância focal' },
+    field35mm: { en: '35mm Equivalent', pt: 'Equivalente a 35mm' },
+    fieldWidth: { en: 'Width', pt: 'Largura' },
+    fieldHeight: { en: 'Height', pt: 'Altura' },
+    fieldOrientation: { en: 'Orientation', pt: 'Orientação' },
+    fieldXRes: { en: 'X Resolution', pt: 'Resolução X' },
+    fieldYRes: { en: 'Y Resolution', pt: 'Resolução Y' },
+    fieldResUnit: { en: 'Resolution Unit', pt: 'Unidade de resolução' },
+    fieldModified: { en: 'Modified', pt: 'Modificado' },
+    fieldDateTaken: { en: 'Date Taken', pt: 'Data da foto' },
+    orientationNormal: { en: 'Normal', pt: 'Normal' },
+    orientationFlippedH: { en: 'Flipped horizontal', pt: 'Invertido horizontalmente' },
+    orientationRotated180: { en: 'Rotated 180°', pt: 'Rotacionado 180°' },
+    orientationFlippedV: { en: 'Flipped vertical', pt: 'Invertido verticalmente' },
+    orientationRotated90CwFlipped: { en: 'Rotated 90° CW, flipped', pt: 'Rotacionado 90° horário, invertido' },
+    orientationRotated90Ccw: { en: 'Rotated 90° CCW', pt: 'Rotacionado 90° anti-horário' },
+    orientationRotated90CcwFlipped: { en: 'Rotated 90° CCW, flipped', pt: 'Rotacionado 90° anti-horário, invertido' },
+    orientationRotated90Cw: { en: 'Rotated 90° CW', pt: 'Rotacionado 90° horário' },
+    unitInches: { en: 'inches', pt: 'polegadas' },
+    unitCentimeters: { en: 'centimeters', pt: 'centímetros' },
+  },
+
+  // Image Metadata Viewer (extended EXIF viewer with GPS + device detection)
+  imageMetadata: {
+    dropzone: { en: 'Drag and drop an image or click to upload', pt: 'Arraste e solte uma imagem ou clique para enviar' },
+    dropzoneHint: { en: 'Supports JPEG, PNG, HEIC, and other image formats', pt: 'Suporta JPEG, PNG, HEIC e outros formatos de imagem' },
+    analyzing: { en: 'Analyzing...', pt: 'Analisando...' },
+    noModelInfo: { en: 'No model info', pt: 'Sem informações do modelo' },
+    locationAvailable: { en: 'Location available', pt: 'Localização disponível' },
+    chooseAnother: { en: 'Choose another image', pt: 'Escolher outra imagem' },
+    tabBasic: { en: '📋 Basic', pt: '📋 Básico' },
+    tabCamera: { en: '📷 Camera', pt: '📷 Câmera' },
+    tabGps: { en: '📍 Location', pt: '📍 Localização' },
+    tabAll: { en: '📑 All', pt: '📑 Tudo' },
+    fileInfo: { en: '📋 File info', pt: '📋 Informações do arquivo' },
+    fileName: { en: 'File name', pt: 'Nome do arquivo' },
+    fileSize: { en: 'File size', pt: 'Tamanho do arquivo' },
+    fileType: { en: 'File type', pt: 'Tipo de arquivo' },
+    resolution: { en: 'Resolution', pt: 'Resolução' },
+    dateTaken: { en: 'Date taken', pt: 'Data da foto' },
+    cameraInfo: { en: '📷 Camera/device info', pt: '📷 Informações da câmera/dispositivo' },
+    manufacturer: { en: 'Manufacturer', pt: 'Fabricante' },
+    model: { en: 'Model', pt: 'Modelo' },
+    software: { en: 'Software', pt: 'Software' },
+    lens: { en: 'Lens', pt: 'Lente' },
+    captureSettings: { en: '⚙️ Capture settings', pt: '⚙️ Configurações de captura' },
+    exposureTime: { en: 'Exposure time', pt: 'Tempo de exposição' },
+    aperture: { en: 'Aperture', pt: 'Abertura' },
+    iso: { en: 'ISO', pt: 'ISO' },
+    focalLength: { en: 'Focal length', pt: 'Distância focal' },
+    focalLength35mm: { en: '35mm equivalent', pt: 'Equivalente a 35mm' },
+    exposureProgramLabel: { en: 'Exposure program', pt: 'Modo de exposição' },
+    meteringModeLabel: { en: 'Metering mode', pt: 'Modo de medição' },
+    flashLabel: { en: 'Flash', pt: 'Flash' },
+    flashCode: { en: 'Flash code', pt: 'Código do flash' },
+    locationInfo: { en: '📍 Location info', pt: '📍 Informações de localização' },
+    latitude: { en: 'Latitude', pt: 'Latitude' },
+    longitude: { en: 'Longitude', pt: 'Longitude' },
+    altitude: { en: 'Altitude', pt: 'Altitude' },
+    viewGoogleMaps: { en: 'View on Google Maps', pt: 'Ver no Google Maps' },
+    viewOsm: { en: 'View on OpenStreetMap', pt: 'Ver no OpenStreetMap' },
+    noLocation: { en: 'No location information', pt: 'Nenhuma informação de localização' },
+    noLocationHint: {
+      en: 'The photo may not include GPS data, or it may have been removed for privacy.',
+      pt: 'A foto pode não ter dados de GPS, ou eles podem ter sido removidos por privacidade.',
+    },
+    privacyNotice: { en: 'Privacy notice', pt: 'Aviso de privacidade' },
+    privacyNoticeText: {
+      en: 'This photo includes location information from when it was taken. We recommend removing location data before uploading to social media or the web.',
+      pt: 'Esta foto inclui informações de localização de quando foi tirada. Recomendamos remover os dados de localização antes de enviar para redes sociais ou a web.',
+    },
+    tipsTitle: { en: '💡 What you can inspect', pt: '💡 O que você pode inspecionar' },
+    tipDevice: {
+      en: 'Device info: Auto-detect iPhone, Galaxy, DSLR, and other capture devices',
+      pt: 'Informações do dispositivo: detecta automaticamente iPhone, Galaxy, DSLR e outros dispositivos de captura',
+    },
+    tipCapture: {
+      en: 'Capture settings: Aperture, shutter speed, ISO, focal length, and more',
+      pt: 'Configurações de captura: abertura, velocidade do obturador, ISO, distância focal e mais',
+    },
+    tipLocation: {
+      en: 'Location info: GPS coordinates and map links (when included)',
+      pt: 'Informações de localização: coordenadas GPS e links de mapa (quando incluídos)',
+    },
+    tipDate: { en: 'Date/time: When the photo was taken', pt: 'Data/hora: quando a foto foi tirada' },
+    // Exposure program values
+    expNotDefined: { en: 'Not defined', pt: 'Não definido' },
+    expManual: { en: 'Manual', pt: 'Manual' },
+    expProgramAe: { en: 'Program AE', pt: 'Programa AE' },
+    expAperturePriority: { en: 'Aperture priority (A/Av)', pt: 'Prioridade de abertura (A/Av)' },
+    expShutterPriority: { en: 'Shutter priority (S/Tv)', pt: 'Prioridade de obturador (S/Tv)' },
+    expCreative: { en: 'Creative', pt: 'Criativo' },
+    expAction: { en: 'Action', pt: 'Ação' },
+    expPortrait: { en: 'Portrait', pt: 'Retrato' },
+    expLandscape: { en: 'Landscape', pt: 'Paisagem' },
+    // Metering mode values
+    meterUnknown: { en: 'Unknown', pt: 'Desconhecido' },
+    meterAverage: { en: 'Average', pt: 'Média' },
+    meterCenterWeighted: { en: 'Center-weighted', pt: 'Ponderada ao centro' },
+    meterSpot: { en: 'Spot', pt: 'Pontual' },
+    meterMultiSpot: { en: 'Multi-spot', pt: 'Multi-pontual' },
+    meterPattern: { en: 'Pattern', pt: 'Padrão' },
+    meterPartial: { en: 'Partial', pt: 'Parcial' },
+    // Flash values
+    flashDidNotFire: { en: 'Flash did not fire', pt: 'Flash não disparou' },
+    flashFired: { en: 'Flash fired', pt: 'Flash disparou' },
+    flashFiredNoStrobeReturn: { en: 'Flash fired (no strobe return detected)', pt: 'Flash disparou (retorno não detectado)' },
+    flashFiredStrobeReturn: { en: 'Flash fired (strobe return detected)', pt: 'Flash disparou (retorno detectado)' },
+    flashDidNotFireForced: { en: 'Flash did not fire (forced)', pt: 'Flash não disparou (forçado)' },
+    flashDidNotFireAuto: { en: 'Flash did not fire (auto)', pt: 'Flash não disparou (automático)' },
+    flashFiredAuto: { en: 'Flash fired (auto)', pt: 'Flash disparou (automático)' },
+  },
+
+  // UTM Builder
+  utm: {
+    websiteUrl: { en: 'Website URL', pt: 'URL do site' },
+    trafficSource: { en: 'Traffic Source', pt: 'Fonte de tráfego' },
+    select: { en: 'Select', pt: 'Selecionar' },
+    orTypeCustom: { en: 'Or type custom', pt: 'Ou digite um valor personalizado' },
+    marketingMedium: { en: 'Marketing Medium', pt: 'Meio de marketing' },
+    campaignName: { en: 'Campaign Name', pt: 'Nome da campanha' },
+    useUnderscores: { en: 'Use underscores instead of spaces', pt: 'Use underscores em vez de espaços' },
+    paidSearchKeywords: { en: 'Paid Search Keywords', pt: 'Palavras-chave de busca paga' },
+    contentIdentifier: { en: 'Content Identifier', pt: 'Identificador de conteúdo' },
+    generatedUrl: { en: 'Generated URL', pt: 'URL gerada' },
+    enterUrlAndParams: { en: 'Enter URL and required parameters', pt: 'Digite a URL e os parâmetros obrigatórios' },
+    fillRequiredFields: { en: 'Please fill in all required (*) fields', pt: 'Preencha todos os campos obrigatórios (*)' },
+    whatIsUtm: { en: 'What are UTM Parameters?', pt: 'O que são parâmetros UTM?' },
+    utmExplanation: {
+      en: 'UTM (Urchin Tracking Module) parameters are used to track marketing campaign traffic sources. They help measure campaign performance in analytics tools like Google Analytics.',
+      pt: 'Os parâmetros UTM (Urchin Tracking Module) são usados para rastrear as fontes de tráfego de campanhas de marketing. Eles ajudam a medir o desempenho das campanhas em ferramentas de análise como o Google Analytics.',
+    },
+  },
+
+  // Image Converter
+  imageConverter: {
+    outputFormat: { en: 'Output Format', pt: 'Formato de saída' },
+    quality: { en: 'Quality', pt: 'Qualidade' },
+    reconvert: { en: 'Re-convert', pt: 'Reconverter' },
+    dropzone: { en: 'Drag images or click to upload', pt: 'Arraste imagens ou clique para enviar' },
+    dropzoneHint: { en: 'Supports JPEG, PNG, WebP, GIF, BMP, HEIC, AVIF', pt: 'Suporta JPEG, PNG, WebP, GIF, BMP, HEIC, AVIF' },
+    converting: { en: 'Converting...', pt: 'Convertendo...' },
+    downloadAll: { en: 'Download All', pt: 'Baixar todos' },
+    clearAll: { en: 'Clear All', pt: 'Limpar tudo' },
+    original: { en: 'Original', pt: 'Original' },
+    conversionFailed: { en: 'Conversion failed - unsupported format', pt: 'Falha na conversão — formato não suportado' },
+    remove: { en: 'Remove', pt: 'Remover' },
+    aboutNote: {
+      en: 'ℹ️ All conversions are processed in browser and not sent to server. RAW files (CR2, NEF, ARW, etc.) may be converted depending on browser support.',
+      pt: 'ℹ️ Todas as conversões são processadas no navegador e não são enviadas a um servidor. Arquivos RAW (CR2, NEF, ARW etc.) podem ser convertidos dependendo do suporte do navegador.',
+    },
+  },
+
+  // Percent Calculator
+  percent: {
+    calcTypeLabel: { en: 'Calculation type', pt: 'Tipo de cálculo' },
+    typeWhatPercent: { en: 'A is what % of B?', pt: 'A é quantos % de B?' },
+    typePercentOf: { en: 'What is A% of B?', pt: 'Quanto é A% de B?' },
+    typePercentChange: { en: 'Percent change from A to B', pt: 'Variação percentual de A para B' },
+    typeAddPercent: { en: 'Add B% to A', pt: 'Somar B% a A' },
+    typeSubtractPercent: { en: 'Subtract B% from A', pt: 'Subtrair B% de A' },
+    valueA: { en: 'Value A', pt: 'Valor A' },
+    baseValueB: { en: 'Base value B', pt: 'Valor base B' },
+    percentA: { en: 'Percent A (%)', pt: 'Percentual A (%)' },
+    previousValueA: { en: 'Previous value A', pt: 'Valor anterior A' },
+    currentValueB: { en: 'Current value B', pt: 'Valor atual B' },
+    percentToAddB: { en: 'Percent to add B (%)', pt: 'Percentual a somar B (%)' },
+    percentToSubtractB: { en: 'Percent to subtract B (%)', pt: 'Percentual a subtrair B (%)' },
+    numberPlaceholder: { en: 'Enter a number', pt: 'Digite um número' },
+    calculate: { en: 'Calculate', pt: 'Calcular' },
+    quickReference: { en: 'Quick reference', pt: 'Referência rápida' },
+    resultWhatPercent: { en: '{a} is {res}% of {b}', pt: '{a} é {res}% de {b}' },
+    resultPercentOf: { en: '{a}% of {b} is {res}', pt: '{a}% de {b} é {res}' },
+    resultPercentChange: { en: 'The change from {a} to {b} is {sign}{res}%', pt: 'A variação de {a} para {b} é {sign}{res}%' },
+    resultAddPercent: { en: '{a} plus {b}% is {res}', pt: '{a} mais {b}% é {res}' },
+    resultSubtractPercent: { en: '{a} minus {b}% is {res}', pt: '{a} menos {b}% é {res}' },
+  },
+
+  // Coin Flip
+  coinFlip: {
+    headsResult: { en: 'Heads!', pt: 'Cara!' },
+    tailsResult: { en: 'Tails!', pt: 'Coroa!' },
+    flipping: { en: 'Flipping...', pt: 'Girando...' },
+    flipButton: { en: '🪙 Flip Coin', pt: '🪙 Jogar moeda' },
+    headsLabel: { en: 'Heads', pt: 'Cara' },
+    tailsLabel: { en: 'Tails', pt: 'Coroa' },
+    historyTitle: { en: 'History (last 20)', pt: 'Histórico (últimas 20)' },
+    tipsTitle: { en: '💡 Tips', pt: '💡 Dicas' },
+    tip1: { en: 'Use this when you need help making a decision', pt: 'Use quando precisar de ajuda para tomar uma decisão' },
+    tip2: {
+      en: 'Uses a cryptographically secure random number generator',
+      pt: 'Usa um gerador de números aleatórios criptograficamente seguro',
+    },
+    tip3: { en: 'Heads (👑) and tails (🦅) each have a 50% chance', pt: 'Cara (👑) e coroa (🦅) têm 50% de chance cada' },
+  },
+
+  // Dice Roller
+  dice: {
+    diceType: { en: 'Dice type', pt: 'Tipo de dado' },
+    numberOfDice: { en: 'Number of dice', pt: 'Número de dados' },
+    rollPrompt: { en: 'Roll the dice!', pt: 'Jogue os dados!' },
+    total: { en: 'Total', pt: 'Total' },
+    rangeLabel: { en: 'Range', pt: 'Intervalo' },
+    rolling: { en: 'Rolling...', pt: 'Rolando...' },
+    rollButtonPrefix: { en: 'Roll', pt: 'Jogar' },
+    historyTitle: { en: '📜 History', pt: '📜 Histórico' },
   },
 } as const;
 

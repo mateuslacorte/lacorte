@@ -1,12 +1,16 @@
 'use client';
 
 import { useEffect } from 'react';
+import Link from 'next/link';
 import FavoriteButton from '@/components/tools/FavoriteButton';
 import ShareButton from '@/components/tools/ShareButton';
 import BookmarkPrompt from '@/components/tools/BookmarkPrompt';
 import RelatedTools from '@/components/tools/RelatedTools';
 import { getToolComponent } from '@/components/tools/registry';
 import { trackToolVisit } from '@/lib/userData';
+import { useTranslation } from '@/i18n/useTranslation';
+import { localizePath } from '@/i18n/urlUtils';
+import type { Language } from '@/i18n';
 
 interface ToolPageClientProps {
   slug: string;
@@ -14,6 +18,7 @@ interface ToolPageClientProps {
   icon: string;
   description: string;
   category: string;
+  lang?: Language;
 }
 
 export default function ToolPageClient({
@@ -22,7 +27,10 @@ export default function ToolPageClient({
   icon,
   description,
   category,
+  lang: routeLang,
 }: ToolPageClientProps) {
+  const { t, lang, translations } = useTranslation(routeLang);
+  const nav = translations.common.nav;
   const ToolComponent = getToolComponent(slug);
   const shortTitle = title.split(' - ')[0];
 
@@ -39,9 +47,17 @@ export default function ToolPageClient({
       <div className="max-w-4xl mx-auto">
         <nav className="text-sm mb-6">
           <ol className="flex items-center gap-2 text-[var(--color-text-muted)]">
-            <li><a href="/" className="hover:text-primary-500">Home</a></li>
+            <li>
+              <Link href={localizePath('/', lang)} className="hover:text-primary-500">
+                {t(nav.home)}
+              </Link>
+            </li>
             <li>/</li>
-            <li><a href="/tools" className="hover:text-primary-500">Tools</a></li>
+            <li>
+              <Link href={localizePath('/tools', lang)} className="hover:text-primary-500">
+                {t(nav.tools)}
+              </Link>
+            </li>
             <li>/</li>
             <li className="text-[var(--color-text)]">{shortTitle}</li>
           </ol>
@@ -62,11 +78,11 @@ export default function ToolPageClient({
         </header>
 
         <div className="bg-[var(--color-card)] rounded-2xl border border-[var(--color-border)] p-4 md:p-8">
-          <ToolComponent />
+          <ToolComponent lang={lang} />
         </div>
 
-        <RelatedTools currentSlug={slug} currentCategory={category} />
-        <BookmarkPrompt />
+        <RelatedTools currentSlug={slug} currentCategory={category} lang={lang} />
+        <BookmarkPrompt lang={lang} />
       </div>
     </section>
   );

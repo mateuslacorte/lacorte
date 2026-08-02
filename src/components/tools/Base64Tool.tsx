@@ -172,7 +172,7 @@ export default function Base64Tool({ lang: initialLang }: { lang?: Language } = 
 
       {/* Info */}
       <p className="text-sm text-[var(--color-text-muted)] text-center">
-        {t({ en: 'Base64 is a method to encode binary data as text', pt: 'Base64 is a method to encode binary data as text' })}
+        {t(tt.aboutNote)}
       </p>
     </div>
   );

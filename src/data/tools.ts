@@ -333,6 +333,24 @@ export const toolsConfig: ToolConfig[] = [
     },
   },
   {
+    slug: 'bcrypt',
+    icon: '🔒',
+    category: 'developer',
+    component: 'BcryptTool',
+    seo: {
+      en: {
+        title: 'Bcrypt Hash & Verify - Free Online Bcrypt Tool',
+        description: 'Free online bcrypt hasher and verifier. Hash passwords and check bcrypt hashes in your browser. Free tool for developers.',
+        keywords: ['bcrypt', 'bcrypt hash', 'bcrypt verify', 'password hash', 'hash password', ...seoKeywords.en],
+      },
+      pt: {
+        title: 'Bcrypt - Hash e verificação online grátis',
+        description: 'Gere e verifique hashes bcrypt no navegador. Codifique senhas e confira se batem com um hash. Grátis, sem envio de dados.',
+        keywords: ['bcrypt', 'hash bcrypt', 'verificar bcrypt', 'hash de senha', 'codificar senha', 'grátis', 'online', 'simples', 'rápido', 'sem instalação', 'web'],
+      },
+    },
+  },
+  {
     slug: 'cron',
     icon: '⏰',
     category: 'developer',

@@ -214,7 +214,7 @@ export default function LoremIpsumGenerator({ lang: initialLang }: { lang?: Lang
 
       {/* Info */}
       <p className="text-sm text-[var(--color-text-muted)] text-center">
-        {t({ en: 'Lorem Ipsum is dummy text used in printing and typesetting industry.', pt: 'Lorem Ipsum is dummy text used in printing and typesetting industry.' })}
+        {t(tt.aboutNote)}
       </p>
     </div>
   );

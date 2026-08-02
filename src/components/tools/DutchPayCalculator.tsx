@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslation } from '../../i18n/useTranslation';
+import type { Language } from '../../i18n';
 
 interface Person {
   id: string;
@@ -9,11 +11,15 @@ interface Person {
   shouldPay: number;
 }
 
-export default function DutchPayCalculator() {
+export default function DutchPayCalculator({ lang: initialLang }: { lang?: Language } = {}) {
+  const { t, translations } = useTranslation(initialLang);
+  const tc = translations.tools.dutchPay;
+  const participantLabel = t({ en: 'Participant', pt: 'Participante' });
+
   const [totalAmount, setTotalAmount] = useState('');
   const [people, setPeople] = useState<Person[]>([
-    { id: '1', name: 'Participant 1', paid: 0, shouldPay: 0 },
-    { id: '2', name: 'Participant 2', paid: 0, shouldPay: 0 },
+    { id: '1', name: `${participantLabel} 1`, paid: 0, shouldPay: 0 },
+    { id: '2', name: `${participantLabel} 2`, paid: 0, shouldPay: 0 },
   ]);
   const [showAdvanced, setShowAdvanced] = useState(false);
 
@@ -21,7 +27,7 @@ export default function DutchPayCalculator() {
     const newId = String(Date.now());
     setPeople([
       ...people,
-      { id: newId, name: `Participant ${people.length + 1}`, paid: 0, shouldPay: 0 },
+      { id: newId, name: `${participantLabel} ${people.length + 1}`, paid: 0, shouldPay: 0 },
     ]);
   };
 
@@ -82,7 +88,7 @@ export default function DutchPayCalculator() {
       {/* Total Amount */}
       <div className="space-y-2">
         <label className="block text-sm font-medium text-[var(--color-text)]">
-          Total amount
+          {t(tc.totalAmount)}
         </label>
         <div className="relative">
           <input
@@ -105,13 +111,13 @@ export default function DutchPayCalculator() {
         <div className="p-4 rounded-lg bg-primary-500/10 border border-primary-500/20">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-[var(--color-text-muted)]">Per person</p>
+              <p className="text-sm text-[var(--color-text-muted)]">{t(tc.perPerson)}</p>
               <p className="text-3xl font-bold text-primary-500">
                 ${Math.ceil(perPerson).toLocaleString()}
               </p>
             </div>
             <div className="text-right">
-              <p className="text-sm text-[var(--color-text-muted)]">Participants</p>
+              <p className="text-sm text-[var(--color-text-muted)]">{t({ en: 'Participants', pt: 'Participantes' })}</p>
               <p className="text-3xl font-bold text-[var(--color-text)]">{people.length}</p>
             </div>
           </div>
@@ -121,7 +127,7 @@ export default function DutchPayCalculator() {
       {/* Quick People Count */}
       <div className="space-y-2">
         <label className="block text-sm font-medium text-[var(--color-text)]">
-          Group size
+          {t({ en: 'Group size', pt: 'Tamanho do grupo' })}
         </label>
         <div className="flex flex-wrap gap-2">
           {[2, 3, 4, 5, 6, 7, 8, 10].map((num) => (
@@ -130,7 +136,7 @@ export default function DutchPayCalculator() {
               onClick={() => {
                 const newPeople = Array.from({ length: num }, (_, i) => ({
                   id: String(i + 1),
-                  name: `Participant ${i + 1}`,
+                  name: `${participantLabel} ${i + 1}`,
                   paid: 0,
                   shouldPay: 0,
                 }));
@@ -153,7 +159,9 @@ export default function DutchPayCalculator() {
         onClick={() => setShowAdvanced(!showAdvanced)}
         className="text-sm text-primary-500 hover:underline text-left"
       >
-        {showAdvanced ? '▼ Show simple view' : '▶ Enter individual payments (settlement)'}
+        {showAdvanced
+          ? t({ en: '▼ Show simple view', pt: '▼ Ver visualização simples' })
+          : t({ en: '▶ Enter individual payments (settlement)', pt: '▶ Informar pagamentos individuais (acerto de contas)' })}
       </button>
 
       {/* Advanced Mode - Individual Payments */}
@@ -204,13 +212,13 @@ export default function DutchPayCalculator() {
               rounded-lg text-[var(--color-text-muted)] hover:border-primary-500
               hover:text-primary-500 transition-colors"
           >
-            + Add participant
+            + {t({ en: 'Add participant', pt: 'Adicionar participante' })}
           </button>
 
           {/* Settlement Results */}
           {settlements.length > 0 && (
             <div className="p-4 rounded-lg bg-[var(--color-card)] border border-[var(--color-border)]">
-              <h3 className="font-medium text-[var(--color-text)] mb-3">💸 Settlement plan</h3>
+              <h3 className="font-medium text-[var(--color-text)] mb-3">💸 {t({ en: 'Settlement plan', pt: 'Plano de acerto' })}</h3>
               <div className="space-y-2">
                 {settlements.map((s, i) => (
                   <div
@@ -233,12 +241,12 @@ export default function DutchPayCalculator() {
           {totalPaid > 0 && (
             <div className="p-4 rounded-lg bg-[var(--color-card)] border border-[var(--color-border)]">
               <div className="flex justify-between text-sm">
-                <span className="text-[var(--color-text-muted)]">Total paid</span>
+                <span className="text-[var(--color-text-muted)]">{t({ en: 'Total paid', pt: 'Total pago' })}</span>
                 <span className="text-[var(--color-text)]">${totalPaid.toLocaleString()}</span>
               </div>
               {totalPaid !== total && (
                 <div className="flex justify-between text-sm mt-1">
-                  <span className="text-[var(--color-text-muted)]">Difference</span>
+                  <span className="text-[var(--color-text-muted)]">{t({ en: 'Difference', pt: 'Diferença' })}</span>
                   <span className={totalPaid > total ? 'text-green-500' : 'text-red-500'}>
                     {totalPaid > total ? '+' : ''}${(totalPaid - total).toLocaleString()}
                   </span>
@@ -251,13 +259,13 @@ export default function DutchPayCalculator() {
 
       {/* Common Scenarios */}
       <div className="p-4 rounded-lg bg-[var(--color-card)] border border-[var(--color-border)]">
-        <h3 className="font-medium text-[var(--color-text)] mb-3">💡 Quick examples</h3>
+        <h3 className="font-medium text-[var(--color-text)] mb-3">💡 {t({ en: 'Quick examples', pt: 'Exemplos rápidos' })}</h3>
         <div className="grid grid-cols-2 gap-2 text-sm">
           {[
-            { label: 'Fried chicken (4)', amount: 40000, people: 4 },
-            { label: 'BBQ dinner (4)', amount: 60000, people: 4 },
-            { label: 'Team dinner (6)', amount: 300000, people: 6 },
-            { label: 'Cafe (3)', amount: 30000, people: 3 },
+            { label: t({ en: 'Fried chicken (4)', pt: 'Frango frito (4)' }), amount: 40000, people: 4 },
+            { label: t({ en: 'BBQ dinner (4)', pt: 'Churrasco (4)' }), amount: 60000, people: 4 },
+            { label: t({ en: 'Team dinner (6)', pt: 'Jantar da equipe (6)' }), amount: 300000, people: 6 },
+            { label: t({ en: 'Cafe (3)', pt: 'Café (3)' }), amount: 30000, people: 3 },
           ].map((item) => (
             <button
               key={item.label}
@@ -266,7 +274,7 @@ export default function DutchPayCalculator() {
                 setPeople(
                   Array.from({ length: item.people }, (_, i) => ({
                     id: String(i + 1),
-                    name: `Participant ${i + 1}`,
+                    name: `${participantLabel} ${i + 1}`,
                     paid: 0,
                     shouldPay: 0,
                   }))

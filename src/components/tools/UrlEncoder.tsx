@@ -7,7 +7,9 @@ import type { Language } from '../../i18n';
 type Mode = 'encode' | 'decode';
 
 export default function UrlEncoder({ lang: initialLang }: { lang?: Language } = {}) {
-  const { t } = useTranslation(initialLang);
+  const { t, translations } = useTranslation(initialLang);
+  const tc = translations.tools.urlEncoder;
+  const common = translations.tools.common;
 
   const [mode, setMode] = useState<Mode>('encode');
   const [input, setInput] = useState('');
@@ -27,7 +29,7 @@ export default function UrlEncoder({ lang: initialLang }: { lang?: Language } = 
         setOutput(decoded);
       }
     } catch (e) {
-      setError(t({ en: 'Invalid input', pt: 'Invalid input' }));
+      setError(t(tc.invalidInput));
       setOutput('');
     }
   };
@@ -75,10 +77,10 @@ export default function UrlEncoder({ lang: initialLang }: { lang?: Language } = 
   };
 
   const examples = [
-    { label: 'URL with spaces', value: 'https://example.com/search?q=hello world' },
-    { label: 'Accented text', value: 'café' },
-    { label: 'Special chars', value: 'name=John&age=30' },
-    { label: 'Encoded URL', value: 'https%3A%2F%2Fexample.com%2Fpath' },
+    { label: t(tc.exampleUrlSpaces), value: 'https://example.com/search?q=hello world' },
+    { label: t(tc.exampleAccented), value: 'café' },
+    { label: t(tc.exampleSpecialChars), value: 'name=John&age=30' },
+    { label: t(tc.exampleEncodedUrl), value: 'https%3A%2F%2Fexample.com%2Fpath' },
   ];
 
   return (
@@ -93,7 +95,7 @@ export default function UrlEncoder({ lang: initialLang }: { lang?: Language } = 
               : 'bg-[var(--color-card)] text-[var(--color-text)] hover:bg-[var(--color-card-hover)]'
             }`}
         >
-          {t({ en: 'Encode', pt: 'Encode' })}
+          {t(tc.encode)}
         </button>
         <button
           onClick={() => handleModeChange('decode')}
@@ -103,7 +105,7 @@ export default function UrlEncoder({ lang: initialLang }: { lang?: Language } = 
               : 'bg-[var(--color-card)] text-[var(--color-text)] hover:bg-[var(--color-card-hover)]'
             }`}
         >
-          {t({ en: 'Decode', pt: 'Decode' })}
+          {t(tc.decode)}
         </button>
       </div>
 
@@ -120,7 +122,7 @@ export default function UrlEncoder({ lang: initialLang }: { lang?: Language } = 
           <span className="text-sm text-[var(--color-text)]">
             encodeURIComponent
             <span className="text-[var(--color-text-muted)] ml-1">
-              ({t({ en: 'Full encoding', pt: 'Full encoding' })})
+              ({t(tc.fullEncoding)})
             </span>
           </span>
         </label>
@@ -135,7 +137,7 @@ export default function UrlEncoder({ lang: initialLang }: { lang?: Language } = 
           <span className="text-sm text-[var(--color-text)]">
             encodeURI
             <span className="text-[var(--color-text-muted)] ml-1">
-              ({t({ en: 'Keep URL structure', pt: 'Keep URL structure' })})
+              ({t(tc.keepUrlStructure)})
             </span>
           </span>
         </label>
@@ -158,12 +160,12 @@ export default function UrlEncoder({ lang: initialLang }: { lang?: Language } = 
       {/* Input */}
       <div className="space-y-2">
         <label className="block text-sm font-medium text-[var(--color-text)]">
-          {t({ en: 'Input', pt: 'Input' })}
+          {t(common.input)}
         </label>
         <textarea
           value={input}
           onChange={(e) => handleInputChange(e.target.value)}
-          placeholder={t({ en: 'Enter URL or text', pt: 'Enter URL or text' })}
+          placeholder={t(tc.inputPlaceholder)}
           rows={4}
           className="w-full px-4 py-3 rounded-lg border border-[var(--color-border)]
             bg-[var(--color-card)] text-[var(--color-text)] font-mono text-sm resize-y
@@ -190,7 +192,7 @@ export default function UrlEncoder({ lang: initialLang }: { lang?: Language } = 
       <div className="space-y-2">
         <div className="flex justify-between items-center">
           <label className="block text-sm font-medium text-[var(--color-text)]">
-            {t({ en: 'Result', pt: 'Result' })}
+            {t(common.result)}
           </label>
           <button
             onClick={copyOutput}
@@ -199,7 +201,7 @@ export default function UrlEncoder({ lang: initialLang }: { lang?: Language } = 
               border border-[var(--color-border)] rounded-lg transition-colors
               disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {copied ? t({ en: 'Copied!', pt: 'Copied!' }) : t({ en: 'Copy', pt: 'Copy' })}
+            {copied ? t(common.copied) : t(common.copy)}
           </button>
         </div>
         <textarea
@@ -222,11 +224,11 @@ export default function UrlEncoder({ lang: initialLang }: { lang?: Language } = 
       {/* Reference */}
       <div className="p-4 rounded-lg bg-[var(--color-card)] border border-[var(--color-border)]">
         <h3 className="text-sm font-medium text-[var(--color-text)] mb-2">
-          {t({ en: 'Difference', pt: 'Difference' })}
+          {t(tc.difference)}
         </h3>
         <div className="text-sm text-[var(--color-text-muted)] space-y-1">
-          <p><code className="bg-[var(--color-bg)] px-1 rounded">encodeURIComponent</code>: {t({ en: 'Encodes all special chars (for query params)', pt: 'Encodes all special chars (for query params)' })}</p>
-          <p><code className="bg-[var(--color-bg)] px-1 rounded">encodeURI</code>: {t({ en: 'Keeps URL structure chars (: / ? # etc)', pt: 'Keeps URL structure chars (: / ? # etc)' })}</p>
+          <p><code className="bg-[var(--color-bg)] px-1 rounded">encodeURIComponent</code>: {t(tc.encodesAllChars)}</p>
+          <p><code className="bg-[var(--color-bg)] px-1 rounded">encodeURI</code>: {t(tc.keepsUrlChars)}</p>
         </div>
       </div>
     </div>

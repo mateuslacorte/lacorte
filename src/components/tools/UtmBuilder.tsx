@@ -38,7 +38,9 @@ const MEDIUMS = [
 ];
 
 export default function UtmBuilder({ lang: initialLang }: { lang?: Language } = {}) {
-  const { t } = useTranslation(initialLang);
+  const { t, translations } = useTranslation(initialLang);
+  const tc = translations.tools.utm;
+  const common = translations.tools.common;
 
   const [params, setParams] = useState<UtmParams>({
     url: '',
@@ -112,21 +114,21 @@ export default function UtmBuilder({ lang: initialLang }: { lang?: Language } = 
           className="px-3 py-1.5 text-sm bg-[var(--color-card)] hover:bg-[var(--color-card-hover)]
             border border-[var(--color-border)] rounded-lg transition-colors"
         >
-          {t({ en: 'Load Example', pt: 'Load Example' })}
+          {t(common.loadExample)}
         </button>
         <button
           onClick={clearAll}
           className="px-3 py-1.5 text-sm bg-[var(--color-card)] hover:bg-[var(--color-card-hover)]
             border border-[var(--color-border)] rounded-lg transition-colors"
         >
-          {t({ en: 'Clear', pt: 'Clear' })}
+          {t(common.clear)}
         </button>
       </div>
 
       {/* URL Input */}
       <div className="space-y-2">
         <label className="block text-sm font-medium text-[var(--color-text)]">
-          {t({ en: 'Website URL', pt: 'Website URL' })} *
+          {t(tc.websiteUrl)} *
         </label>
         <input
           type="text"
@@ -144,7 +146,7 @@ export default function UtmBuilder({ lang: initialLang }: { lang?: Language } = 
         {/* Source */}
         <div className="space-y-2">
           <label className="block text-sm font-medium text-[var(--color-text)]">
-            utm_source * <span className="text-[var(--color-text-muted)] font-normal">({t({ en: 'Traffic Source', pt: 'Traffic Source' })})</span>
+            utm_source * <span className="text-[var(--color-text-muted)] font-normal">({t(tc.trafficSource)})</span>
           </label>
           <select
             value={params.source}
@@ -153,7 +155,7 @@ export default function UtmBuilder({ lang: initialLang }: { lang?: Language } = 
               bg-[var(--color-card)] text-[var(--color-text)]
               focus:outline-none focus:ring-2 focus:ring-primary-500"
           >
-            <option value="">{t({ en: 'Select', pt: 'Select' })}</option>
+            <option value="">{t(tc.select)}</option>
             {SOURCES.map((s) => (
               <option key={s.value} value={s.value}>{s.label}</option>
             ))}
@@ -162,7 +164,7 @@ export default function UtmBuilder({ lang: initialLang }: { lang?: Language } = 
             type="text"
             value={params.source}
             onChange={(e) => setParams({ ...params, source: e.target.value })}
-            placeholder={t({ en: 'Or type custom', pt: 'Or type custom' })}
+            placeholder={t(tc.orTypeCustom)}
             className="w-full px-4 py-2 rounded-lg border border-[var(--color-border)]
               bg-[var(--color-card)] text-[var(--color-text)] text-sm
               focus:outline-none focus:ring-2 focus:ring-primary-500"
@@ -172,7 +174,7 @@ export default function UtmBuilder({ lang: initialLang }: { lang?: Language } = 
         {/* Medium */}
         <div className="space-y-2">
           <label className="block text-sm font-medium text-[var(--color-text)]">
-            utm_medium * <span className="text-[var(--color-text-muted)] font-normal">({t({ en: 'Marketing Medium', pt: 'Marketing Medium' })})</span>
+            utm_medium * <span className="text-[var(--color-text-muted)] font-normal">({t(tc.marketingMedium)})</span>
           </label>
           <select
             value={params.medium}
@@ -181,7 +183,7 @@ export default function UtmBuilder({ lang: initialLang }: { lang?: Language } = 
               bg-[var(--color-card)] text-[var(--color-text)]
               focus:outline-none focus:ring-2 focus:ring-primary-500"
           >
-            <option value="">{t({ en: 'Select', pt: 'Select' })}</option>
+            <option value="">{t(tc.select)}</option>
             {MEDIUMS.map((m) => (
               <option key={m.value} value={m.value}>{m.label}</option>
             ))}
@@ -190,7 +192,7 @@ export default function UtmBuilder({ lang: initialLang }: { lang?: Language } = 
             type="text"
             value={params.medium}
             onChange={(e) => setParams({ ...params, medium: e.target.value })}
-            placeholder={t({ en: 'Or type custom', pt: 'Or type custom' })}
+            placeholder={t(tc.orTypeCustom)}
             className="w-full px-4 py-2 rounded-lg border border-[var(--color-border)]
               bg-[var(--color-card)] text-[var(--color-text)] text-sm
               focus:outline-none focus:ring-2 focus:ring-primary-500"
@@ -200,7 +202,7 @@ export default function UtmBuilder({ lang: initialLang }: { lang?: Language } = 
         {/* Campaign */}
         <div className="space-y-2">
           <label className="block text-sm font-medium text-[var(--color-text)]">
-            utm_campaign * <span className="text-[var(--color-text-muted)] font-normal">({t({ en: 'Campaign Name', pt: 'Campaign Name' })})</span>
+            utm_campaign * <span className="text-[var(--color-text-muted)] font-normal">({t(tc.campaignName)})</span>
           </label>
           <input
             type="text"
@@ -212,7 +214,7 @@ export default function UtmBuilder({ lang: initialLang }: { lang?: Language } = 
               focus:outline-none focus:ring-2 focus:ring-primary-500"
           />
           <p className="text-xs text-[var(--color-text-muted)]">
-            {t({ en: 'Use underscores instead of spaces', pt: 'Use underscores instead of spaces' })}
+            {t(tc.useUnderscores)}
           </p>
         </div>
       </div>
@@ -222,7 +224,7 @@ export default function UtmBuilder({ lang: initialLang }: { lang?: Language } = 
         {/* Term */}
         <div className="space-y-2">
           <label className="block text-sm font-medium text-[var(--color-text)]">
-            utm_term <span className="text-[var(--color-text-muted)] font-normal">({t({ en: 'Paid Search Keywords', pt: 'Paid Search Keywords' })})</span>
+            utm_term <span className="text-[var(--color-text-muted)] font-normal">({t(tc.paidSearchKeywords)})</span>
           </label>
           <input
             type="text"
@@ -238,7 +240,7 @@ export default function UtmBuilder({ lang: initialLang }: { lang?: Language } = 
         {/* Content */}
         <div className="space-y-2">
           <label className="block text-sm font-medium text-[var(--color-text)]">
-            utm_content <span className="text-[var(--color-text-muted)] font-normal">({t({ en: 'Content Identifier', pt: 'Content Identifier' })})</span>
+            utm_content <span className="text-[var(--color-text-muted)] font-normal">({t(tc.contentIdentifier)})</span>
           </label>
           <input
             type="text"
@@ -256,7 +258,7 @@ export default function UtmBuilder({ lang: initialLang }: { lang?: Language } = 
       <div className="space-y-2">
         <div className="flex justify-between items-center">
           <label className="block text-sm font-medium text-[var(--color-text)]">
-            {t({ en: 'Generated URL', pt: 'Generated URL' })}
+            {t(tc.generatedUrl)}
           </label>
           <button
             onClick={copyToClipboard}
@@ -264,7 +266,7 @@ export default function UtmBuilder({ lang: initialLang }: { lang?: Language } = 
             className="px-3 py-1 text-sm bg-primary-500 hover:bg-primary-600 text-white rounded
               transition-colors disabled:opacity-50"
           >
-            {copied ? t({ en: 'Copied!', pt: 'Copied!' }) : t({ en: 'Copy', pt: 'Copy' })}
+            {copied ? t(common.copied) : t(common.copy)}
           </button>
         </div>
         <div className="p-4 rounded-lg bg-[var(--color-bg)] border border-[var(--color-border)] min-h-[60px]">
@@ -274,13 +276,13 @@ export default function UtmBuilder({ lang: initialLang }: { lang?: Language } = 
             </code>
           ) : (
             <span className="text-sm text-[var(--color-text-muted)]">
-              {t({ en: 'Enter URL and required parameters', pt: 'Enter URL and required parameters' })}
+              {t(tc.enterUrlAndParams)}
             </span>
           )}
         </div>
         {!isValid && params.url && (
           <p className="text-sm text-yellow-600 dark:text-yellow-400">
-            {t({ en: 'Please fill in all required (*) fields', pt: 'Please fill in all required (*) fields' })}
+            {t(tc.fillRequiredFields)}
           </p>
         )}
       </div>
@@ -288,10 +290,10 @@ export default function UtmBuilder({ lang: initialLang }: { lang?: Language } = 
       {/* Info */}
       <div className="p-4 rounded-lg bg-[var(--color-card)] border border-[var(--color-border)]">
         <h3 className="text-sm font-medium text-[var(--color-text)] mb-2">
-          {t({ en: 'What are UTM Parameters?', pt: 'What are UTM Parameters?' })}
+          {t(tc.whatIsUtm)}
         </h3>
         <p className="text-sm text-[var(--color-text-muted)]">
-          {t({ en: 'UTM (Urchin Tracking Module) parameters are used to track marketing campaign traffic sources. They help measure campaign performance in analytics tools like Google Analytics.', pt: 'UTM (Urchin Tracking Module) parameters are used to track marketing campaign traffic sources. They help measure campaign performance in analytics tools like Google Analytics.' })}
+          {t(tc.utmExplanation)}
         </p>
       </div>
     </div>

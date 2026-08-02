@@ -23,7 +23,9 @@ const PRESETS = [
 ];
 
 export default function GradientGenerator({ lang: initialLang }: { lang?: Language } = {}) {
-  const { t } = useTranslation(initialLang);
+  const { t, translations } = useTranslation(initialLang);
+  const tc = translations.tools.gradient;
+  const common = translations.tools.common;
 
   const [gradientType, setGradientType] = useState<GradientType>('linear');
   const [angle, setAngle] = useState(90);
@@ -119,7 +121,7 @@ export default function GradientGenerator({ lang: initialLang }: { lang?: Langua
                 : 'bg-[var(--color-card)] text-[var(--color-text)] hover:bg-[var(--color-card-hover)]'
               }`}
           >
-            {type}
+            {type === 'linear' ? t(tc.typeLinear) : type === 'radial' ? t(tc.typeRadial) : t(tc.typeConic)}
           </button>
         ))}
       </div>
@@ -129,7 +131,7 @@ export default function GradientGenerator({ lang: initialLang }: { lang?: Langua
         <div className="space-y-2">
           <div className="flex justify-between">
             <label className="text-sm font-medium text-[var(--color-text)]">
-              {t({ en: 'Angle', pt: 'Angle' })}
+              {t(tc.angle)}
             </label>
             <span className="text-sm text-[var(--color-text-muted)]">{angle}°</span>
           </div>
@@ -148,7 +150,7 @@ export default function GradientGenerator({ lang: initialLang }: { lang?: Langua
       <div className="space-y-3">
         <div className="flex justify-between items-center">
           <label className="text-sm font-medium text-[var(--color-text)]">
-            {t({ en: 'Color Stops', pt: 'Color Stops' })}
+            {t(tc.colorStops)}
           </label>
           <button
             onClick={addColorStop}
@@ -156,7 +158,7 @@ export default function GradientGenerator({ lang: initialLang }: { lang?: Langua
             className="px-3 py-1 text-sm bg-primary-500 hover:bg-primary-600 text-white rounded
               transition-colors disabled:opacity-50"
           >
-            + {t({ en: 'Add', pt: 'Add' })}
+            + {t(tc.add)}
           </button>
         </div>
 
@@ -205,7 +207,7 @@ export default function GradientGenerator({ lang: initialLang }: { lang?: Langua
       {/* Presets */}
       <div className="space-y-2">
         <label className="text-sm font-medium text-[var(--color-text)]">
-          {t({ en: 'Presets', pt: 'Presets' })}
+          {t(tc.presets)}
         </label>
         <div className="flex flex-wrap gap-2">
           {PRESETS.map((preset) => (
@@ -224,7 +226,7 @@ export default function GradientGenerator({ lang: initialLang }: { lang?: Langua
             className="px-3 h-8 rounded-lg bg-[var(--color-card)] border border-[var(--color-border)]
               hover:bg-[var(--color-card-hover)] transition-colors text-sm"
           >
-            🎲 {t({ en: 'Random', pt: 'Random' })}
+            🎲 {t(tc.random)}
           </button>
         </div>
       </div>
@@ -238,7 +240,7 @@ export default function GradientGenerator({ lang: initialLang }: { lang?: Langua
             className="px-3 py-1 text-sm bg-[var(--color-card)] hover:bg-[var(--color-card-hover)]
               border border-[var(--color-border)] rounded transition-colors"
           >
-            {copied ? t({ en: 'Copied!', pt: 'Copied!' }) : t({ en: 'Copy', pt: 'Copy' })}
+            {copied ? t(common.copied) : t(common.copy)}
           </button>
         </div>
         <div className="p-4 rounded-lg bg-[var(--color-bg)] border border-[var(--color-border)]">

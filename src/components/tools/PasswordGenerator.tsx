@@ -107,7 +107,7 @@ export default function PasswordGenerator({ lang: initialLang }: { lang?: Langua
             type="text"
             value={password}
             readOnly
-            placeholder={t({ en: 'Generated password', pt: 'Generated password' })}
+            placeholder={t(tt.generatedPlaceholder)}
             className="flex-1 px-4 py-3 rounded-lg border border-[var(--color-border)]
               bg-[var(--color-card)] text-[var(--color-text)] font-mono text-lg
               focus:outline-none"

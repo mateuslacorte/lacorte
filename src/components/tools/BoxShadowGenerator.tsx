@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { useTranslation } from '../../i18n/useTranslation';
+import { useTranslation, translations } from '../../i18n/useTranslation';
 import type { Language } from '../../i18n';
 
 interface Shadow {
@@ -13,16 +13,18 @@ interface Shadow {
   inset: boolean;
 }
 
-const PRESETS = [
-  { name: 'Subtle', shadow: { offsetX: 0, offsetY: 1, blur: 3, spread: 0, color: 'rgba(0,0,0,0.12)', inset: false } },
-  { name: 'Regular', shadow: { offsetX: 0, offsetY: 4, blur: 6, spread: -1, color: 'rgba(0,0,0,0.1)', inset: false } },
-  { name: 'Medium', shadow: { offsetX: 0, offsetY: 10, blur: 15, spread: -3, color: 'rgba(0,0,0,0.1)', inset: false } },
-  { name: 'Large', shadow: { offsetX: 0, offsetY: 20, blur: 25, spread: -5, color: 'rgba(0,0,0,0.1)', inset: false } },
-  { name: 'Sharp', shadow: { offsetX: 4, offsetY: 4, blur: 0, spread: 0, color: 'rgba(0,0,0,0.25)', inset: false } },
-  { name: 'Inset', shadow: { offsetX: 0, offsetY: 2, blur: 4, spread: 0, color: 'rgba(0,0,0,0.06)', inset: true } },
-  { name: 'Glow', shadow: { offsetX: 0, offsetY: 0, blur: 20, spread: 0, color: 'rgba(59,130,246,0.5)', inset: false } },
-  { name: 'Layered', shadow: { offsetX: 0, offsetY: 4, blur: 6, spread: 0, color: 'rgba(0,0,0,0.07)', inset: false } },
-];
+function getPresets(t: (entry: { en: string; pt: string }) => string, tc: typeof translations.tools.boxShadow) {
+  return [
+    { name: t(tc.presetSubtle), shadow: { offsetX: 0, offsetY: 1, blur: 3, spread: 0, color: 'rgba(0,0,0,0.12)', inset: false } },
+    { name: t(tc.presetRegular), shadow: { offsetX: 0, offsetY: 4, blur: 6, spread: -1, color: 'rgba(0,0,0,0.1)', inset: false } },
+    { name: t(tc.presetMedium), shadow: { offsetX: 0, offsetY: 10, blur: 15, spread: -3, color: 'rgba(0,0,0,0.1)', inset: false } },
+    { name: t(tc.presetLarge), shadow: { offsetX: 0, offsetY: 20, blur: 25, spread: -5, color: 'rgba(0,0,0,0.1)', inset: false } },
+    { name: t(tc.presetSharp), shadow: { offsetX: 4, offsetY: 4, blur: 0, spread: 0, color: 'rgba(0,0,0,0.25)', inset: false } },
+    { name: t(tc.presetInset), shadow: { offsetX: 0, offsetY: 2, blur: 4, spread: 0, color: 'rgba(0,0,0,0.06)', inset: true } },
+    { name: t(tc.presetGlow), shadow: { offsetX: 0, offsetY: 0, blur: 20, spread: 0, color: 'rgba(59,130,246,0.5)', inset: false } },
+    { name: t(tc.presetLayered), shadow: { offsetX: 0, offsetY: 4, blur: 6, spread: 0, color: 'rgba(0,0,0,0.07)', inset: false } },
+  ];
+}
 
 function hexToRgba(hex: string, alpha: number): string {
   const r = parseInt(hex.slice(1, 3), 16);
@@ -32,7 +34,10 @@ function hexToRgba(hex: string, alpha: number): string {
 }
 
 export default function BoxShadowGenerator({ lang: initialLang }: { lang?: Language } = {}) {
-  const { t } = useTranslation(initialLang);
+  const { t, translations: tr } = useTranslation(initialLang);
+  const tc = tr.tools.boxShadow;
+  const common = tr.tools.common;
+  const PRESETS = useMemo(() => getPresets(t, tc), [t, tc]);
 
   const [shadows, setShadows] = useState<Shadow[]>([
     { offsetX: 0, offsetY: 4, blur: 6, spread: -1, color: '#000000', inset: false },
@@ -104,7 +109,7 @@ export default function BoxShadowGenerator({ lang: initialLang }: { lang?: Langu
             borderRadius: `${borderRadius}px`,
           }}
         >
-          Preview
+          {t(tc.preview)}
         </div>
       </div>
 
@@ -112,7 +117,7 @@ export default function BoxShadowGenerator({ lang: initialLang }: { lang?: Langu
       <div className="flex flex-wrap gap-4 items-center p-4 rounded-lg bg-[var(--color-card)] border border-[var(--color-border)]">
         <div className="flex items-center gap-2">
           <label className="text-sm text-[var(--color-text)]">
-            {t({ en: 'Box Color', pt: 'Box Color' })}:
+            {t(tc.boxColor)}:
           </label>
           <input
             type="color"
@@ -123,7 +128,7 @@ export default function BoxShadowGenerator({ lang: initialLang }: { lang?: Langu
         </div>
         <div className="flex items-center gap-2">
           <label className="text-sm text-[var(--color-text)]">
-            {t({ en: 'Radius', pt: 'Radius' })}:
+            {t(tc.radius)}:
           </label>
           <input
             type="number"
@@ -138,7 +143,7 @@ export default function BoxShadowGenerator({ lang: initialLang }: { lang?: Langu
         </div>
         <div className="flex items-center gap-2">
           <label className="text-sm text-[var(--color-text)]">
-            {t({ en: 'Opacity', pt: 'Opacity' })}:
+            {t(tc.opacity)}:
           </label>
           <input
             type="range"
@@ -155,7 +160,7 @@ export default function BoxShadowGenerator({ lang: initialLang }: { lang?: Langu
       {/* Presets */}
       <div className="space-y-2">
         <label className="text-sm font-medium text-[var(--color-text)]">
-          {t({ en: 'Presets', pt: 'Presets' })}
+          {t(tc.presets)}
         </label>
         <div className="flex flex-wrap gap-2">
           {PRESETS.map((preset) => (
@@ -175,7 +180,7 @@ export default function BoxShadowGenerator({ lang: initialLang }: { lang?: Langu
       <div className="space-y-3">
         <div className="flex justify-between items-center">
           <label className="text-sm font-medium text-[var(--color-text)]">
-            {t({ en: 'Shadow Layers', pt: 'Shadow Layers' })}
+            {t(tc.shadowLayers)}
           </label>
           <button
             onClick={addShadow}
@@ -183,7 +188,7 @@ export default function BoxShadowGenerator({ lang: initialLang }: { lang?: Langu
             className="px-3 py-1 text-sm bg-primary-500 hover:bg-primary-600 text-white rounded
               transition-colors disabled:opacity-50"
           >
-            + {t({ en: 'Add', pt: 'Add' })}
+            + {t(tc.add)}
           </button>
         </div>
 
@@ -191,7 +196,7 @@ export default function BoxShadowGenerator({ lang: initialLang }: { lang?: Langu
           <div key={index} className="p-4 rounded-lg bg-[var(--color-card)] border border-[var(--color-border)] space-y-3">
             <div className="flex justify-between items-center">
               <span className="text-sm font-medium text-[var(--color-text)]">
-                {t({ en: 'Layer', pt: 'Layer' })} {index + 1}
+                {t(tc.layer)} {index + 1}
               </span>
               <div className="flex items-center gap-2">
                 <label className="flex items-center gap-1 cursor-pointer">
@@ -201,7 +206,7 @@ export default function BoxShadowGenerator({ lang: initialLang }: { lang?: Langu
                     onChange={(e) => updateShadow(index, { inset: e.target.checked })}
                     className="w-4 h-4 rounded text-primary-500"
                   />
-                  <span className="text-xs text-[var(--color-text-muted)]">inset</span>
+                  <span className="text-xs text-[var(--color-text-muted)]">{t(tc.inset)}</span>
                 </label>
                 <button
                   onClick={() => removeShadow(index)}
@@ -220,8 +225,8 @@ export default function BoxShadowGenerator({ lang: initialLang }: { lang?: Langu
               {[
                 { key: 'offsetX', label: 'X', min: -50, max: 50 },
                 { key: 'offsetY', label: 'Y', min: -50, max: 50 },
-                { key: 'blur', label: t({ en: 'Blur', pt: 'Blur' }), min: 0, max: 100 },
-                { key: 'spread', label: t({ en: 'Spread', pt: 'Spread' }), min: -50, max: 50 },
+                { key: 'blur', label: t(tc.blur), min: 0, max: 100 },
+                { key: 'spread', label: t(tc.spread), min: -50, max: 50 },
               ].map(({ key, label, min, max }) => (
                 <div key={key} className="space-y-1">
                   <label className="text-xs text-[var(--color-text-muted)]">{label}</label>
@@ -250,7 +255,7 @@ export default function BoxShadowGenerator({ lang: initialLang }: { lang?: Langu
 
             <div className="flex items-center gap-2">
               <label className="text-xs text-[var(--color-text-muted)]">
-                {t({ en: 'Color', pt: 'Color' })}:
+                {t(tc.color)}:
               </label>
               <input
                 type="color"
@@ -283,7 +288,7 @@ export default function BoxShadowGenerator({ lang: initialLang }: { lang?: Langu
             className="px-3 py-1 text-sm bg-[var(--color-card)] hover:bg-[var(--color-card-hover)]
               border border-[var(--color-border)] rounded transition-colors"
           >
-            {copied ? t({ en: 'Copied!', pt: 'Copied!' }) : t({ en: 'Copy', pt: 'Copy' })}
+            {copied ? t(common.copied) : t(common.copy)}
           </button>
         </div>
         <div className="p-4 rounded-lg bg-[var(--color-bg)] border border-[var(--color-border)]">
