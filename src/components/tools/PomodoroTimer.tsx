@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from '../../i18n/useTranslation';
 import type { Language } from '../../i18n';
+import { playTimerChime } from '@/lib/playTimerChime';
 
 type TimerMode = 'work' | 'shortBreak' | 'longBreak';
 
@@ -37,7 +38,6 @@ export default function PomodoroTimer({ lang: initialLang }: { lang?: Language }
   const [showSettings, setShowSettings] = useState(false);
 
   const intervalRef = useRef<number | null>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const getDuration = useCallback((timerMode: TimerMode) => {
     switch (timerMode) {
@@ -56,39 +56,13 @@ export default function PomodoroTimer({ lang: initialLang }: { lang?: Language }
     setIsRunning(false);
   }, [getDuration]);
 
-  const playNotification = () => {
-    // Play a simple beep sound
-    try {
-      const audioContext = new AudioContext();
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
-
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-
-      oscillator.frequency.value = 800;
-      oscillator.type = 'sine';
-      gainNode.gain.value = 0.3;
-
-      oscillator.start();
-      setTimeout(() => oscillator.stop(), 200);
-
-      // Vibrate if supported
-      if ('vibrate' in navigator) {
-        navigator.vibrate([200, 100, 200]);
-      }
-    } catch (e) {
-      console.log('Audio notification not supported');
-    }
-  };
-
   useEffect(() => {
     if (isRunning && timeLeft > 0) {
       intervalRef.current = window.setInterval(() => {
         setTimeLeft((prev) => prev - 1);
       }, 1000);
-    } else if (timeLeft === 0) {
-      playNotification();
+    } else if (isRunning && timeLeft === 0) {
+      playTimerChime();
 
       if (mode === 'work') {
         const newCompletedSessions = completedSessions + 1;

@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from '../../i18n/useTranslation';
 import type { Language } from '../../i18n';
+import { playTimerChime } from '@/lib/playTimerChime';
 
 type Mode = 'timer' | 'stopwatch';
 
@@ -72,10 +73,7 @@ export default function TimerStopwatch({ lang: initialLang }: { lang?: Language 
           setIsRunning(false);
           setTimeUp(true);
           clearTimer();
-          // Play sound or notification
-          if ('vibrate' in navigator) {
-            navigator.vibrate([200, 100, 200]);
-          }
+          playTimerChime();
         } else {
           setTime(remaining);
         }

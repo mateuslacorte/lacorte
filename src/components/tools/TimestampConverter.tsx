@@ -5,16 +5,18 @@ import { useTranslation } from '../../i18n/useTranslation';
 import type { Language } from '../../i18n';
 
 export default function TimestampConverter({ lang: initialLang }: { lang?: Language } = {}) {
-  const { t, lang, translations } = useTranslation(initialLang);
+  const { t, translations } = useTranslation(initialLang);
   const tc = translations.tools.timestamp;
   const tcc = translations.tools.common;
 
   const [timestamp, setTimestamp] = useState('');
   const [dateString, setDateString] = useState('');
-  const [currentTime, setCurrentTime] = useState(Date.now());
+  // null until mount — avoid SSR/client clock mismatch (hydration can wipe html.dark).
+  const [currentTime, setCurrentTime] = useState<number | null>(null);
   const [unit, setUnit] = useState<'seconds' | 'milliseconds'>('seconds');
 
   useEffect(() => {
+    setCurrentTime(Date.now());
     const interval = setInterval(() => {
       setCurrentTime(Date.now());
     }, 1000);
@@ -90,17 +92,26 @@ export default function TimestampConverter({ lang: initialLang }: { lang?: Langu
     }
   };
 
-  const currentTimestamp = unit === 'milliseconds' ? currentTime : Math.floor(currentTime / 1000);
+  const nowSec = currentTime === null ? null : Math.floor(currentTime / 1000);
+  const currentTimestamp =
+    currentTime === null ? null : unit === 'milliseconds' ? currentTime : nowSec;
 
-  const commonTimes = [
-    { labelKey: 'inOneHour' as const, getTs: () => Math.floor(Date.now() / 1000) + 3600 },
-    { labelKey: 'tomorrow' as const, getTs: () => Math.floor(Date.now() / 1000) + 86400 },
-    { labelKey: 'inOneWeek' as const, getTs: () => Math.floor(Date.now() / 1000) + 604800 },
-    { labelKey: 'inOneMonth' as const, getTs: () => Math.floor(Date.now() / 1000) + 2592000 },
-    { label: '2000/1/1', getTs: () => 946684800 },
-    { label: '2024/1/1', getTs: () => 1704067200 },
-    { label: '2025/1/1', getTs: () => 1735689600 },
-  ];
+  const commonTimes =
+    nowSec === null
+      ? [
+          { label: '2000/1/1', getTs: () => 946684800 },
+          { label: '2024/1/1', getTs: () => 1704067200 },
+          { label: '2025/1/1', getTs: () => 1735689600 },
+        ]
+      : [
+          { labelKey: 'inOneHour' as const, getTs: () => nowSec + 3600 },
+          { labelKey: 'tomorrow' as const, getTs: () => nowSec + 86400 },
+          { labelKey: 'inOneWeek' as const, getTs: () => nowSec + 604800 },
+          { labelKey: 'inOneMonth' as const, getTs: () => nowSec + 2592000 },
+          { label: '2000/1/1', getTs: () => 946684800 },
+          { label: '2024/1/1', getTs: () => 1704067200 },
+          { label: '2025/1/1', getTs: () => 1735689600 },
+        ];
 
   return (
     <div className="flex flex-col gap-6">
@@ -110,21 +121,23 @@ export default function TimestampConverter({ lang: initialLang }: { lang?: Langu
           <div>
             <p className="text-sm text-[var(--color-text-muted)]">{t(tc.currentTimestamp)}</p>
             <p className="text-2xl font-mono font-bold text-primary-500">
-              {currentTimestamp}
+              {currentTimestamp ?? '—'}
             </p>
           </div>
           <button
             onClick={() => {
+              if (currentTimestamp === null) return;
               setTimestamp(String(currentTimestamp));
               copyText(String(currentTimestamp));
             }}
-            className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg text-sm font-medium transition-colors"
+            disabled={currentTimestamp === null}
+            className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
           >
             {t(tc.copyAndUse)}
           </button>
         </div>
         <p className="text-sm text-[var(--color-text-muted)] mt-2">
-          {formatDate(new Date(currentTime))}
+          {currentTime === null ? '—' : formatDate(new Date(currentTime))}
         </p>
       </div>
 

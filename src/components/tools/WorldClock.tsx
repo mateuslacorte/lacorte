@@ -66,13 +66,15 @@ function getOffsetString(offset: number): string {
 export default function WorldClock({ lang: initialLang }: { lang?: Language } = {}) {
   const { t, lang } = useTranslation(initialLang);
 
-  const [now, setNow] = useState(new Date());
+  // null until mount — avoid SSR/client clock mismatch (hydration can wipe html.dark).
+  const [now, setNow] = useState<Date | null>(null);
   const [selectedZones, setSelectedZones] = useState<string[]>(['utc', 'est', 'gmt', 'jst']);
   const [inputTime, setInputTime] = useState('');
   const [inputDate, setInputDate] = useState('');
   const [inputZone, setInputZone] = useState('utc');
 
   useEffect(() => {
+    setNow(new Date());
     const timer = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
@@ -150,10 +152,10 @@ export default function WorldClock({ lang: initialLang }: { lang?: Language } = 
               </button>
               <p className="text-sm text-[var(--color-text-muted)]">{zone.city}</p>
               <p className="text-3xl font-mono font-bold text-[var(--color-text)] my-2">
-                {formatTime(now, zone.offset)}
+                {now ? formatTime(now, zone.offset) : '--:--:--'}
               </p>
               <p className="text-sm text-[var(--color-text-muted)]">
-                {formatDate(now, zone.offset, lang)}
+                {now ? formatDate(now, zone.offset, lang) : '—'}
               </p>
               <p className="text-xs text-[var(--color-text-muted)] mt-1">
                 {getOffsetString(zone.offset)}

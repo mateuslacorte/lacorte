@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { SiteLogoMark } from '@/components/SiteLogoMark';
@@ -8,6 +8,20 @@ import { useTranslation } from '@/i18n/useTranslation';
 import { localizePath, stripLocalePrefix } from '@/i18n/urlUtils';
 import { type Language } from '@/i18n';
 import { SITE_NAME } from '@/lib/site';
+
+function applyStoredTheme() {
+  const stored = localStorage.getItem('theme');
+  const theme =
+    stored === 'dark' || stored === 'light'
+      ? stored
+      : window.matchMedia('(prefers-color-scheme: dark)').matches
+        ? 'dark'
+        : 'light';
+  const root = document.documentElement;
+  root.classList.toggle('dark', theme === 'dark');
+  root.style.colorScheme = theme;
+  root.dataset.themeReady = '1';
+}
 
 interface NavItem {
   href: string;
@@ -36,6 +50,11 @@ export default function Header() {
   const { lang, t, changeLanguage, translations } = useTranslation();
   const nav = translations.common.nav;
   const darkModeLabel = t(translations.common.ui.darkMode);
+
+  // Re-apply after hydration — React recovery from mismatches can clear html.dark.
+  useEffect(() => {
+    applyStoredTheme();
+  }, []);
 
   const isActive = (href: string): boolean =>
     basePath === href || (href !== '/' && basePath.startsWith(href));
