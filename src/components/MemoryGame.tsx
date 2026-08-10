@@ -211,7 +211,7 @@ export default function MemoryGame() {
             className={`aspect-square rounded-xl text-3xl md:text-4xl flex items-center justify-center transition-all duration-300 transform ${
               card.isFlipped || card.isMatched
                 ? 'bg-white dark:bg-gray-700 rotate-0'
-                : 'bg-gradient-to-br from-primary-500 to-purple-500 rotate-0 hover:scale-105'
+                : 'bg-gradient-to-br from-primary-500 to-accent-500 rotate-0 hover:scale-105'
             } ${card.isMatched ? 'opacity-70 scale-95' : ''}`}
             style={{
               transformStyle: 'preserve-3d',

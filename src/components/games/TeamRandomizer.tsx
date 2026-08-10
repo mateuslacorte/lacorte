@@ -105,8 +105,8 @@ export default function TeamRandomizer() {
     'from-blue-500 to-cyan-500',
     'from-green-500 to-emerald-500',
     'from-yellow-500 to-orange-500',
-    'from-purple-500 to-violet-500',
-    'from-indigo-500 to-blue-500',
+    'from-primary-500 to-accent-500',
+    'from-lime-500 to-green-600',
     'from-teal-500 to-green-500',
     'from-rose-500 to-red-500',
   ];
@@ -231,7 +231,7 @@ export default function TeamRandomizer() {
         <button
           onClick={randomizeTeams}
           disabled={members.length < teamCount || isAnimating}
-          className="w-full py-4 bg-gradient-to-r from-primary-500 to-purple-500 text-white text-xl font-bold rounded-xl hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+          className="w-full py-4 bg-gradient-to-r from-primary-500 to-accent-500 text-white text-xl font-bold rounded-xl hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
         >
           {isAnimating
             ? t({ en: 'Shuffling...', pt: 'Shuffling...' })

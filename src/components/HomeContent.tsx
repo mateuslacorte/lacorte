@@ -1,5 +1,6 @@
 'use client';
 
+import { projects } from '@/data/projects';
 import { useTranslation } from '../i18n/useTranslation';
 import { localizePath } from '@/i18n/urlUtils';
 
@@ -161,23 +162,24 @@ export function GameCenterBanner() {
   const idx = translations.common.index;
 
   return (
-    <section className="py-16 px-6 bg-gradient-to-r from-purple-500/10 via-pink-500/10 to-orange-500/10 border-t border-[var(--color-border)]">
+    <section className="py-16 px-6 bg-[var(--color-bg)] border-t border-[var(--color-border)]">
       <div className="max-w-4xl mx-auto">
         <a href={localizePath('/games', lang)} className="block group">
-          <div className="flex flex-col md:flex-row items-center gap-8 p-8 bg-[var(--color-card)] rounded-2xl border border-[var(--color-border)] hover:border-primary-500/50 transition-all hover:shadow-xl">
-            <div className="flex gap-2 text-5xl">
+          <div className="relative overflow-hidden flex flex-col md:flex-row items-center gap-8 p-8 rounded-2xl border border-primary-500/25 bg-gradient-to-br from-primary-500/15 via-accent-500/10 to-primary-500/5 hover:border-primary-500/50 transition-all hover:shadow-xl hover:shadow-primary-500/10">
+            <div className="absolute inset-y-0 left-0 w-1.5 bg-gradient-to-b from-primary-500 to-accent-500" aria-hidden />
+            <div className="flex gap-2 text-5xl pl-2">
               <span className="animate-bounce" style={{ animationDelay: '0s' }}>🎮</span>
               <span className="animate-bounce" style={{ animationDelay: '0.1s' }}>🎰</span>
               <span className="animate-bounce" style={{ animationDelay: '0.2s' }}>🎡</span>
             </div>
             <div className="flex-1 text-center md:text-left">
-              <h2 className="text-2xl font-bold mb-2 group-hover:text-primary-500 transition-colors">
+              <h2 className="text-2xl font-bold mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
                 {t(idx.gameCenterOpen)}
               </h2>
               <p className="text-[var(--color-text-muted)] mb-4">
                 {t(idx.gameCenterDesc)}
               </p>
-              <span className="inline-flex items-center gap-2 text-primary-500 font-medium">
+              <span className="inline-flex items-center gap-2 text-primary-600 dark:text-primary-400 font-medium">
                 {t(idx.playNow)}
                 <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
@@ -191,11 +193,12 @@ export function GameCenterBanner() {
   );
 }
 
-// Projects Section — games live under /games; catalog is currently empty
+// Projects Section — games live under /games; catalog from src/data/projects.ts
 export function ProjectsSection() {
   const { t, translations, lang } = useTranslation();
   const idx = translations.common.index;
   const nav = translations.common.nav;
+  const proj = translations.common.projects;
 
   return (
     <section className="py-20 px-6 bg-[var(--color-card)] border-t border-[var(--color-border)]">
@@ -216,19 +219,46 @@ export function ProjectsSection() {
           </a>
         </div>
 
-        <div className="rounded-2xl border border-dashed border-[var(--color-border)] bg-[var(--color-bg)] px-6 py-12 text-center">
-          <p className="text-xl font-semibold mb-2">{t(idx.noProjectsYet)}</p>
-          <p className="text-[var(--color-text-muted)] mb-6 max-w-md mx-auto">{t(idx.noProjectsHint)}</p>
-          <a
-            href={localizePath('/games', lang)}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary-600 text-white font-medium hover:bg-primary-700 transition-colors"
-          >
-            {t(idx.browseGames)}
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-            </svg>
-          </a>
-        </div>
+        {projects.length === 0 ? (
+          <div className="rounded-2xl border border-dashed border-[var(--color-border)] bg-[var(--color-bg)] px-6 py-12 text-center">
+            <p className="text-xl font-semibold mb-2">{t(idx.noProjectsYet)}</p>
+            <p className="text-[var(--color-text-muted)] mb-6 max-w-md mx-auto">{t(idx.noProjectsHint)}</p>
+            <a
+              href={localizePath('/games', lang)}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary-600 text-white font-medium hover:bg-primary-700 transition-colors"
+            >
+              {t(idx.browseGames)}
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </a>
+          </div>
+        ) : (
+          <div className="grid sm:grid-cols-2 gap-6">
+            {projects.map((project) => (
+              <a
+                key={project.slug}
+                href={localizePath(`/projects/${project.slug}`, lang)}
+                className="group relative overflow-hidden rounded-2xl bg-[var(--color-bg)] border border-[var(--color-border)] hover:border-primary-500/40 transition-all hover:shadow-lg hover:-translate-y-0.5 p-6"
+              >
+                <div className={`absolute inset-0 bg-gradient-to-br ${project.color} opacity-0 group-hover:opacity-10 transition-opacity`} />
+                <div className="relative">
+                  <div className="text-4xl mb-3">{project.icon}</div>
+                  <h3 className="text-xl font-bold mb-2 group-hover:text-primary-500 transition-colors">
+                    {t(project.title)}
+                  </h3>
+                  <p className="text-[var(--color-text-muted)] mb-4">{t(project.description)}</p>
+                  <span className="inline-flex items-center text-primary-500 text-sm font-medium">
+                    {t(proj.viewProject)}
+                    <svg className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                  </span>
+                </div>
+              </a>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

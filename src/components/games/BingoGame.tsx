@@ -125,7 +125,7 @@ export default function BingoGame() {
         {/* Current Number Display */}
         <div className={`w-32 h-32 md:w-40 md:h-40 rounded-full flex items-center justify-center mb-6 ${
           isAnimating ? 'animate-pulse' : ''
-        } bg-gradient-to-br from-primary-500 to-purple-500 text-white`}>
+        } bg-gradient-to-br from-primary-500 to-accent-500 text-white`}>
           <div className="text-center">
             {currentNumber && (
               <>
@@ -143,7 +143,7 @@ export default function BingoGame() {
         <button
           onClick={drawNumber}
           disabled={isAnimating || drawnNumbers.length >= MAX_NUMBER || hasBingo}
-          className="px-8 py-4 bg-gradient-to-r from-primary-500 to-purple-500 text-white text-xl font-bold rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+          className="px-8 py-4 bg-gradient-to-r from-primary-500 to-accent-500 text-white text-xl font-bold rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
         >
           {isAnimating
             ? t({ en: 'Drawing...', pt: 'Drawing...' })

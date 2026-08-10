@@ -94,7 +94,7 @@ export default function JobsAggregator() {
 
   return (
     <div className="space-y-6">
-      <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl p-6 text-white">
+      <div className="bg-gradient-to-r from-primary-500 to-accent-500 rounded-xl p-6 text-white">
         <h1 className="text-2xl font-bold mb-2">{t(pj.heading)}</h1>
         <p className="opacity-90">{t(pj.subtitle)}</p>
       </div>

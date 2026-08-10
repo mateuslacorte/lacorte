@@ -60,7 +60,7 @@ Now there's a multi-stage **Dockerfile** (Node 22, native deps for canvas/bcrypt
 One line, roughly: `docker compose --env-file .env.docker up -d --build`. Then you can stop explaining your local setup in Slack.
 
 
-There's an install walkthrough on the live wiki: [Click here to see](https://nestjs.lacorte.dev/backend/install).
+There's an install walkthrough on the live wiki: [Click here to see](https://nest.lacorte.dev/backend/install).
 
 
 ## Logtail Out, Graylog In
@@ -84,7 +84,7 @@ Is Graylog glamorous? No. Is it self-hosted and sitting in the same `docker comp
 There's now a Terminus-backed **`GET /health`** that checks Postgres, Mongo, Redis, Kafka, and memory heap. It's public, it's marked `@NoLog()`, and the Docker image's `HEALTHCHECK` hits it. Boring. Correct. Exactly what you want when Compose is deciding whether your API container is actually useful.
 
 
-Live: [Check out the health example](https://nestjs.lacorte.dev/health).
+Live: [Check out the health example](https://nest.lacorte.dev/health).
 
 
 ## Docs That Live With the API
@@ -101,7 +101,7 @@ The July pass turned the wiki into something I'd actually send someone:
 - Favicons, `robots.txt`, a web manifest — the little things that make it feel like a site, not a leftover Pug folder
 
 
-The demo lives at **[nestjs.lacorte.dev](https://nestjs.lacorte.dev)**. The interactive API is at **[nestjs.lacorte.dev/swagger](https://nestjs.lacorte.dev/swagger)**. Same origin as the docs. No "docs are over here, the API is somewhere else, good luck."
+The demo lives at **[nestjs.lacorte.dev](https://nest.lacorte.dev)**. The interactive API is at **[nestjs.lacorte.dev/swagger](https://nest.lacorte.dev/swagger)**. Same origin as the docs. No "docs are over here, the API is somewhere else, good luck."
 
 
 GraphQL is still at `/graphql` if that's your religion. Most people poking the example will start at Swagger. That's fine.
@@ -119,7 +119,7 @@ What stayed is intentional and much less dramatic: **CQRS-ready**.
 Each domain can keep dual repositories (Postgres via TypeORM, Mongo via Mongoose). Services inject what they need. Postgres is the active store by default; Mongo repos hang around for when you actually want a command/query split, optionally synced over Kafka. There is no fake command bus pretending to be DDD cosplay.
 
 
-I'd rather ship a template that says "here's how you'd go CQRS" than one that claims it already is and then gaslights you for three days. The architecture page spells it out: [Check it out here](https://nestjs.lacorte.dev/architecture).
+I'd rather ship a template that says "here's how you'd go CQRS" than one that claims it already is and then gaslights you for three days. The architecture page spells it out: [Check it out here](https://nest.lacorte.dev/architecture).
 
 
 ## Hardening Bits
@@ -133,7 +133,7 @@ A few smaller changes that don't deserve their own manifesto but would annoy me 
 - **Richer Swagger examples** — because "string" as every example helps nobody
 
 
-Security still has the SUPER-role admin surface for blocked/suspicious IPs. Details [here](https://nestjs.lacorte.dev/security).
+Security still has the SUPER-role admin surface for blocked/suspicious IPs. Details [here](https://nest.lacorte.dev/security).
 
 
 ## Try It
@@ -141,10 +141,10 @@ Security still has the SUPER-role admin surface for blocked/suspicious IPs. Deta
 
 If you want the short tour:
 
-1. Docs: [https://nestjs.lacorte.dev](https://nestjs.lacorte.dev)
-2. Example API (Swagger): [https://nestjs.lacorte.dev/swagger](https://nestjs.lacorte.dev/swagger)
-3. Health: [https://nestjs.lacorte.dev/health](https://nestjs.lacorte.dev/health)
-4. Architecture / CQRS-ready: [https://nestjs.lacorte.dev/architecture](https://nestjs.lacorte.dev/architecture)
+1. Docs: [https://nestjs.lacorte.dev](https://nest.lacorte.dev)
+2. Example API (Swagger): [https://nestjs.lacorte.dev/swagger](https://nest.lacorte.dev/swagger)
+3. Health: [https://nestjs.lacorte.dev/health](https://nest.lacorte.dev/health)
+4. Architecture / CQRS-ready: [https://nestjs.lacorte.dev/architecture](https://nest.lacorte.dev/architecture)
 
 
 The January post was "here's a kitchen sink Nest template." This one is "here's the same kitchen sink, but the plumbing actually drains."

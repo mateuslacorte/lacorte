@@ -73,7 +73,7 @@ export default function ReactionTest() {
     if (time < 150) return { rank: 'S', label: t({ en: 'Godlike!', pt: 'Godlike!' }), color: 'text-yellow-400', emoji: '⚡' };
     if (time < 200) return { rank: 'A', label: t({ en: 'Very Fast', pt: 'Very Fast' }), color: 'text-green-400', emoji: '🚀' };
     if (time < 250) return { rank: 'B', label: t({ en: 'Fast', pt: 'Fast' }), color: 'text-blue-400', emoji: '💨' };
-    if (time < 300) return { rank: 'C', label: t({ en: 'Average', pt: 'Average' }), color: 'text-purple-400', emoji: '👍' };
+    if (time < 300) return { rank: 'C', label: t({ en: 'Average', pt: 'Average' }), color: 'text-accent-600', emoji: '👍' };
     if (time < 400) return { rank: 'D', label: t({ en: 'Slow', pt: 'Slow' }), color: 'text-orange-400', emoji: '🐢' };
     return { rank: 'F', label: t({ en: 'Very Slow', pt: 'Very Slow' }), color: 'text-red-400', emoji: '😴' };
   };
@@ -154,7 +154,7 @@ export default function ReactionTest() {
           <div className="text-sm text-[var(--color-text-muted)]">{t({ en: 'Average', pt: 'Average' })}</div>
         </div>
         <div className="bg-[var(--color-card)] rounded-xl p-4 text-center border border-[var(--color-border)]">
-          <div className="text-2xl font-bold text-purple-500">{results.length}</div>
+          <div className="text-2xl font-bold text-primary-600 dark:text-primary-400">{results.length}</div>
           <div className="text-sm text-[var(--color-text-muted)]">{t({ en: 'Attempts', pt: 'Attempts' })}</div>
         </div>
       </div>
@@ -199,7 +199,7 @@ export default function ReactionTest() {
             { range: '< 150ms', rank: 'S', color: 'text-yellow-400' },
             { range: '< 200ms', rank: 'A', color: 'text-green-400' },
             { range: '< 250ms', rank: 'B', color: 'text-blue-400' },
-            { range: '< 300ms', rank: 'C', color: 'text-purple-400' },
+            { range: '< 300ms', rank: 'C', color: 'text-accent-600' },
             { range: '< 400ms', rank: 'D', color: 'text-orange-400' },
             { range: '400ms+', rank: 'F', color: 'text-red-400' },
           ].map(({ range, rank, color }) => (

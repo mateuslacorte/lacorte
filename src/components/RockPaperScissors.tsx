@@ -143,8 +143,8 @@ export default function RockPaperScissors() {
           <div className="text-2xl font-bold text-yellow-500">{stats.draws}</div>
           <div className="text-xs text-[var(--color-text-muted)]">{t({ en: 'Draws', pt: 'Draws' })}</div>
         </div>
-        <div className="bg-purple-500/20 rounded-lg p-3 text-center">
-          <div className="text-2xl font-bold text-purple-500">{streak}</div>
+        <div className="bg-primary-500/20 rounded-lg p-3 text-center">
+          <div className="text-2xl font-bold text-primary-600 dark:text-primary-400">{streak}</div>
           <div className="text-xs text-[var(--color-text-muted)]">{t({ en: 'Streak', pt: 'Streak' })}</div>
         </div>
       </div>

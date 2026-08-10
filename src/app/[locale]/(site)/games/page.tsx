@@ -51,7 +51,7 @@ function GameGrid({
             href={localizePath(`/games/${game.slug}`, lang)}
             className={`group p-4 rounded-xl border transition-all hover:shadow-lg hover:-translate-y-1 ${
               featured
-                ? 'bg-gradient-to-br from-primary-500/10 to-purple-500/10 border-primary-500/30 hover:border-primary-500'
+                ? 'bg-gradient-to-br from-primary-500/10 to-accent-500/10 border-primary-500/30 hover:border-primary-500'
                 : 'bg-[var(--color-card)] border-[var(--color-border)] hover:border-primary-500'
             }`}
           >
@@ -112,7 +112,7 @@ export default async function GamesPage({ params }: GamesPageProps) {
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12">
           <div className="flex items-center justify-center gap-3 mb-4">
-            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary-500 to-purple-500 bg-clip-text text-transparent">
+            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary-500 to-accent-500 bg-clip-text text-transparent">
               {labels.heading}
             </h1>
             <ShareButton title={title} description={description} />

@@ -259,7 +259,7 @@ export default function MathQuiz() {
       {!isPlaying && (
         <>
           {timeLeft === 0 && (
-            <div className="mb-6 p-6 bg-gradient-to-r from-primary-500/20 to-purple-500/20 rounded-xl border border-primary-500 text-center w-full">
+            <div className="mb-6 p-6 bg-gradient-to-r from-primary-500/20 to-accent-500/20 rounded-xl border border-primary-500 text-center w-full">
               <div className="text-2xl font-bold mb-4">
                 {t({ en: 'Game Over!', pt: 'Game Over!' })}
               </div>

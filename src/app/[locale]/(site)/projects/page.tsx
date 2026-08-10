@@ -70,17 +70,17 @@ export default async function ProjectsPage({ params }: ProjectsPageProps) {
                 <div className="p-8">
                   {project.badge && (
                     <span className="absolute top-4 right-4 px-2 py-1 text-xs font-bold bg-primary-500 text-white rounded-full">
-                      {project.badge}
+                      {t(project.badge, lang)}
                     </span>
                   )}
                   <div className="text-6xl mb-4 transform group-hover:scale-110 transition-transform duration-300">
                     {project.icon}
                   </div>
                   <h3 className="text-2xl font-bold mb-2 group-hover:text-primary-500 transition-colors">
-                    {project.title}
+                    {t(project.title, lang)}
                   </h3>
                   <p className="text-[var(--color-text-muted)] text-lg">
-                    {project.description}
+                    {t(project.description, lang)}
                   </p>
                   <div className="mt-6 flex items-center text-primary-500 opacity-0 group-hover:opacity-100 transition-opacity">
                     <span>{t(proj.viewProject, lang)}</span>

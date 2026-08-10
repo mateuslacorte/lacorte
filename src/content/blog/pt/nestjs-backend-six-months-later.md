@@ -61,7 +61,7 @@ Agora existe um **Dockerfile** multi-stage (Node 22, dependências nativas para 
 Uma linha, mais ou menos: `docker compose --env-file .env.docker up -d --build`. Depois disso você pode parar de explicar seu setup local no Slack.
 
 
-Tem um passo a passo de instalação na wiki ao vivo: [Clique aqui para ver](https://nestjs.lacorte.dev/backend/install).
+Tem um passo a passo de instalação na wiki ao vivo: [Clique aqui para ver](https://nest.lacorte.dev/backend/install).
 
 
 ## Logtail Fora, Graylog Dentro
@@ -85,7 +85,7 @@ O Graylog é glamouroso? Não. Ele é self-hosted e está sentado no mesmo `dock
 Agora existe um **`GET /health`** com Terminus por trás que checa Postgres, Mongo, Redis, Kafka, e heap de memória. É público, está marcado com `@NoLog()`, e o `HEALTHCHECK` da imagem Docker bate nele. Chato. Correto. Exatamente o que você quer quando o Compose está decidindo se seu container de API é realmente útil.
 
 
-Ao vivo: [Confira o exemplo de health](https://nestjs.lacorte.dev/health).
+Ao vivo: [Confira o exemplo de health](https://nest.lacorte.dev/health).
 
 
 ## Documentação Que Mora Junto com a API
@@ -102,7 +102,7 @@ A leva de julho transformou a wiki em algo que eu realmente enviaria para algué
 - Favicons, `robots.txt`, um web manifest — as pequenas coisas que fazem parecer um site de verdade, e não uma pasta Pug esquecida
 
 
-A demonstração vive em **[nestjs.lacorte.dev](https://nestjs.lacorte.dev)**. A API interativa está em **[nestjs.lacorte.dev/swagger](https://nestjs.lacorte.dev/swagger)**. Mesma origem que a documentação. Nada de "a documentação está aqui, a API está em algum outro lugar, boa sorte."
+A demonstração vive em **[nestjs.lacorte.dev](https://nest.lacorte.dev)**. A API interativa está em **[nestjs.lacorte.dev/swagger](https://nest.lacorte.dev/swagger)**. Mesma origem que a documentação. Nada de "a documentação está aqui, a API está em algum outro lugar, boa sorte."
 
 
 O GraphQL ainda está em `/graphql` se essa for a sua religião. A maioria das pessoas mexendo no exemplo vai começar pelo Swagger. E tudo bem.
@@ -120,7 +120,7 @@ O que ficou é intencional e bem menos dramático: **pronto para CQRS**.
 Cada domínio pode manter repositórios duplos (Postgres via TypeORM, Mongo via Mongoose). Os serviços injetam o que precisam. Postgres é o armazenamento ativo por padrão; os repositórios Mongo ficam esperando para quando você realmente quiser uma separação de comando/consulta, opcionalmente sincronizados via Kafka. Não existe um bus de comandos falso fingindo ser cosplay de DDD.
 
 
-Prefiro entregar um template que diz "é assim que você iria para CQRS" do que um que afirma já estar lá e depois faz você duvidar de si mesmo por três dias. A página de arquitetura explica tudo: [Confira aqui](https://nestjs.lacorte.dev/architecture).
+Prefiro entregar um template que diz "é assim que você iria para CQRS" do que um que afirma já estar lá e depois faz você duvidar de si mesmo por três dias. A página de arquitetura explica tudo: [Confira aqui](https://nest.lacorte.dev/architecture).
 
 
 ## Itens de Blindagem
@@ -134,7 +134,7 @@ Algumas mudanças menores que não merecem seu próprio manifesto, mas que me ir
 - **Exemplos mais ricos no Swagger** — porque "string" como todo exemplo não ajuda ninguém
 
 
-A segurança ainda tem a superfície de admin de papel SUPER para IPs bloqueados/suspeitos. Detalhes [aqui](https://nestjs.lacorte.dev/security).
+A segurança ainda tem a superfície de admin de papel SUPER para IPs bloqueados/suspeitos. Detalhes [aqui](https://nest.lacorte.dev/security).
 
 
 ## Experimente
@@ -142,10 +142,10 @@ A segurança ainda tem a superfície de admin de papel SUPER para IPs bloqueados
 
 Se você quiser o tour rápido:
 
-1. Documentação: [https://nestjs.lacorte.dev](https://nestjs.lacorte.dev)
-2. Exemplo de API (Swagger): [https://nestjs.lacorte.dev/swagger](https://nestjs.lacorte.dev/swagger)
-3. Health: [https://nestjs.lacorte.dev/health](https://nestjs.lacorte.dev/health)
-4. Arquitetura / pronto para CQRS: [https://nestjs.lacorte.dev/architecture](https://nestjs.lacorte.dev/architecture)
+1. Documentação: [https://nestjs.lacorte.dev](https://nest.lacorte.dev)
+2. Exemplo de API (Swagger): [https://nestjs.lacorte.dev/swagger](https://nest.lacorte.dev/swagger)
+3. Health: [https://nestjs.lacorte.dev/health](https://nest.lacorte.dev/health)
+4. Arquitetura / pronto para CQRS: [https://nestjs.lacorte.dev/architecture](https://nest.lacorte.dev/architecture)
 
 
 O post de janeiro era "aqui está um template Nest com pia de cozinha incluída." Esse aqui é "aqui está a mesma pia de cozinha, mas o encanamento realmente escoa."

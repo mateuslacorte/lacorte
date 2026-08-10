@@ -239,7 +239,7 @@ export default function TypingGame() {
 
       {/* Game Over Stats */}
       {!isPlaying && timeLeft === 0 && (
-        <div className="mt-6 p-6 bg-gradient-to-r from-primary-500/20 to-purple-500/20 rounded-xl border border-primary-500 text-center">
+        <div className="mt-6 p-6 bg-gradient-to-r from-primary-500/20 to-accent-500/20 rounded-xl border border-primary-500 text-center">
           <div className="text-2xl font-bold mb-4">
             {t({ en: 'Results', pt: 'Results' })}
           </div>

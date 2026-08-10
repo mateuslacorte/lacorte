@@ -1,6 +1,7 @@
 import type { MetadataRoute } from 'next';
 import { getAllPosts, getAllTags } from '@/lib/blog';
 import { gamesConfig } from '@/data/games';
+import { projects } from '@/data/projects';
 import { toolsConfig } from '@/data/tools';
 import { locales } from '@/i18n';
 import { localizePath } from '@/i18n/urlUtils';
@@ -35,6 +36,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
         lastModified: now,
         changeFrequency: 'weekly',
         priority: path === '/' ? 1 : 0.8,
+      });
+    }
+  }
+
+  for (const project of projects) {
+    for (const lang of locales) {
+      entries.push({
+        url: `${SITE_URL}${localizePath(`/projects/${project.slug}`, lang)}`,
+        lastModified: now,
+        changeFrequency: 'monthly',
+        priority: 0.7,
       });
     }
   }

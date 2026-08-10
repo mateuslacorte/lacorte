@@ -233,8 +233,8 @@ export default function Breakout() {
         state.paddleX,
         CANVAS_HEIGHT - 10
       );
-      gradient.addColorStop(0, '#4f46e5');
-      gradient.addColorStop(1, '#7c3aed');
+      gradient.addColorStop(0, '#7EC151');
+      gradient.addColorStop(1, '#FED24F');
       ctx.fillStyle = gradient;
       ctx.fillRect(state.paddleX, CANVAS_HEIGHT - PADDLE_HEIGHT - 10, PADDLE_WIDTH, PADDLE_HEIGHT);
 

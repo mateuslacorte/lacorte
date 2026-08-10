@@ -113,7 +113,7 @@ export default function EventRoulette() {
                   }
                 }}
                 disabled={isSpinning || items.length < 2}
-                className="mt-6 px-8 py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xl font-bold rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                className="mt-6 px-8 py-4 bg-gradient-to-r from-primary-500 to-accent-500 text-white text-xl font-bold rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               >
                 {isSpinning
                   ? t({ en: 'Drawing...', pt: 'Drawing...' })

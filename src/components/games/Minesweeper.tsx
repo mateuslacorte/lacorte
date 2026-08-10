@@ -206,7 +206,7 @@ export default function Minesweeper() {
   };
 
   const getCellColor = (count: number) => {
-    const colors = ['', 'text-blue-500', 'text-green-500', 'text-red-500', 'text-purple-500', 'text-yellow-600', 'text-cyan-500', 'text-gray-700', 'text-gray-500'];
+    const colors = ['', 'text-blue-500', 'text-green-500', 'text-red-500', 'text-primary-700', 'text-yellow-600', 'text-cyan-500', 'text-gray-700', 'text-gray-500'];
     return colors[count] || '';
   };
 

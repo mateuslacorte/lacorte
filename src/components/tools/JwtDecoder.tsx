@@ -170,8 +170,8 @@ export default function JwtDecoder({ lang: initialLang }: { lang?: Language } = 
 
           {/* Payload */}
           <div className="rounded-lg border border-[var(--color-border)] overflow-hidden">
-            <div className="flex justify-between items-center px-4 py-2 bg-purple-100 dark:bg-purple-900/30">
-              <span className="font-medium text-purple-700 dark:text-purple-300">
+            <div className="flex justify-between items-center px-4 py-2 bg-primary-100 dark:bg-primary-900/30">
+              <span className="font-medium text-primary-700 dark:text-primary-300">
                 {t(tc.payload)} (DATA)
               </span>
               <button

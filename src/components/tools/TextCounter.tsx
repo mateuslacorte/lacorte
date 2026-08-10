@@ -50,9 +50,9 @@ export default function TextCounter({ lang: initialLang }: { lang?: Language } =
 
   const statItems = [
     { key: 'characters', label: tt.characters, value: stats.characters, color: 'bg-blue-500' },
-    { key: 'charactersNoSpace', label: tt.charactersNoSpace, value: stats.charactersNoSpace, color: 'bg-indigo-500' },
-    { key: 'words', label: tt.words, value: stats.words, color: 'bg-purple-500' },
-    { key: 'lines', label: tt.lines, value: stats.lines, color: 'bg-pink-500' },
+    { key: 'charactersNoSpace', label: tt.charactersNoSpace, value: stats.charactersNoSpace, color: 'bg-primary-500' },
+    { key: 'words', label: tt.words, value: stats.words, color: 'bg-accent-500' },
+    { key: 'lines', label: tt.lines, value: stats.lines, color: 'bg-teal-500' },
     { key: 'sentences', label: tt.sentences, value: stats.sentences, color: 'bg-rose-500' },
     { key: 'paragraphs', label: tt.paragraphs, value: stats.paragraphs, color: 'bg-orange-500' },
   ];

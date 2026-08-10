@@ -44,7 +44,7 @@ export default function GamePageClient({
           <div className="flex justify-center gap-2 flex-wrap">
             <span className="px-3 py-1 text-sm bg-green-500/10 text-green-500 rounded-full">Free</span>
             <span className="px-3 py-1 text-sm bg-blue-500/10 text-blue-500 rounded-full">No Install</span>
-            <span className="px-3 py-1 text-sm bg-purple-500/10 text-purple-500 rounded-full">Browser Game</span>
+            <span className="px-3 py-1 text-sm bg-primary-500/10 text-primary-600 dark:text-primary-400 rounded-full">Browser Game</span>
           </div>
         </div>
 
