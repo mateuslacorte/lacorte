@@ -43,7 +43,12 @@
   }
 
   .prose pre {
-    @apply my-8 bg-[#1e1e2e] rounded-xl p-5 overflow-x-auto border border-[var(--color-border)];
+    @apply my-8 rounded-xl p-0 overflow-x-auto border border-[var(--color-border)];
+    background-color: #eff1f5; /* catppuccin-latte */
+  }
+
+  .dark .prose pre {
+    background-color: #1e1e2e; /* catppuccin-mocha */
   }
 
   .prose code {
@@ -51,7 +56,46 @@
   }
 
   .prose pre code {
-    @apply bg-transparent p-0 text-[#cdd6f4];
+    @apply block bg-transparent p-5 text-sm font-normal leading-relaxed;
+  }
+
+  /* Dual-theme Shiki tokens (rehype-pretty-code) — keyed off html.dark */
+  .prose code[data-theme*=' '],
+  .prose code[data-theme*=' '] span {
+    color: var(--shiki-light);
+    background-color: transparent;
+  }
+
+  .dark .prose code[data-theme*=' '],
+  .dark .prose code[data-theme*=' '] span {
+    color: var(--shiki-dark);
+    background-color: transparent;
+  }
+
+  .prose pre [data-line] {
+    @apply inline-block w-full px-0 leading-relaxed;
+  }
+
+  .prose pre [data-line]:empty::before {
+    content: ' ';
+  }
+
+  .prose figure[data-rehype-pretty-code-figure] {
+    @apply my-8;
+  }
+
+  .prose figure[data-rehype-pretty-code-figure] pre {
+    @apply my-0;
+  }
+
+  .prose figcaption[data-rehype-pretty-code-title] {
+    @apply px-4 py-2 text-xs font-medium text-[var(--color-text-muted)]
+           bg-[var(--color-card)] border border-b-0 border-[var(--color-border)]
+           rounded-t-xl;
+  }
+
+  .prose figcaption[data-rehype-pretty-code-title] + pre {
+    @apply rounded-t-none;
   }
 
   .prose h1, .prose h2, .prose h3, .prose h4 {
