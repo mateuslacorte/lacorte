@@ -21,6 +21,7 @@ export function PageOgImage({
   tags,
   footer = SITE_NAME,
   icon,
+  iconSrc,
 }: {
   label: string;
   title: string;
@@ -28,6 +29,8 @@ export function PageOgImage({
   tags?: string[];
   footer?: string;
   icon?: string;
+  /** Data URL or absolute URL for raster icons (e.g. project logos in OG). */
+  iconSrc?: string;
 }) {
   const trimmedDescription = description ? truncateOgText(description, 180) : undefined;
   const visibleTags = (tags ?? []).filter(Boolean).slice(0, 6);
@@ -52,7 +55,19 @@ export function PageOgImage({
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '980px' }}>
-        {icon ? (
+        {iconSrc ? (
+          <img
+            src={iconSrc}
+            width={72}
+            height={72}
+            alt=""
+            style={{
+              display: 'flex',
+              borderRadius: '16px',
+              boxShadow: '0 8px 24px rgba(126, 193, 81, 0.25)',
+            }}
+          />
+        ) : icon ? (
           <div style={{ display: 'flex', fontSize: '56px', lineHeight: 1 }}>{icon}</div>
         ) : null}
         <div
