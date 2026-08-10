@@ -90,7 +90,7 @@ export default function BcryptTool({ lang: initialLang }: { lang?: Language } = 
           }}
           className={`flex-1 py-3 font-medium transition-colors ${
             mode === 'hash'
-              ? 'bg-primary-500 text-white'
+              ? 'bg-primary-500 text-primary-950'
               : 'bg-[var(--color-card)] text-[var(--color-text)] hover:bg-[var(--color-card-hover)]'
           }`}
         >
@@ -104,7 +104,7 @@ export default function BcryptTool({ lang: initialLang }: { lang?: Language } = 
           }}
           className={`flex-1 py-3 font-medium transition-colors ${
             mode === 'verify'
-              ? 'bg-primary-500 text-white'
+              ? 'bg-primary-500 text-primary-950'
               : 'bg-[var(--color-card)] text-[var(--color-text)] hover:bg-[var(--color-card-hover)]'
           }`}
         >
@@ -150,7 +150,7 @@ export default function BcryptTool({ lang: initialLang }: { lang?: Language } = 
             type="button"
             onClick={runHash}
             disabled={busy}
-            className="w-full py-3 bg-primary-500 hover:bg-primary-600 text-white rounded-lg
+            className="w-full py-3 bg-primary-500 hover:bg-primary-600 text-primary-950 rounded-lg
               font-medium transition-colors disabled:opacity-50"
           >
             {busy ? t(tt.hashing) : t(tt.hashButton)}
@@ -215,7 +215,7 @@ export default function BcryptTool({ lang: initialLang }: { lang?: Language } = 
             type="button"
             onClick={runVerify}
             disabled={busy}
-            className="w-full py-3 bg-primary-500 hover:bg-primary-600 text-white rounded-lg
+            className="w-full py-3 bg-primary-500 hover:bg-primary-600 text-primary-950 rounded-lg
               font-medium transition-colors disabled:opacity-50"
           >
             {busy ? t(tt.verifying) : t(tt.verifyButton)}

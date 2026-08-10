@@ -230,7 +230,7 @@ export default function TypingGame() {
       {/* Start/Restart Button */}
       <button
         onClick={startGame}
-        className="mt-6 px-8 py-4 bg-primary-500 text-white text-xl font-bold rounded-full hover:bg-primary-600 transition-colors"
+        className="mt-6 px-8 py-4 bg-primary-500 text-primary-950 text-xl font-bold rounded-full hover:bg-primary-600 transition-colors"
       >
         {isPlaying
           ? t({ en: 'Restart', pt: 'Restart' })

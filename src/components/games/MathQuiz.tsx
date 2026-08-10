@@ -190,7 +190,7 @@ export default function MathQuiz() {
               onClick={() => setDifficulty(diff)}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 difficulty === diff
-                  ? 'bg-primary-500 text-white'
+                  ? 'bg-primary-500 text-primary-950'
                   : 'bg-[var(--color-card)] border border-[var(--color-border)]'
               }`}
             >
@@ -240,7 +240,7 @@ export default function MathQuiz() {
             <button
               type="submit"
               disabled={!userAnswer}
-              className="px-6 py-4 bg-primary-500 text-white font-bold rounded-xl hover:bg-primary-600 disabled:opacity-50"
+              className="px-6 py-4 bg-primary-500 text-primary-950 font-bold rounded-xl hover:bg-primary-600 disabled:opacity-50"
             >
               {t({ en: 'Check', pt: 'Check' })}
             </button>
@@ -281,7 +281,7 @@ export default function MathQuiz() {
           )}
           <button
             onClick={startGame}
-            className="px-8 py-4 bg-primary-500 text-white text-xl font-bold rounded-full hover:bg-primary-600 transition-colors"
+            className="px-8 py-4 bg-primary-500 text-primary-950 text-xl font-bold rounded-full hover:bg-primary-600 transition-colors"
           >
             {t({ en: 'Start', pt: 'Start' })}
           </button>

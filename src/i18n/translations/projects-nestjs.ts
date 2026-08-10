@@ -175,6 +175,17 @@ export const nestjsBackendProject = {
   relatedRead: { en: 'Read post', pt: 'Ler post' } satisfies Localized,
   related: [
     {
+      slug: 'nestjs-backend-auth-got-serious',
+      title: {
+        en: 'NestJS Reference Backend: Auth Got Serious',
+        pt: 'Backend NestJS de referência: a auth ficou séria',
+      },
+      blurb: {
+        en: 'Social IdPs, AD group→role mapping, Argon2id, and Fastify — the August auth wave.',
+        pt: 'IdPs sociais, mapeamento AD grupo→role, Argon2id e Fastify — a leva de auth de agosto.',
+      },
+    },
+    {
       slug: 'nestjs-reference-backend',
       title: {
         en: 'NestJS Reference Backend',

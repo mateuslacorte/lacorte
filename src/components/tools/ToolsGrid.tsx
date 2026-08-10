@@ -52,7 +52,7 @@ export default function ToolsGrid({ tools, categories, lang: routeLang }: ToolsG
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors
               ${
                 selectedCategory === category.id
-                  ? 'bg-primary-500 text-white'
+                  ? 'bg-primary-500 text-primary-950'
                   : 'bg-[var(--color-card)] hover:bg-[var(--color-card-hover)] text-[var(--color-text)] border border-[var(--color-border)]'
               }`}
           >

@@ -303,7 +303,7 @@ export default function Breakout() {
             <div className="text-5xl mb-4">🧱</div>
             <button
               onClick={startGame}
-              className="px-8 py-4 bg-primary-500 text-white text-xl font-bold rounded-full hover:bg-primary-600 transition-colors"
+              className="px-8 py-4 bg-primary-500 text-primary-950 text-xl font-bold rounded-full hover:bg-primary-600 transition-colors"
             >
               {gameOver || won
                 ? t({ en: 'Play Again', pt: 'Play Again' })

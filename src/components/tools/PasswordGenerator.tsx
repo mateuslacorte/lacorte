@@ -186,7 +186,7 @@ export default function PasswordGenerator({ lang: initialLang }: { lang?: Langua
       {/* Generate button */}
       <button
         onClick={generatePassword}
-        className="w-full py-3 bg-primary-500 hover:bg-primary-600 text-white rounded-lg
+        className="w-full py-3 bg-primary-500 hover:bg-primary-600 text-primary-950 rounded-lg
           font-medium transition-colors flex items-center justify-center gap-2"
       >
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

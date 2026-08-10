@@ -47,7 +47,7 @@ export default async function ProjectsPage({ params }: ProjectsPageProps) {
             <div className="mt-8 flex flex-wrap justify-center gap-4">
               <Link
                 href={localizePath('/games', lang)}
-                className="inline-flex items-center px-5 py-2.5 rounded-xl bg-primary-600 text-white font-medium hover:bg-primary-700 transition-colors"
+                className="inline-flex items-center px-5 py-2.5 rounded-xl bg-primary-600 text-primary-950 font-medium hover:bg-primary-700 transition-colors"
               >
                 {t(idx.browseGames, lang)}
               </Link>
@@ -70,7 +70,7 @@ export default async function ProjectsPage({ params }: ProjectsPageProps) {
                 <div className={`absolute inset-0 bg-gradient-to-br ${project.color} opacity-0 group-hover:opacity-10 transition-opacity`} />
                 <div className="p-8">
                   {project.badge && (
-                    <span className="absolute top-4 right-4 px-2 py-1 text-xs font-bold bg-primary-500 text-white rounded-full">
+                    <span className="absolute top-4 right-4 px-2 py-1 text-xs font-bold bg-primary-500 text-primary-950 rounded-full">
                       {t(project.badge, lang)}
                     </span>
                   )}

@@ -92,7 +92,7 @@ export default function JsonFormatter({ lang: initialLang }: { lang?: Language }
       <div className="flex flex-wrap gap-2">
         <button
           onClick={formatJson}
-          className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg
+          className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-primary-950 rounded-lg
             transition-colors font-medium"
         >
           {t(tt.format)}

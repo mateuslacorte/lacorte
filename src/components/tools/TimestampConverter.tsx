@@ -131,7 +131,7 @@ export default function TimestampConverter({ lang: initialLang }: { lang?: Langu
               copyText(String(currentTimestamp));
             }}
             disabled={currentTimestamp === null}
-            className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
+            className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-primary-950 rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
           >
             {t(tc.copyAndUse)}
           </button>
@@ -147,7 +147,7 @@ export default function TimestampConverter({ lang: initialLang }: { lang?: Langu
           onClick={() => setUnit('seconds')}
           className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors
             ${unit === 'seconds'
-              ? 'bg-primary-500 text-white'
+              ? 'bg-primary-500 text-primary-950'
               : 'bg-[var(--color-card)] hover:bg-[var(--color-card-hover)] text-[var(--color-text)] border border-[var(--color-border)]'
             }`}
         >
@@ -157,7 +157,7 @@ export default function TimestampConverter({ lang: initialLang }: { lang?: Langu
           onClick={() => setUnit('milliseconds')}
           className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors
             ${unit === 'milliseconds'
-              ? 'bg-primary-500 text-white'
+              ? 'bg-primary-500 text-primary-950'
               : 'bg-[var(--color-card)] hover:bg-[var(--color-card-hover)] text-[var(--color-text)] border border-[var(--color-border)]'
             }`}
         >
@@ -219,7 +219,7 @@ export default function TimestampConverter({ lang: initialLang }: { lang?: Langu
               </div>
               <button
                 onClick={() => copyText(String(dateTimestamp))}
-                className="px-3 py-1 bg-primary-500 hover:bg-primary-600 text-white rounded-lg text-sm transition-colors"
+                className="px-3 py-1 bg-primary-500 hover:bg-primary-600 text-primary-950 rounded-lg text-sm transition-colors"
               >
                 {t(tcc.copy)}
               </button>

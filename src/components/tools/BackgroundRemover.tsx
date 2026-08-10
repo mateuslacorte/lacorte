@@ -209,7 +209,7 @@ export default function BackgroundRemover({ lang: initialLang }: { lang?: Langua
             <button
               onClick={removeBackground}
               disabled={isProcessing}
-              className="flex-1 py-3 bg-primary-500 hover:bg-primary-600 text-white rounded-lg
+              className="flex-1 py-3 bg-primary-500 hover:bg-primary-600 text-primary-950 rounded-lg
                 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed
                 flex items-center justify-center gap-2"
             >

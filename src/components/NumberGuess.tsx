@@ -126,7 +126,7 @@ export default function NumberGuess() {
             onClick={() => newGame(diff)}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
               difficulty === diff
-                ? 'bg-primary-500 text-white'
+                ? 'bg-primary-500 text-primary-950'
                 : 'bg-[var(--color-card)] border border-[var(--color-border)] hover:bg-[var(--color-card-hover)]'
             }`}
           >
@@ -163,7 +163,7 @@ export default function NumberGuess() {
             <button
               onClick={makeGuess}
               disabled={!input}
-              className="px-6 py-3 bg-primary-500 text-white rounded-lg font-bold hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="px-6 py-3 bg-primary-500 text-primary-950 rounded-lg font-bold hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {t({ en: 'Submit', pt: 'Submit' })}
             </button>
@@ -190,7 +190,7 @@ export default function NumberGuess() {
             </p>
             <button
               onClick={() => newGame()}
-              className="px-6 py-3 bg-primary-500 text-white rounded-lg font-bold hover:bg-primary-600"
+              className="px-6 py-3 bg-primary-500 text-primary-950 rounded-lg font-bold hover:bg-primary-600"
             >
               {t({ en: 'Play Again', pt: 'Play Again' })}
             </button>

@@ -145,7 +145,7 @@ export default function RegexTester({ lang: initialLang }: { lang?: Language } =
             onClick={() => toggleFlag(value)}
             className={`px-3 py-1.5 rounded-lg text-sm transition-colors
               ${flags.includes(value)
-                ? 'bg-primary-500 text-white'
+                ? 'bg-primary-500 text-primary-950'
                 : 'bg-[var(--color-card)] text-[var(--color-text)] border border-[var(--color-border)] hover:bg-[var(--color-card-hover)]'
               }`}
             title={t(desc)}

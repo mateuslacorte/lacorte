@@ -337,7 +337,7 @@ export default function ImageResizer({ lang: initialLang }: { lang?: Language } 
                 onClick={() => setResizeMode('custom')}
                 className={`px-3 py-1 text-sm rounded-lg border transition-colors
                   ${resizeMode === 'custom'
-                    ? 'bg-primary-500 text-white border-primary-500'
+                    ? 'bg-primary-500 text-primary-950 border-primary-500'
                     : 'bg-[var(--color-card)] border-[var(--color-border)] hover:bg-[var(--color-card-hover)]'
                   }`}
               >
@@ -347,7 +347,7 @@ export default function ImageResizer({ lang: initialLang }: { lang?: Language } 
                 onClick={() => setResizeMode('preset')}
                 className={`px-3 py-1 text-sm rounded-lg border transition-colors
                   ${resizeMode === 'preset'
-                    ? 'bg-primary-500 text-white border-primary-500'
+                    ? 'bg-primary-500 text-primary-950 border-primary-500'
                     : 'bg-[var(--color-card)] border-[var(--color-border)] hover:bg-[var(--color-card-hover)]'
                   }`}
               >
@@ -494,7 +494,7 @@ export default function ImageResizer({ lang: initialLang }: { lang?: Language } 
                 onClick={() => setCropMode('free')}
                 className={`px-3 py-1 text-sm rounded-lg border transition-colors
                   ${cropMode === 'free'
-                    ? 'bg-primary-500 text-white border-primary-500'
+                    ? 'bg-primary-500 text-primary-950 border-primary-500'
                     : 'bg-[var(--color-card)] border-[var(--color-border)] hover:bg-[var(--color-card-hover)]'
                   }`}
               >
@@ -504,7 +504,7 @@ export default function ImageResizer({ lang: initialLang }: { lang?: Language } 
                 onClick={() => setCropMode('output')}
                 className={`px-3 py-1 text-sm rounded-lg border transition-colors
                   ${cropMode === 'output'
-                    ? 'bg-primary-500 text-white border-primary-500'
+                    ? 'bg-primary-500 text-primary-950 border-primary-500'
                     : 'bg-[var(--color-card)] border-[var(--color-border)] hover:bg-[var(--color-card-hover)]'
                   }`}
               >

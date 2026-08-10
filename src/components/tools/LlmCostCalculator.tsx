@@ -296,7 +296,7 @@ export default function LlmCostCalculator({ lang: initialLang }: { lang?: Langua
           onClick={() => setUseManualTokens(false)}
           className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors
             ${!useManualTokens
-              ? 'bg-primary-500 text-white'
+              ? 'bg-primary-500 text-primary-950'
               : 'bg-[var(--color-card)] hover:bg-[var(--color-card-hover)] text-[var(--color-text)] border border-[var(--color-border)]'
             }`}
         >
@@ -306,7 +306,7 @@ export default function LlmCostCalculator({ lang: initialLang }: { lang?: Langua
           onClick={() => setUseManualTokens(true)}
           className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors
             ${useManualTokens
-              ? 'bg-primary-500 text-white'
+              ? 'bg-primary-500 text-primary-950'
               : 'bg-[var(--color-card)] hover:bg-[var(--color-card-hover)] text-[var(--color-text)] border border-[var(--color-border)]'
             }`}
         >
@@ -513,7 +513,7 @@ export default function LlmCostCalculator({ lang: initialLang }: { lang?: Langua
               onClick={() => setSelectedCurrency(currency.code)}
               className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors
                 ${selectedCurrency === currency.code
-                  ? 'bg-primary-500 text-white'
+                  ? 'bg-primary-500 text-primary-950'
                   : 'bg-[var(--color-card)] hover:bg-[var(--color-card-hover)] text-[var(--color-text)] border border-[var(--color-border)]'
                 }`}
             >
@@ -529,7 +529,7 @@ export default function LlmCostCalculator({ lang: initialLang }: { lang?: Langua
               <button
                 onClick={fetchExchangeRates}
                 disabled={isLoadingRates}
-                className="px-3 py-1 text-sm rounded-lg bg-primary-500 text-white hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-3 py-1 text-sm rounded-lg bg-primary-500 text-primary-950 hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoadingRates ? t(tc.fetchingRates) : t(tc.fetchRates)}
               </button>
@@ -620,7 +620,7 @@ export default function LlmCostCalculator({ lang: initialLang }: { lang?: Langua
               onClick={() => toggleProvider(provider)}
               className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors
                 ${selectedProviders.has(provider)
-                  ? 'bg-primary-500 text-white'
+                  ? 'bg-primary-500 text-primary-950'
                   : 'bg-[var(--color-card)] hover:bg-[var(--color-card-hover)] text-[var(--color-text)] border border-[var(--color-border)]'
                 }`}
             >

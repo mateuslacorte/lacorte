@@ -89,7 +89,7 @@ export default function PercentCalculator({ lang: initialLang }: { lang?: Langua
               }}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors
                 ${calcType === type.id
-                  ? 'bg-primary-500 text-white'
+                  ? 'bg-primary-500 text-primary-950'
                   : 'bg-[var(--color-card)] hover:bg-[var(--color-card-hover)] text-[var(--color-text)] border border-[var(--color-border)]'
                 }`}
             >
@@ -134,7 +134,7 @@ export default function PercentCalculator({ lang: initialLang }: { lang?: Langua
       {/* Calculate Button */}
       <button
         onClick={calculate}
-        className="w-full py-3 bg-primary-500 hover:bg-primary-600 text-white rounded-lg
+        className="w-full py-3 bg-primary-500 hover:bg-primary-600 text-primary-950 rounded-lg
           font-medium transition-colors"
       >
         Calculate

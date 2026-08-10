@@ -71,7 +71,7 @@ export default function CoinFlip({ lang: initialLang }: { lang?: Language } = {}
       <button
         onClick={flip}
         disabled={isFlipping}
-        className="w-full py-4 bg-primary-500 hover:bg-primary-600 text-white rounded-xl
+        className="w-full py-4 bg-primary-500 hover:bg-primary-600 text-primary-950 rounded-xl
           font-bold text-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {isFlipping ? t(tc.flipping) : t(tc.flipButton)}

@@ -241,7 +241,7 @@ export default function WorldClock({ lang: initialLang }: { lang?: Language } = 
 
           <button
             onClick={setToNow}
-            className="px-3 py-2 text-sm bg-primary-500 hover:bg-primary-600 text-white rounded-lg
+            className="px-3 py-2 text-sm bg-primary-500 hover:bg-primary-600 text-primary-950 rounded-lg
               transition-colors"
           >
             {t(tc.now)}

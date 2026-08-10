@@ -185,7 +185,7 @@ export default function BoxShadowGenerator({ lang: initialLang }: { lang?: Langu
           <button
             onClick={addShadow}
             disabled={shadows.length >= 5}
-            className="px-3 py-1 text-sm bg-primary-500 hover:bg-primary-600 text-white rounded
+            className="px-3 py-1 text-sm bg-primary-500 hover:bg-primary-600 text-primary-950 rounded
               transition-colors disabled:opacity-50"
           >
             + {t(tc.add)}

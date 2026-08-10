@@ -124,7 +124,7 @@ export default function WhackAMole() {
         <button
           type="button"
           onClick={startGame}
-          className="px-6 py-3 bg-primary-500 text-white rounded-xl font-bold hover:bg-primary-600 transition-colors"
+          className="px-6 py-3 bg-primary-500 text-primary-950 rounded-xl font-bold hover:bg-primary-600 transition-colors"
         >
           {isPlaying
             ? t({ en: 'Restart', pt: 'Restart' })

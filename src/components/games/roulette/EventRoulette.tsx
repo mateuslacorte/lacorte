@@ -113,7 +113,7 @@ export default function EventRoulette() {
                   }
                 }}
                 disabled={isSpinning || items.length < 2}
-                className="mt-6 px-8 py-4 bg-gradient-to-r from-primary-500 to-accent-500 text-white text-xl font-bold rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                className="mt-6 px-8 py-4 bg-gradient-to-r from-primary-500 to-accent-500 text-primary-950 text-xl font-bold rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               >
                 {isSpinning
                   ? t({ en: 'Drawing...', pt: 'Drawing...' })
@@ -160,7 +160,7 @@ export default function EventRoulette() {
               <button
                 onClick={handleBulkInput}
                 disabled={!bulkInput.trim()}
-                className="flex-1 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 disabled:opacity-50"
+                className="flex-1 py-2 bg-primary-500 text-primary-950 rounded-lg hover:bg-primary-600 disabled:opacity-50"
               >
                 {t({ en: 'Apply', pt: 'Apply' })}
               </button>

@@ -263,7 +263,7 @@ export default function UtmBuilder({ lang: initialLang }: { lang?: Language } = 
           <button
             onClick={copyToClipboard}
             disabled={!generatedUrl}
-            className="px-3 py-1 text-sm bg-primary-500 hover:bg-primary-600 text-white rounded
+            className="px-3 py-1 text-sm bg-primary-500 hover:bg-primary-600 text-primary-950 rounded
               transition-colors disabled:opacity-50"
           >
             {copied ? t(common.copied) : t(common.copy)}

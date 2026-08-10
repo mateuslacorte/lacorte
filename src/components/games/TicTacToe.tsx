@@ -208,7 +208,7 @@ export default function TicTacToe() {
             onClick={() => changeDifficulty(diff)}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
               difficulty === diff
-                ? 'bg-primary-500 text-white'
+                ? 'bg-primary-500 text-primary-950'
                 : 'bg-[var(--color-card)] border border-[var(--color-border)] hover:bg-[var(--color-card-hover)]'
             }`}
           >
@@ -274,7 +274,7 @@ export default function TicTacToe() {
       {/* New Game Button */}
       <button
         onClick={resetGame}
-        className="px-6 py-3 bg-primary-500 text-white font-bold rounded-lg hover:bg-primary-600 transition-colors"
+        className="px-6 py-3 bg-primary-500 text-primary-950 font-bold rounded-lg hover:bg-primary-600 transition-colors"
       >
         {t({ en: 'New Game', pt: 'New Game' })}
       </button>

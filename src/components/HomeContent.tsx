@@ -145,7 +145,7 @@ export function PopularToolsSection() {
         </div>
 
         <div className="mt-6 text-center">
-          <a href={localizePath('/tools', lang)} className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary-500 text-white font-medium hover:bg-primary-600 transition-colors">
+          <a href={localizePath('/tools', lang)} className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary-500 text-primary-950 font-medium hover:bg-primary-600 transition-colors">
             26{t(idx.seeAllTools)}
             <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
@@ -225,7 +225,7 @@ export function ProjectsSection() {
             <p className="text-[var(--color-text-muted)] mb-6 max-w-md mx-auto">{t(idx.noProjectsHint)}</p>
             <a
               href={localizePath('/games', lang)}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary-600 text-white font-medium hover:bg-primary-700 transition-colors"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary-600 text-primary-950 font-medium hover:bg-primary-700 transition-colors"
             >
               {t(idx.browseGames)}
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

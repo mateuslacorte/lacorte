@@ -214,7 +214,7 @@ export default function UnitConverter({ lang: initialLang }: { lang?: Language }
             onClick={() => handleCategoryChange(cat)}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors
               ${category === cat
-                ? 'bg-primary-500 text-white'
+                ? 'bg-primary-500 text-primary-950'
                 : 'bg-[var(--color-card)] hover:bg-[var(--color-card-hover)] text-[var(--color-text)] border border-[var(--color-border)]'
               }`}
           >

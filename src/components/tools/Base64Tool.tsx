@@ -88,7 +88,7 @@ export default function Base64Tool({ lang: initialLang }: { lang?: Language } = 
           onClick={() => handleModeChange('encode')}
           className={`flex-1 py-3 font-medium transition-colors
             ${mode === 'encode'
-              ? 'bg-primary-500 text-white'
+              ? 'bg-primary-500 text-primary-950'
               : 'bg-[var(--color-card)] text-[var(--color-text)] hover:bg-[var(--color-card-hover)]'
             }`}
         >
@@ -98,7 +98,7 @@ export default function Base64Tool({ lang: initialLang }: { lang?: Language } = 
           onClick={() => handleModeChange('decode')}
           className={`flex-1 py-3 font-medium transition-colors
             ${mode === 'decode'
-              ? 'bg-primary-500 text-white'
+              ? 'bg-primary-500 text-primary-950'
               : 'bg-[var(--color-card)] text-[var(--color-text)] hover:bg-[var(--color-card-hover)]'
             }`}
         >

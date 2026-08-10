@@ -298,7 +298,7 @@ export default function LadderGame() {
         <button
           onClick={generateLadder}
           disabled={participants.length < 2 || results.length < participants.length}
-          className="mt-4 w-full py-3 bg-primary-500 text-white font-bold rounded-lg hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="mt-4 w-full py-3 bg-primary-500 text-primary-950 font-bold rounded-lg hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           {t({ en: 'Generate Ladder', pt: 'Generate Ladder' })}
         </button>
@@ -339,7 +339,7 @@ export default function LadderGame() {
               />
               <button
                 onClick={handleBulkAdd}
-                className="w-full py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600"
+                className="w-full py-2 bg-primary-500 text-primary-950 rounded-lg hover:bg-primary-600"
               >
                 {t({ en: 'Apply', pt: 'Apply' })}
               </button>
@@ -359,7 +359,7 @@ export default function LadderGame() {
                 <button
                   onClick={addParticipant}
                   disabled={participants.length >= 10}
-                  className="shrink-0 px-3 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 disabled:opacity-50"
+                  className="shrink-0 px-3 py-2 bg-primary-500 text-primary-950 rounded-lg hover:bg-primary-600 disabled:opacity-50"
                 >
                   +
                 </button>
@@ -400,7 +400,7 @@ export default function LadderGame() {
             <button
               onClick={addResult}
               disabled={results.length >= 10}
-              className="shrink-0 px-3 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 disabled:opacity-50"
+              className="shrink-0 px-3 py-2 bg-primary-500 text-primary-950 rounded-lg hover:bg-primary-600 disabled:opacity-50"
             >
               +
             </button>

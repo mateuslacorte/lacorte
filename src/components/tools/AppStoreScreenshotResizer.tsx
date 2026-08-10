@@ -370,7 +370,7 @@ export default function AppStoreScreenshotResizer({ lang: initialLang }: { lang?
                 onClick={() => handleDeviceTypeChange('iphone')}
                 className={`flex-1 py-2 px-4 rounded-lg font-medium transition-colors
                   ${deviceType === 'iphone'
-                    ? 'bg-primary-500 text-white'
+                    ? 'bg-primary-500 text-primary-950'
                     : 'bg-[var(--color-card)] hover:bg-[var(--color-card-hover)] border border-[var(--color-border)]'
                   }`}
               >
@@ -380,7 +380,7 @@ export default function AppStoreScreenshotResizer({ lang: initialLang }: { lang?
                 onClick={() => handleDeviceTypeChange('ipad')}
                 className={`flex-1 py-2 px-4 rounded-lg font-medium transition-colors
                   ${deviceType === 'ipad'
-                    ? 'bg-primary-500 text-white'
+                    ? 'bg-primary-500 text-primary-950'
                     : 'bg-[var(--color-card)] hover:bg-[var(--color-card-hover)] border border-[var(--color-border)]'
                   }`}
               >
@@ -433,7 +433,7 @@ export default function AppStoreScreenshotResizer({ lang: initialLang }: { lang?
                     onClick={() => setOrientation('portrait')}
                     className={`flex-1 py-2 px-3 rounded-lg text-sm transition-colors
                       ${orientation === 'portrait'
-                        ? 'bg-primary-500 text-white'
+                        ? 'bg-primary-500 text-primary-950'
                         : 'bg-[var(--color-card)] hover:bg-[var(--color-card-hover)] border border-[var(--color-border)]'
                       }`}
                   >
@@ -443,7 +443,7 @@ export default function AppStoreScreenshotResizer({ lang: initialLang }: { lang?
                     onClick={() => setOrientation('landscape')}
                     className={`flex-1 py-2 px-3 rounded-lg text-sm transition-colors
                       ${orientation === 'landscape'
-                        ? 'bg-primary-500 text-white'
+                        ? 'bg-primary-500 text-primary-950'
                         : 'bg-[var(--color-card)] hover:bg-[var(--color-card-hover)] border border-[var(--color-border)]'
                       }`}
                   >
@@ -541,7 +541,7 @@ export default function AppStoreScreenshotResizer({ lang: initialLang }: { lang?
             <button
               onClick={processAll}
               disabled={isProcessing}
-              className="flex-1 py-3 bg-primary-500 hover:bg-primary-600 disabled:bg-gray-400 text-white rounded-lg
+              className="flex-1 py-3 bg-primary-500 hover:bg-primary-600 disabled:bg-gray-400 text-primary-950 rounded-lg
                 font-medium transition-colors"
             >
               {isProcessing

@@ -517,7 +517,7 @@ export default function ImageMetadataViewer({ lang: initialLang }: { lang?: Lang
                     onClick={() => setActiveTab(tab.id as any)}
                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors
                       ${activeTab === tab.id
-                        ? 'bg-primary-500 text-white'
+                        ? 'bg-primary-500 text-primary-950'
                         : 'hover:bg-[var(--color-card)] text-[var(--color-text-muted)]'
                       }`}
                   >
@@ -602,7 +602,7 @@ export default function ImageMetadataViewer({ lang: initialLang }: { lang?: Lang
                             href={`https://maps.google.com/?q=${exifData.gpsLatitude},${exifData.gpsLongitude}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex-1 px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg text-center text-sm font-medium transition-colors"
+                            className="flex-1 px-4 py-2 bg-primary-500 hover:bg-primary-600 text-primary-950 rounded-lg text-center text-sm font-medium transition-colors"
                           >
                             {t(tc.viewGoogleMaps)}
                           </a>

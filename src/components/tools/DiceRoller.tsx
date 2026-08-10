@@ -70,7 +70,7 @@ export default function DiceRoller({ lang: initialLang }: { lang?: Language } = 
               onClick={() => setConfig((c) => ({ ...c, sides }))}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors
                 ${config.sides === sides
-                  ? 'bg-primary-500 text-white'
+                  ? 'bg-primary-500 text-primary-950'
                   : 'bg-[var(--color-card)] hover:bg-[var(--color-card-hover)] text-[var(--color-text)] border border-[var(--color-border)]'
                 }`}
             >
@@ -133,7 +133,7 @@ export default function DiceRoller({ lang: initialLang }: { lang?: Language } = 
       <button
         onClick={roll}
         disabled={isRolling}
-        className="w-full py-4 bg-primary-500 hover:bg-primary-600 text-white rounded-xl
+        className="w-full py-4 bg-primary-500 hover:bg-primary-600 text-primary-950 rounded-xl
           font-bold text-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {isRolling ? t(tc.rolling) : `🎲 ${t(tc.rollButtonPrefix)} ${config.count}D${config.sides}`}

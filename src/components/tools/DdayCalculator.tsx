@@ -173,7 +173,7 @@ export default function DdayCalculator({ lang: initialLang }: { lang?: Language 
           {eventName && (
             <button
               onClick={saveDday}
-              className="w-full py-3 bg-primary-500 hover:bg-primary-600 text-white rounded-lg
+              className="w-full py-3 bg-primary-500 hover:bg-primary-600 text-primary-950 rounded-lg
                 font-medium transition-colors"
             >
               {t({ en: 'Save D-Day', pt: 'Salvar D-Day' })}

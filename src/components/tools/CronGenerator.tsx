@@ -206,7 +206,7 @@ export default function CronGenerator({ lang: initialLang }: { lang?: Language }
               onClick={() => parseCron(preset.cron)}
               className={`px-3 py-1.5 text-sm rounded-lg transition-colors
                 ${cronExpression === preset.cron
-                  ? 'bg-primary-500 text-white'
+                  ? 'bg-primary-500 text-primary-950'
                   : 'bg-[var(--color-card)] hover:bg-[var(--color-card-hover)] text-[var(--color-text)] border border-[var(--color-border)]'
                 }`}
             >
@@ -254,19 +254,19 @@ export default function CronGenerator({ lang: initialLang }: { lang?: Language }
           <div className="flex flex-wrap gap-1">
             <button
               onClick={() => setParts({ ...parts, dayOfWeek: '*' })}
-              className={`px-2 py-1 text-xs rounded ${parts.dayOfWeek === '*' ? 'bg-primary-500 text-white' : 'bg-[var(--color-card)] border border-[var(--color-border)]'}`}
+              className={`px-2 py-1 text-xs rounded ${parts.dayOfWeek === '*' ? 'bg-primary-500 text-primary-950' : 'bg-[var(--color-card)] border border-[var(--color-border)]'}`}
             >
               {t(tc.everyLabel)}
             </button>
             <button
               onClick={() => setParts({ ...parts, dayOfWeek: '1-5' })}
-              className={`px-2 py-1 text-xs rounded ${parts.dayOfWeek === '1-5' ? 'bg-primary-500 text-white' : 'bg-[var(--color-card)] border border-[var(--color-border)]'}`}
+              className={`px-2 py-1 text-xs rounded ${parts.dayOfWeek === '1-5' ? 'bg-primary-500 text-primary-950' : 'bg-[var(--color-card)] border border-[var(--color-border)]'}`}
             >
               {t(tc.weekdays)}
             </button>
             <button
               onClick={() => setParts({ ...parts, dayOfWeek: '0,6' })}
-              className={`px-2 py-1 text-xs rounded ${parts.dayOfWeek === '0,6' ? 'bg-primary-500 text-white' : 'bg-[var(--color-card)] border border-[var(--color-border)]'}`}
+              className={`px-2 py-1 text-xs rounded ${parts.dayOfWeek === '0,6' ? 'bg-primary-500 text-primary-950' : 'bg-[var(--color-card)] border border-[var(--color-border)]'}`}
             >
               {t(tc.weekend)}
             </button>
@@ -274,7 +274,7 @@ export default function CronGenerator({ lang: initialLang }: { lang?: Language }
               <button
                 key={day.value}
                 onClick={() => setParts({ ...parts, dayOfWeek: day.value })}
-                className={`px-2 py-1 text-xs rounded ${parts.dayOfWeek === day.value ? 'bg-primary-500 text-white' : 'bg-[var(--color-card)] border border-[var(--color-border)]'}`}
+                className={`px-2 py-1 text-xs rounded ${parts.dayOfWeek === day.value ? 'bg-primary-500 text-primary-950' : 'bg-[var(--color-card)] border border-[var(--color-border)]'}`}
               >
                 {day.label}
               </button>
@@ -292,7 +292,7 @@ export default function CronGenerator({ lang: initialLang }: { lang?: Language }
               <button
                 key={val}
                 onClick={() => setParts({ ...parts, minute: val })}
-                className={`px-2 py-1 text-xs rounded ${parts.minute === val ? 'bg-primary-500 text-white' : 'bg-[var(--color-card)] border border-[var(--color-border)]'}`}
+                className={`px-2 py-1 text-xs rounded ${parts.minute === val ? 'bg-primary-500 text-primary-950' : 'bg-[var(--color-card)] border border-[var(--color-border)]'}`}
               >
                 {val === '*' ? t(tc.everyLabel) : val}
               </button>

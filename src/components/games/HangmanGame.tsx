@@ -144,7 +144,7 @@ export default function HangmanGame() {
 
       <button
         onClick={resetGame}
-        className="mx-auto px-5 py-2 rounded-lg bg-primary-500 text-white font-semibold hover:bg-primary-600 transition-colors"
+        className="mx-auto px-5 py-2 rounded-lg bg-primary-500 text-primary-950 font-semibold hover:bg-primary-600 transition-colors"
       >
         {t({ en: 'New Game', pt: 'New Game' })}
       </button>

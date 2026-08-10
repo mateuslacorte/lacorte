@@ -147,7 +147,7 @@ export default function ColorMatch() {
             onClick={() => setMode('text-color')}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
               mode === 'text-color'
-                ? 'bg-primary-500 text-white'
+                ? 'bg-primary-500 text-primary-950'
                 : 'bg-[var(--color-card)] border border-[var(--color-border)]'
             }`}
           >
@@ -157,7 +157,7 @@ export default function ColorMatch() {
             onClick={() => setMode('color-text')}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
               mode === 'color-text'
-                ? 'bg-primary-500 text-white'
+                ? 'bg-primary-500 text-primary-950'
                 : 'bg-[var(--color-card)] border border-[var(--color-border)]'
             }`}
           >
@@ -230,7 +230,7 @@ export default function ColorMatch() {
           )}
           <button
             onClick={startGame}
-            className="px-8 py-4 bg-primary-500 text-white text-xl font-bold rounded-full hover:bg-primary-600 transition-colors"
+            className="px-8 py-4 bg-primary-500 text-primary-950 text-xl font-bold rounded-full hover:bg-primary-600 transition-colors"
           >
             {t({ en: 'Start', pt: 'Start' })}
           </button>

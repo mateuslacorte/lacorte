@@ -119,7 +119,7 @@ export default function TimerStopwatch({ lang: initialLang }: { lang?: Language 
           onClick={() => handleModeChange('stopwatch')}
           className={`flex-1 py-3 font-medium transition-colors
             ${mode === 'stopwatch'
-              ? 'bg-primary-500 text-white'
+              ? 'bg-primary-500 text-primary-950'
               : 'bg-[var(--color-card)] text-[var(--color-text)] hover:bg-[var(--color-card-hover)]'
             }`}
         >
@@ -129,7 +129,7 @@ export default function TimerStopwatch({ lang: initialLang }: { lang?: Language 
           onClick={() => handleModeChange('timer')}
           className={`flex-1 py-3 font-medium transition-colors
             ${mode === 'timer'
-              ? 'bg-primary-500 text-white'
+              ? 'bg-primary-500 text-primary-950'
               : 'bg-[var(--color-card)] text-[var(--color-text)] hover:bg-[var(--color-card-hover)]'
             }`}
         >

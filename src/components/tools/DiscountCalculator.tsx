@@ -83,7 +83,7 @@ export default function DiscountCalculator({ lang: initialLang }: { lang?: Langu
               onClick={() => setDiscountPercent(String(d))}
               className={`px-3 py-1 rounded-lg text-sm transition-colors
                 ${discountPercent === String(d)
-                  ? 'bg-primary-500 text-white'
+                  ? 'bg-primary-500 text-primary-950'
                   : 'bg-[var(--color-bg)] hover:bg-[var(--color-card-hover)] text-[var(--color-text)] border border-[var(--color-border)]'
                 }`}
             >

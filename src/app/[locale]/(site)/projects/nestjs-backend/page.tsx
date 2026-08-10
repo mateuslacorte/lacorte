@@ -114,7 +114,7 @@ export default async function NestjsBackendProjectPage({ params }: PageProps) {
                   href={NESTJS_BACKEND_DEMO_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center px-6 py-3.5 rounded-xl bg-primary-600 hover:bg-primary-700 text-white font-semibold shadow-lg shadow-primary-500/25 transition-all hover:-translate-y-0.5"
+                  className="inline-flex items-center px-6 py-3.5 rounded-xl bg-primary-600 hover:bg-primary-700 text-primary-950 font-semibold shadow-lg shadow-primary-500/25 transition-all hover:-translate-y-0.5"
                 >
                   {t(copy.ctaDemo, lang)}
                   <span className="ml-2" aria-hidden>
@@ -168,8 +168,8 @@ export default async function NestjsBackendProjectPage({ params }: PageProps) {
                   <p>{t(copy.heroPanel.swagger, lang)}</p>
                   <p className="text-primary-700 dark:text-primary-300 mt-1">{t(copy.heroPanel.health, lang)}</p>
                 </div>
-                <div className="rounded-xl bg-gradient-to-r from-primary-600 to-accent-500 text-white p-4">
-                  <p className="text-white/80 text-xs mb-1">compose</p>
+                <div className="rounded-xl bg-gradient-to-r from-primary-600 to-accent-500 text-primary-950 p-4">
+                  <p className="text-primary-950/70 text-xs mb-1">compose</p>
                   <p className="break-all">{t(copy.heroPanel.compose, lang)}</p>
                 </div>
               </div>
@@ -205,7 +205,7 @@ export default async function NestjsBackendProjectPage({ params }: PageProps) {
                 key={feature.title.en}
                 className="group p-6 md:p-7 rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] hover:border-primary-500/40 hover:shadow-lg hover:shadow-primary-500/5 transition-all"
               >
-                <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-primary-500 to-accent-500 text-white flex items-center justify-center font-bold mb-5 shadow-md shadow-primary-500/20 group-hover:scale-105 transition-transform">
+                <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-primary-500 to-accent-500 text-primary-950 flex items-center justify-center font-bold mb-5 shadow-md shadow-primary-500/20 group-hover:scale-105 transition-transform">
                   {index + 1}
                 </div>
                 <h3 className="text-xl font-semibold mb-2">{t(feature.title, lang)}</h3>
@@ -229,7 +229,7 @@ export default async function NestjsBackendProjectPage({ params }: PageProps) {
                 key={step.title.en}
                 className="relative p-6 rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg)]"
               >
-                <div className="w-10 h-10 rounded-full bg-primary-600 text-white flex items-center justify-center font-semibold mb-5">
+                <div className="w-10 h-10 rounded-full bg-primary-600 text-primary-950 flex items-center justify-center font-semibold mb-5">
                   {index + 1}
                 </div>
                 <h3 className="text-xl font-semibold mb-2">{t(step.title, lang)}</h3>
@@ -251,7 +251,7 @@ export default async function NestjsBackendProjectPage({ params }: PageProps) {
             <ol className="space-y-5">
               {copy.trySteps.map((step, index) => (
                 <li key={step.en} className="flex gap-4">
-                  <span className="shrink-0 w-9 h-9 rounded-full bg-gradient-to-br from-primary-600 to-accent-500 text-white flex items-center justify-center font-semibold shadow-sm">
+                  <span className="shrink-0 w-9 h-9 rounded-full bg-gradient-to-br from-primary-600 to-accent-500 text-primary-950 flex items-center justify-center font-semibold shadow-sm">
                     {index + 1}
                   </span>
                   <span className="pt-1.5 leading-relaxed">{t(step, lang)}</span>
@@ -271,7 +271,7 @@ export default async function NestjsBackendProjectPage({ params }: PageProps) {
                 href={NESTJS_BACKEND_GITHUB_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center px-5 py-2.5 rounded-xl bg-primary-600 hover:bg-primary-700 text-white font-medium transition-colors"
+                className="inline-flex items-center px-5 py-2.5 rounded-xl bg-primary-600 hover:bg-primary-700 text-primary-950 font-medium transition-colors"
               >
                 {t(copy.ctaGithub, lang)}
               </Link>
@@ -370,19 +370,19 @@ export default async function NestjsBackendProjectPage({ params }: PageProps) {
       {/* Bottom CTA — local-price style */}
       <section className="py-16 px-4">
         <div className="max-w-6xl mx-auto">
-          <div className="p-8 md:p-10 rounded-3xl bg-gradient-to-r from-primary-600 via-primary-500 to-accent-500 text-white flex flex-col md:flex-row md:items-center md:justify-between gap-8 shadow-xl shadow-primary-500/20">
+          <div className="p-8 md:p-10 rounded-3xl bg-gradient-to-r from-primary-600 via-primary-500 to-accent-500 text-primary-950 flex flex-col md:flex-row md:items-center md:justify-between gap-8 shadow-xl shadow-primary-500/20">
             <div className="flex items-start gap-5">
               <Image
                 src={NESTJS_BACKEND_ICON}
                 alt=""
                 width={64}
                 height={64}
-                className="rounded-2xl shadow-lg ring-2 ring-white/20"
+                className="rounded-2xl shadow-lg ring-2 ring-primary-950/15"
                 aria-hidden
               />
               <div>
                 <h2 className="text-2xl md:text-3xl font-bold mb-2">{t(copy.bottomCtaTitle, lang)}</h2>
-                <p className="text-primary-50/95 text-lg">{t(copy.bottomCtaBody, lang)}</p>
+                <p className="text-primary-950/75 text-lg">{t(copy.bottomCtaBody, lang)}</p>
               </div>
             </div>
             <div className="flex flex-wrap gap-3 shrink-0">
@@ -398,7 +398,7 @@ export default async function NestjsBackendProjectPage({ params }: PageProps) {
                 href={NESTJS_BACKEND_GITHUB_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center px-5 py-3 rounded-xl border border-white/40 hover:bg-white/10 font-semibold transition-colors"
+                className="inline-flex items-center justify-center px-5 py-3 rounded-xl border border-primary-950/35 hover:bg-primary-950/10 font-semibold transition-colors"
               >
                 {t(copy.ctaGithub, lang)}
               </Link>

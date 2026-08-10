@@ -117,7 +117,7 @@ export default function GradientGenerator({ lang: initialLang }: { lang?: Langua
             onClick={() => setGradientType(type)}
             className={`flex-1 py-2 font-medium transition-colors capitalize
               ${gradientType === type
-                ? 'bg-primary-500 text-white'
+                ? 'bg-primary-500 text-primary-950'
                 : 'bg-[var(--color-card)] text-[var(--color-text)] hover:bg-[var(--color-card-hover)]'
               }`}
           >
@@ -155,7 +155,7 @@ export default function GradientGenerator({ lang: initialLang }: { lang?: Langua
           <button
             onClick={addColorStop}
             disabled={colorStops.length >= 10}
-            className="px-3 py-1 text-sm bg-primary-500 hover:bg-primary-600 text-white rounded
+            className="px-3 py-1 text-sm bg-primary-500 hover:bg-primary-600 text-primary-950 rounded
               transition-colors disabled:opacity-50"
           >
             + {t(tc.add)}
