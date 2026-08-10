@@ -1,5 +1,5 @@
 ---
-title: 'NestJS Reference Backend: Auth Got Serious'
+title: 'NestJS Reference Backend: Auth Built for Real Products'
 date: '2026-08-10'
 tags:
   - portfolio
@@ -10,77 +10,73 @@ tags:
   - oauth
   - ldap
 description: >-
-  A full social IdP roster, AD group→role mapping, Argon2id, Fastify, and an
-  OAuth redirect that stops trailing hashes — what landed since the July ops post.
+  How the NestJS reference template handles social login, Active Directory,
+  Argon2id, and mobile-friendly OAuth — for teams who need a solid starting
+  point, not another demo that only supports Google.
 ---
 
 
-In [July](/posts/nestjs-backend-six-months-later) I bragged about plumbing: Compose, Graylog, `/health`, a wiki that lives next to Swagger. Auth got a polite paragraph. Google and Facebook were already there. I said "and more" like a brochure.
+If you are starting a NestJS API and know authentication will be more than “email + password + maybe Google,” you have probably felt the same trap: weeks spent wiring OAuth providers, LDAP for the corporate client, password hashing that will not embarrass you later, and deep links that break inside mobile browsers.
 
 
-Then the next two and a half weeks happened.
+That is the audience for this update to my [NestJS reference backend](/posts/nestjs-reference-backend). The [July post](/posts/nestjs-backend-six-months-later) focused on ops — Compose, Graylog, health checks, docs next to Swagger. This one focuses on **auth you can enable selectively**: social identity providers, on-prem Active Directory, safer password hashing, and OAuth flows that behave on mobile.
 
 
-This is not another "I added Docker" post. This is the auth surface catching up with the kitchen sink — and then deleting three IdPs that did not earn their keep.
+Live demo: [nest.lacorte.dev](https://nest.lacorte.dev) · Project overview: [/projects/nestjs-backend](/projects/nestjs-backend) · Source: [GitHub](https://github.com/mateuslacorte/nestjs-backend)
 
 
-## What Landed
+## Who This Helps
 
 
-Between 24 July and 10 August:
+You may find the template useful if you:
 
-- **Social login went from two providers to a full roster** (then a slightly smaller honest roster)
-- **Active Directory LDAP/LDAPS** with real **group → role** mapping on login
-- **Argon2id** instead of bcrypt for password hashing
-- **Express → Fastify** (yes, ten days after I wrote about a custom Express Apollo driver — comedy writes itself)
-- OAuth completion that survives **Chrome Custom Tabs** without a trailing `#`
-- MetaMask SIWE, Steam OpenID, Apple `form_post`, and a one-time **exchange code** for mobile/web clients
-- Per-provider wiki pages (EN + pt-BR) and an English README that matches reality
+- Need a **clone-ready NestJS 11** app with REST and GraphQL already on Fastify
+- Expect **more than one social login** (product, B2B portal, community app, or white-label)
+- Have an enterprise stakeholder who asks for **Active Directory (LDAP/LDAPS)** and roles tied to security groups
+- Ship a **mobile or Expo** client and need OAuth completion without fragile redirect hacks
+- Want each provider documented so you can turn features **on or off** without reverse-engineering the repo
 
 
-If you only want the demo: [nest.lacorte.dev](https://nest.lacorte.dev). Project page on this site: [/projects/nestjs-backend](/projects/nestjs-backend). Code: [GitHub](https://github.com/mateuslacorte/nestjs-backend).
+It is still a reference. You should delete what you do not use. The goal is a clear pattern per provider — not a permanent dependency on every IdP in the list.
 
 
-## Social Login: Add Everything, Then Edit
+## Social Login as Opt-In Modules
 
 
-Timeline without the marketing gloss:
-
-1. **24 Jul** — X / Twitter OAuth2 with PKCE (`TwitterStrategy`, `GET /auth/twitter`)
-2. **27 Jul** — the big bang: GitHub, Figma, LinkedIn, Slack, Atlassian, GitLab, Bitbucket, Discord, Twitch, Amazon, Patreon, Dropbox, Reddit, Apple, Steam, MetaMask, plus AD LDAP, plus a few IdPs that did not survive
-3. **9 Aug** — Spotify removed. Same day: Microsoft and Coinbase removed. Apple hardened (`PassportStrategy(..., 6)` + forced `response_mode: form_post`)
+The template includes Passport strategies and routes for common providers, including Google, Facebook, X/Twitter (PKCE), GitHub, Figma, LinkedIn, Slack, Atlassian, GitLab, Bitbucket, Discord, Twitch, Amazon, Patreon, Dropbox, Reddit, Apple (`form_post` callback), Steam OpenID, and MetaMask SIWE.
 
 
-What remains at HEAD is boring on purpose: Google, Facebook, X/Twitter, GitHub, Figma, LinkedIn, Slack, Atlassian, GitLab, Bitbucket, Discord, Twitch, Amazon, Patreon, Dropbox, Reddit, Apple, Steam OpenID, MetaMask SIWE — each with `GET /auth/<provider>` (+ Apple's `POST` callback), a Passport strategy/guard pair, user link fields (`githubId`, `metamaskId`, …), and a wiki page under `/auth/social/...`.
+Each provider typically follows the same shape:
+
+- Config module and env flags (for example `GITHUB_AUTH_ENABLED`, client id/secret, callback URL, redirect allowlist, default roles)
+- Strategy + guard pair
+- `GET /auth/<provider>` and callback routes under `/api/v1`
+- A user link field (`githubId`, `appleId`, …)
+- A wiki guide under [/auth/social](https://nest.lacorte.dev/auth/social)
 
 
-Spotify, Microsoft, and Coinbase left the tree. The commits do not narrate a product thesis. I am not inventing one. Templates that keep dead strategies "for completeness" lie to the next person who clones them.
+For mobile and SPA clients, `POST /auth/exchange` (`OauthExchangeService`) trades a short-lived exchange code for tokens so you do not have to put JWTs in deep links.
 
 
-Shared mobile/web finish line: `POST /auth/exchange` via `OauthExchangeService` — swap a short-lived code for tokens without stuffing JWTs into a deep link.
+**Practical advice:** enable only the providers you will configure in your environment. Unused strategies stay out of the path when their `*_AUTH_ENABLED` flag is off. Providers that were not worth maintaining were removed from the tree so clones do not inherit dead code.
 
 
-## Active Directory That Maps Groups
+## Active Directory With Group → Role Mapping
 
 
-AD login shipped in the July 27 wave as bind + search: `POST /auth/ad/login`, `ActiveDirectoryLdapService`, guides at [/auth/active-directory](https://nest.lacorte.dev/auth/active-directory).
+Corporate pilots often start with “can we log in with AD?” and then ask for roles that match existing security groups. The template supports that path.
 
 
-What it did *not* do until 10 August: care about `memberOf`.
+- Endpoint: `POST /auth/ad/login`
+- Service: `ActiveDirectoryLdapService`
+- Guides: [Active Directory](https://nest.lacorte.dev/auth/active-directory), plus LDAP / LDAPS pages
 
 
-New users got flat `AD_LDAP_DEFAULT_ROLES`. Re-logins did not refresh roles from security groups. Multi-valued LDAP attributes were effectively first-value-only. Fine for a demo bind. Useless if your GPO world thinks Nest-Admins means `admin`.
-
-
-The fix lives in `ad-ldap-group-role-map.util.ts` and `AuthService`:
-
-- Fetch `memberOf` into `groups: string[]`
-- Parse `AD_LDAP_GROUP_ROLE_MAP` as `groupKey|role;…` (full DN or CN → `super|admin|manager|user`)
-- Resolve roles on create; optionally **sync on every AD login** when the map is set and `AD_LDAP_SYNC_ROLES_ON_LOGIN` is true
+On login, the service can read `memberOf`, map groups to application roles (`super`, `admin`, `manager`, `user`) via `AD_LDAP_GROUP_ROLE_MAP`, and optionally sync those roles on every successful AD login (`AD_LDAP_SYNC_ROLES_ON_LOGIN`).
 
 
 ```bash
-# .env — sketch, not a paste-and-pray production policy
+# Example — adjust DNs and secrets for your directory; this is not a production policy
 AD_LDAP_ENABLED=true
 AD_LDAP_URL=ldaps://dc.example.com:636
 AD_LDAP_BASE_DN=DC=example,DC=com
@@ -92,17 +88,16 @@ AD_LDAP_SYNC_ROLES_ON_LOGIN=true
 ```
 
 
-Unit coverage followed in `ad-ldap-group-role-map.util.spec.ts` and AD cases in `auth.service.spec.ts`. If your map is empty, you still get defaults. If it is wrong, you get wrong roles — LDAP does not forgive typos.
+If the map is empty, new users still receive `AD_LDAP_DEFAULT_ROLES`. If the map is wrong, roles will be wrong — treat the mapping as configuration you review with whoever owns AD.
 
 
-## Passwords: Argon2id
+## Password Hashing With Argon2id
 
 
-Twitter day also deleted `bcrypt.config.ts` and added `password.util.ts` / `argon2.config.ts`. Hashing is **argon2id** with env knobs:
+Local accounts use **argon2id** through `password.util.ts`, with tunable cost parameters:
 
 
 ```ts
-// resolveArgon2Options — defaults match the template
 {
   memoryCost: parsePositiveInt(process.env.ARGON2_MEMORY_COST, 19456),
   timeCost: parsePositiveInt(process.env.ARGON2_TIME_COST, 2),
@@ -111,16 +106,16 @@ Twitter day also deleted `bcrypt.config.ts` and added `password.util.ts` / `argo
 ```
 
 
-`isPasswordHashed` recognizes `$argon2id$` / `$argon2i$` / `$argon2d$`. Migrate carefully if you already have bcrypt hashes in a fork — the template is a starting point, not a free upgrade path for every deployed user table.
+`isPasswordHashed` recognizes standard Argon2 encodings. If you fork the template onto an existing bcrypt user table, plan a migration — the defaults are for greenfield or deliberate upgrades, not a silent rewrite of every stored hash.
 
 
-## Fastify, and the Trailing Hash From Hell
+## Fastify and Reliable OAuth Redirects
 
 
-The July post mentioned a custom **Express** Apollo driver. On 3 August the HTTP adapter moved to **Fastify** (`@nestjs/platform-fastify`, Fastify Apollo driver, `@fastify/cookie` + `@fastify/session` + `@fastify/passport` for Twitter PKCE).
+The HTTP stack runs on **Fastify** (`@nestjs/platform-fastify`), including the Apollo GraphQL driver and session support needed for Twitter PKCE (`@fastify/cookie`, `@fastify/session`, `@fastify/passport`).
 
 
-That was not aesthetic. OAuth callbacks into Expo AuthSession / Chrome Custom Tabs were coming back with a trailing empty `#` on the client redirect. A bare `302 Location` kept re-attaching garbage. `sendOAuthClientRedirect` now returns HTML + `location.replace()` (and a meta refresh) with the URL scrubbed by `stripTrailingEmptyHash`:
+A common failure mode with Expo AuthSession and Chrome Custom Tabs is a client redirect that picks up a trailing empty `#`. Instead of relying only on a raw `302 Location`, the template finishes the browser hop with a small HTML page that calls `location.replace()` on a cleaned URL (`sendOAuthClientRedirect` / `stripTrailingEmptyHash`):
 
 
 ```ts
@@ -144,30 +139,24 @@ export function sendOAuthClientRedirect(
 ```
 
 
-Boring HTML. Correct deep links. Tests in `oauth-client-redirect.spec.ts` cover relative URLs, real hashes, and `%` edge cases.
+That detail matters if your first users are on phones, not Postman.
 
 
-## Docs That Admit the Roster
+## Documentation Next to the API
 
 
-Each provider got a wiki page. AD got LDAP and LDAPS guides. The README flipped from Portuguese to English so the GitHub landing page matches the bilingual wiki instead of contradicting it.
+Auth is only useful if the next engineer can configure it without a Slack archaeology session. The built-in wiki covers the social index and AD flows in English and Brazilian Portuguese. The README is in English and points at the same paths. Swagger remains at [/swagger](https://nest.lacorte.dev/swagger) on the same origin as the docs.
 
 
-Start at [auth social](https://nest.lacorte.dev/auth/social) or [AD](https://nest.lacorte.dev/auth/active-directory). Swagger still sits at [/swagger](https://nest.lacorte.dev/swagger).
+## Getting Started
 
 
-## Try It
+1. Browse the overview: [nest.lacorte.dev](https://nest.lacorte.dev)
+2. Social login guides: [nest.lacorte.dev/auth/social](https://nest.lacorte.dev/auth/social)
+3. Active Directory: [nest.lacorte.dev/auth/active-directory](https://nest.lacorte.dev/auth/active-directory)
+4. Interactive API: [nest.lacorte.dev/swagger](https://nest.lacorte.dev/swagger)
+5. Product page on this site: [/projects/nestjs-backend](/projects/nestjs-backend)
+6. Clone: [github.com/mateuslacorte/nestjs-backend](https://github.com/mateuslacorte/nestjs-backend)
 
 
-1. Docs: [https://nest.lacorte.dev](https://nest.lacorte.dev)
-2. Social index: [https://nest.lacorte.dev/auth/social](https://nest.lacorte.dev/auth/social)
-3. AD guide: [https://nest.lacorte.dev/auth/active-directory](https://nest.lacorte.dev/auth/active-directory)
-4. Swagger: [https://nest.lacorte.dev/swagger](https://nest.lacorte.dev/swagger)
-5. Project page: [/projects/nestjs-backend](/projects/nestjs-backend)
-6. Repo: [github.com/mateuslacorte/nestjs-backend](https://github.com/mateuslacorte/nestjs-backend)
-
-
-January was the kitchen sink. July was plumbing. August is "please stop shipping an auth module that only works for Google demos and a default role string."
-
-
-Enable only the providers you will configure. Leave the rest off. That is the whole point of a reference: show the pattern, then let you delete half of it without lying about what is left.
+Bring the stack up with Compose, confirm `/health`, enable the auth providers you need, and remove the rest. The boilerplate is there so you spend time on your product — not re-implementing the same OAuth and AD wiring on every new Nest project.

@@ -177,12 +177,12 @@ export const nestjsBackendProject = {
     {
       slug: 'nestjs-backend-auth-got-serious',
       title: {
-        en: 'NestJS Reference Backend: Auth Got Serious',
-        pt: 'Backend NestJS de referência: a auth ficou séria',
+        en: 'NestJS Reference Backend: Auth Built for Real Products',
+        pt: 'Backend NestJS de referência: auth pensada para produtos reais',
       },
       blurb: {
-        en: 'Social IdPs, AD group→role mapping, Argon2id, and Fastify — the August auth wave.',
-        pt: 'IdPs sociais, mapeamento AD grupo→role, Argon2id e Fastify — a leva de auth de agosto.',
+        en: 'Social login, AD group→role mapping, Argon2id, and mobile-friendly OAuth — for teams cloning a Nest boilerplate.',
+        pt: 'Login social, mapeamento AD grupo→role, Argon2id e OAuth mobile — para times que clonam um boilerplate Nest.',
       },
     },
     {
