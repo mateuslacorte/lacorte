@@ -5,6 +5,7 @@ import { SITE_URL } from '@/lib/site';
 /** Paths that skip locale prefix rewriting (ops / system). */
 export const LOCALE_EXCLUDED_PREFIXES = [
   '/api',
+  '/s',
   '/admin',
   '/login',
   '/auth',

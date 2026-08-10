@@ -315,6 +315,43 @@ export const toolsConfig: ToolConfig[] = [
     },
   },
   {
+    slug: 'link-shortener',
+    icon: '✂️',
+    category: 'developer',
+    component: 'LinkShortener',
+    seo: {
+      en: {
+        title: 'Link Shortener - Free URL Shortener | lacorte.dev',
+        description:
+          'Free online link shortener. Turn long URLs into short lacorte.dev/s/ links. No account required.',
+        keywords: [
+          'link shortener',
+          'url shortener',
+          'short link',
+          'short url',
+          ...seoKeywords.en,
+        ],
+      },
+      pt: {
+        title: 'Encurtador de links online grátis | lacorte.dev',
+        description:
+          'Encurtador de URL online grátis. Transforme links longos em lacorte.dev/s/ curtos. Sem conta.',
+        keywords: [
+          'encurtador de links',
+          'encurtador de url',
+          'link curto',
+          'url curta',
+          'grátis',
+          'online',
+          'simples',
+          'rápido',
+          'sem instalação',
+          'web',
+        ],
+      },
+    },
+  },
+  {
     slug: 'jwt-decoder',
     icon: '🎫',
     category: 'developer',

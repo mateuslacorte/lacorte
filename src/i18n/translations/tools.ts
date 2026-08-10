@@ -1009,6 +1009,40 @@ export const toolTranslations = {
     rollButtonPrefix: { en: 'Roll', pt: 'Jogar' },
     historyTitle: { en: '📜 History', pt: '📜 Histórico' },
   },
+
+  linkShortener: {
+    intro: {
+      en: 'Paste a long URL and get a short lacorte.dev/s/ link. History is saved in this browser only.',
+      pt: 'Cole uma URL longa e receba um link curto lacorte.dev/s/. O histórico fica só neste navegador.',
+    },
+    urlPlaceholder: {
+      en: 'https://example.com/very/long/path?with=params',
+      pt: 'https://exemplo.com/caminho/muito/longo?com=params',
+    },
+    shorten: { en: 'Shorten', pt: 'Encurtar' },
+    shortening: { en: 'Shortening…', pt: 'Encurtando…' },
+    yourLink: { en: 'Your short link', pt: 'Seu link curto' },
+    emptyUrl: { en: 'Enter a URL to shorten.', pt: 'Digite uma URL para encurtar.' },
+    createFailed: {
+      en: 'Could not create a short link. Try again.',
+      pt: 'Não foi possível criar o link curto. Tente de novo.',
+    },
+    notesTitle: { en: 'How it works', pt: 'Como funciona' },
+    note1: {
+      en: 'Links use the format https://www.lacorte.dev/s/xxxxxx',
+      pt: 'Os links usam o formato https://www.lacorte.dev/s/xxxxxx',
+    },
+    note2: {
+      en: 'Only http and https targets are allowed. Nested lacorte.dev/s/ links are blocked.',
+      pt: 'Só URLs http e https são aceitas. Links lacorte.dev/s/ aninhados são bloqueados.',
+    },
+    note3: {
+      en: 'No account needed. Recent links from this device appear below.',
+      pt: 'Sem conta. Links recentes deste dispositivo aparecem abaixo.',
+    },
+    historyTitle: { en: 'Recent on this device', pt: 'Recentes neste dispositivo' },
+    clearHistory: { en: 'Clear history', pt: 'Limpar histórico' },
+  },
 } as const;
 
 export type ToolTranslationKey = keyof typeof toolTranslations;

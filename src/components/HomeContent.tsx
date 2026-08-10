@@ -2,6 +2,7 @@
 
 import { ProjectIcon } from '@/components/projects/ProjectIcon';
 import { projects } from '@/data/projects';
+import { toolsConfig } from '@/data/tools';
 import { useTranslation } from '../i18n/useTranslation';
 import { localizePath } from '@/i18n/urlUtils';
 
@@ -146,7 +147,7 @@ export function PopularToolsSection() {
 
         <div className="mt-6 text-center">
           <a href={localizePath('/tools', lang)} className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary-500 text-primary-950 font-medium hover:bg-primary-600 transition-colors">
-            26{t(idx.seeAllTools)}
+            {toolsConfig.length}{t(idx.seeAllTools)}
             <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
             </svg>

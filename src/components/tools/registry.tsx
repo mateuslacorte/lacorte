@@ -18,6 +18,7 @@ import DiffTool from '@/components/tools/DiffTool';
 import JsonFormatter from '@/components/tools/JsonFormatter';
 import RegexTester from '@/components/tools/RegexTester';
 import UrlEncoder from '@/components/tools/UrlEncoder';
+import LinkShortener from '@/components/tools/LinkShortener';
 import JwtDecoder from '@/components/tools/JwtDecoder';
 import BcryptTool from '@/components/tools/BcryptTool';
 import CronGenerator from '@/components/tools/CronGenerator';
@@ -61,6 +62,7 @@ const toolComponents: Record<string, ToolComponentType> = {
   JsonFormatter,
   RegexTester,
   UrlEncoder,
+  LinkShortener,
   JwtDecoder,
   BcryptTool,
   CronGenerator,
