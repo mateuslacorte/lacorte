@@ -41,12 +41,13 @@ export function PageOgImage({
         flexDirection: 'column',
         justifyContent: 'space-between',
         padding: '72px',
-        background: 'linear-gradient(135deg, #09090b 0%, #18181b 45%, #09090b 100%)',
+        background:
+          'linear-gradient(135deg, #09090b 0%, #121a0f 40%, #18181b 70%, #1a1608 100%)',
         color: '#fafafa',
         fontFamily: 'Courier New, monospace',
       }}
     >
-      <div style={{ display: 'flex', fontSize: '20px', letterSpacing: '4px', color: '#a78bfa' }}>
+      <div style={{ display: 'flex', fontSize: '20px', letterSpacing: '4px', color: '#B2D959' }}>
         {label}
       </div>
 
@@ -89,9 +90,9 @@ export function PageOgImage({
                   alignItems: 'center',
                   padding: '8px 16px',
                   borderRadius: '8px',
-                  border: '1px solid #3f3f46',
-                  background: 'rgba(39, 39, 42, 0.8)',
-                  color: '#a1a1aa',
+                  border: '1px solid #3d6629',
+                  background: 'rgba(126, 193, 81, 0.12)',
+                  color: '#B2D959',
                   fontSize: '20px',
                   letterSpacing: '1px',
                   fontFamily: 'Courier New, monospace',
@@ -104,8 +105,26 @@ export function PageOgImage({
         ) : null}
       </div>
 
-      <div style={{ display: 'flex', fontSize: '16px', letterSpacing: '3px', color: '#71717a' }}>
-        {footer}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '24px',
+        }}
+      >
+        <div style={{ display: 'flex', fontSize: '16px', letterSpacing: '3px', color: '#71717a' }}>
+          {footer}
+        </div>
+        <div
+          style={{
+            display: 'flex',
+            width: '48px',
+            height: '4px',
+            borderRadius: '2px',
+            background: 'linear-gradient(90deg, #7EC151 0%, #FED24F 100%)',
+          }}
+        />
       </div>
     </div>
   );
@@ -132,12 +151,12 @@ export function LlmWikiOgImage() {
         flexDirection: 'column',
         justifyContent: 'space-between',
         padding: '72px',
-        background: 'linear-gradient(135deg, #09090d 0%, #14141c 50%, #09090d 100%)',
+        background: 'linear-gradient(135deg, #09090b 0%, #121a0f 50%, #09090b 100%)',
         color: '#f4f0e8',
         fontFamily: 'Courier New, monospace',
       }}
     >
-      <div style={{ display: 'flex', fontSize: '14px', letterSpacing: '3px', color: '#9b87ff' }}>
+      <div style={{ display: 'flex', fontSize: '14px', letterSpacing: '3px', color: '#B2D959' }}>
         INTERACTIVE FIELD GUIDE / 001
       </div>
 
