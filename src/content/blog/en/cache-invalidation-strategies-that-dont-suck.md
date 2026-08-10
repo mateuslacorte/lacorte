@@ -89,10 +89,10 @@ Start with the flags that matter. `-v` (or `-i` for headers-only) prints the ful
 -o /dev/null -D - | awk 'BEGIN{IGNORECASE=1}
   function trim(s){ sub(/\r$/, "", s); return s }
   /^HTTP\//{code=trim($2)}
-  /^age:/{age=trim($2)}
-  /^x-cache:/{cache=trim($2)}
-  /^cf-cache-status:/{cf=trim($2)}
-  /^etag:/{etag=trim($2)}
+  /^age:/{age=$0; sub(/\r$/, "", age); sub(/^age:[[:space:]]*/, "", age)}
+  /^x-cache:/{cache=$0; sub(/\r$/, "", cache); sub(/^x-cache:[[:space:]]*/, "", cache)}
+  /^cf-cache-status:/{cf=$0; sub(/\r$/, "", cf); sub(/^cf-cache-status:[[:space:]]*/, "", cf)}
+  /^etag:/{etag=$0; sub(/\r$/, "", etag); sub(/^etag:[[:space:]]*/, "", etag)}
   /^vary:/{vary=$0; sub(/\r$/, "", vary); sub(/^vary:[[:space:]]*/, "", vary)}
   END{printf "http=%s age=%s cache=%s cf=%s etag=%s vary=%s\n", code, age, cache, cf, etag, vary}'
 ```
@@ -111,10 +111,10 @@ cache-debug() {
     "$@" "$url" | awk 'BEGIN{IGNORECASE=1}
       function trim(s){ sub(/\r$/, "", s); return s }
       /^HTTP\//{code=trim($2)}
-      /^age:/{age=trim($2)}
-      /^x-cache:/{cache=trim($2)}
-      /^cf-cache-status:/{cf=trim($2)}
-      /^etag:/{etag=trim($2)}
+      /^age:/{age=$0; sub(/\r$/, "", age); sub(/^age:[[:space:]]*/, "", age)}
+      /^x-cache:/{cache=$0; sub(/\r$/, "", cache); sub(/^x-cache:[[:space:]]*/, "", cache)}
+      /^cf-cache-status:/{cf=$0; sub(/\r$/, "", cf); sub(/^cf-cache-status:[[:space:]]*/, "", cf)}
+      /^etag:/{etag=$0; sub(/\r$/, "", etag); sub(/^etag:[[:space:]]*/, "", etag)}
       /^vary:/{vary=$0; sub(/\r$/, "", vary); sub(/^vary:[[:space:]]*/, "", vary)}
       END{printf "http=%s age=%s cache=%s cf=%s etag=%s vary=%s\n", code, age, cache, cf, etag, vary}'
 }

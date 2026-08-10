@@ -609,7 +609,7 @@ to_epoch() {
     date -j -f "%Y-%m-%d" "$d" +%s
   else
     echo "Cannot parse expires date: $d (want YYYY-MM-DD)" >&2
-    exit 2
+    return 2
   fi
 }
 
@@ -617,7 +617,8 @@ now="$(date +%s)"
 failed=0
 while IFS=$'\t' read -r pkg expires; do
   [[ -z "${expires:-}" || "$expires" == "null" ]] && continue
-  if (( $(to_epoch "$expires") < now )); then
+  epoch="$(to_epoch "$expires")" || exit $?
+  if (( epoch < now )); then
     echo "::error::Pin for $pkg expired on $expires — update or extend"
     failed=1
   fi
