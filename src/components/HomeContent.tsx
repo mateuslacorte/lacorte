@@ -1,5 +1,6 @@
 'use client';
 
+import { ProjectIcon } from '@/components/projects/ProjectIcon';
 import { projects } from '@/data/projects';
 import { useTranslation } from '../i18n/useTranslation';
 import { localizePath } from '@/i18n/urlUtils';
@@ -242,7 +243,9 @@ export function ProjectsSection() {
               >
                 <div className={`absolute inset-0 bg-gradient-to-br ${project.color} opacity-0 group-hover:opacity-10 transition-opacity`} />
                 <div className="relative">
-                  <div className="text-4xl mb-3">{project.icon}</div>
+                  <div className="mb-3 w-fit">
+                    <ProjectIcon icon={project.icon} alt={t(project.title)} size={48} />
+                  </div>
                   <h3 className="text-xl font-bold mb-2 group-hover:text-primary-500 transition-colors">
                     {t(project.title)}
                   </h3>

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { ProjectIcon } from '@/components/projects/ProjectIcon';
 import { projects } from '@/data/projects';
 import { parseLocale, t } from '@/i18n';
 import { localizePath } from '@/i18n/urlUtils';
@@ -73,8 +74,8 @@ export default async function ProjectsPage({ params }: ProjectsPageProps) {
                       {t(project.badge, lang)}
                     </span>
                   )}
-                  <div className="text-6xl mb-4 transform group-hover:scale-110 transition-transform duration-300">
-                    {project.icon}
+                  <div className="mb-4 transform group-hover:scale-110 transition-transform duration-300 w-fit">
+                    <ProjectIcon icon={project.icon} alt={t(project.title, lang)} size={72} />
                   </div>
                   <h3 className="text-2xl font-bold mb-2 group-hover:text-primary-500 transition-colors">
                     {t(project.title, lang)}

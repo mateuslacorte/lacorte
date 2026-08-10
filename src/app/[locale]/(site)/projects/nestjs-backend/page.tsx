@@ -1,11 +1,14 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
-import { FeatureCard, JsonLd, ProjectBreadcrumb } from '@/components/projects/ProjectPageParts';
+import { JsonLd, ProjectBreadcrumb } from '@/components/projects/ProjectPageParts';
 import { parseLocale, t } from '@/i18n';
 import { localizePath } from '@/i18n/urlUtils';
 import {
   NESTJS_BACKEND_DEMO_URL,
   NESTJS_BACKEND_GITHUB_URL,
+  NESTJS_BACKEND_HEALTH_URL,
+  NESTJS_BACKEND_ICON,
   NESTJS_BACKEND_SWAGGER_URL,
   nestjsBackendProject as copy,
 } from '@/i18n/translations/projects-nestjs';
@@ -47,11 +50,22 @@ export default async function NestjsBackendProjectPage({ params }: PageProps) {
           offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
           url: NESTJS_BACKEND_DEMO_URL,
           codeRepository: NESTJS_BACKEND_GITHUB_URL,
+          image: NESTJS_BACKEND_ICON,
         }}
       />
 
-      <section className="relative overflow-hidden py-16 px-4 bg-gradient-to-b from-primary-500/10 via-accent-500/5 to-transparent">
-        <div className="relative max-w-5xl mx-auto">
+      {/* Hero — local-price two-col + roomfit badges */}
+      <section className="relative overflow-hidden py-20 md:py-28 px-4 bg-gradient-to-b from-primary-500/15 via-accent-500/8 to-transparent">
+        <div
+          className="pointer-events-none absolute -top-24 -right-24 h-72 w-72 rounded-full bg-primary-500/20 blur-3xl"
+          aria-hidden
+        />
+        <div
+          className="pointer-events-none absolute bottom-0 left-1/4 h-56 w-56 rounded-full bg-accent-500/15 blur-3xl"
+          aria-hidden
+        />
+
+        <div className="relative max-w-6xl mx-auto">
           <ProjectBreadcrumb
             items={[
               { label: t(copy.breadcrumbHome, lang), href: localizePath('/', lang) },
@@ -60,106 +74,336 @@ export default async function NestjsBackendProjectPage({ params }: PageProps) {
             ]}
           />
 
-          <div className="max-w-3xl">
-            <div className="flex flex-wrap items-center gap-2 mb-5">
-              <span className="text-4xl mr-1" aria-hidden="true">
-                🪺
-              </span>
-              <span className="inline-flex items-center px-3 py-1 text-sm font-medium rounded-full bg-primary-500/10 text-primary-700 dark:text-primary-300">
-                {t(copy.badges.nest, lang)}
-              </span>
-              <span className="inline-flex items-center px-3 py-1 text-sm font-medium rounded-full bg-accent-500/15 text-accent-700 dark:text-accent-300">
-                {t(copy.badges.apis, lang)}
-              </span>
-              <span className="inline-flex items-center px-3 py-1 text-sm font-medium rounded-full bg-primary-500/10 text-primary-700 dark:text-primary-300">
-                {t(copy.badges.docker, lang)}
-              </span>
+          <div className="grid lg:grid-cols-[1.15fr_0.85fr] gap-12 items-center">
+            <div>
+              <div className="flex flex-wrap items-center gap-3 mb-6">
+                <Image
+                  src={NESTJS_BACKEND_ICON}
+                  alt={t(copy.title, lang)}
+                  width={56}
+                  height={56}
+                  className="rounded-2xl shadow-lg shadow-primary-500/20"
+                  priority
+                />
+                <span className="inline-flex items-center px-3 py-1 text-sm font-medium rounded-full bg-primary-500/15 text-primary-800 dark:text-primary-200">
+                  {t(copy.badges.nest, lang)}
+                </span>
+                <span className="inline-flex items-center px-3 py-1 text-sm font-medium rounded-full bg-accent-500/20 text-accent-800 dark:text-accent-200">
+                  {t(copy.badges.apis, lang)}
+                </span>
+                <span className="inline-flex items-center px-3 py-1 text-sm font-medium rounded-full bg-primary-500/10 text-primary-700 dark:text-primary-300">
+                  {t(copy.badges.docker, lang)}
+                </span>
+                <span className="inline-flex items-center px-3 py-1 text-sm font-medium rounded-full bg-[var(--color-card)] border border-[var(--color-border)] text-[var(--color-text-muted)]">
+                  {t(copy.badges.template, lang)}
+                </span>
+              </div>
+
+              <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight text-balance mb-5">
+                {t(copy.title, lang)}
+              </h1>
+              <p className="text-xl md:text-2xl leading-relaxed text-[var(--color-text-muted)] mb-4">
+                {t(copy.pitch, lang)}
+              </p>
+              <p className="text-base md:text-lg leading-relaxed text-[var(--color-text-muted)] mb-10 max-w-2xl">
+                {t(copy.pitchExtra, lang)}
+              </p>
+
+              <div className="flex flex-wrap gap-3">
+                <Link
+                  href={NESTJS_BACKEND_DEMO_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center px-6 py-3.5 rounded-xl bg-primary-600 hover:bg-primary-700 text-white font-semibold shadow-lg shadow-primary-500/25 transition-all hover:-translate-y-0.5"
+                >
+                  {t(copy.ctaDemo, lang)}
+                  <span className="ml-2" aria-hidden>
+                    ↗
+                  </span>
+                </Link>
+                <Link
+                  href={NESTJS_BACKEND_SWAGGER_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center px-6 py-3.5 rounded-xl border border-primary-500/40 text-primary-800 dark:text-primary-200 hover:bg-primary-500/10 font-medium transition-colors"
+                >
+                  {t(copy.ctaSwagger, lang)}
+                </Link>
+                <Link
+                  href={NESTJS_BACKEND_GITHUB_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center px-6 py-3.5 rounded-xl border border-[var(--color-border)] hover:bg-[var(--color-card-hover)] font-medium transition-colors"
+                >
+                  {t(copy.ctaGithub, lang)}
+                </Link>
+              </div>
             </div>
 
-            <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-5">{t(copy.title, lang)}</h1>
-            <p className="text-xl md:text-2xl leading-relaxed text-[var(--color-text-muted)] mb-8">
-              {t(copy.pitch, lang)}
-            </p>
-
-            <div className="flex flex-wrap gap-4">
-              <Link
-                href={NESTJS_BACKEND_DEMO_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center px-6 py-3 rounded-xl bg-primary-600 hover:bg-primary-700 text-white font-semibold shadow-lg shadow-primary-500/20 transition-all hover:-translate-y-0.5"
-              >
-                {t(copy.ctaDemo, lang)}
-              </Link>
-              <Link
-                href={NESTJS_BACKEND_SWAGGER_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center px-6 py-3 rounded-xl border border-primary-500/40 text-primary-700 dark:text-primary-300 hover:bg-primary-500/10 font-medium transition-colors"
-              >
-                {t(copy.ctaSwagger, lang)}
-              </Link>
-              <Link
-                href={NESTJS_BACKEND_GITHUB_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center px-6 py-3 rounded-xl border border-[var(--color-border)] hover:bg-[var(--color-card-hover)] font-medium transition-colors"
-              >
-                {t(copy.ctaGithub, lang)}
-              </Link>
-            </div>
+            <figure className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-5 md:p-6 shadow-xl shadow-primary-500/5">
+              <div className="flex items-center gap-3 mb-4">
+                <Image
+                  src={NESTJS_BACKEND_ICON}
+                  alt=""
+                  width={40}
+                  height={40}
+                  className="rounded-xl"
+                  aria-hidden
+                />
+                <div>
+                  <p className="text-xs uppercase tracking-wide text-[var(--color-text-muted)]">
+                    {t(copy.heroPanel.title, lang)}
+                  </p>
+                  <p className="font-semibold font-mono text-sm">{t(copy.heroPanel.origin, lang)}</p>
+                </div>
+              </div>
+              <div className="space-y-3 font-mono text-sm">
+                <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-bg)] p-4">
+                  <p className="text-[var(--color-text-muted)] text-xs mb-1">docs</p>
+                  <p className="text-primary-600 dark:text-primary-400">{t(copy.heroPanel.origin, lang)}</p>
+                </div>
+                <div className="flex items-center justify-center text-[var(--color-text-muted)] text-xs">↓</div>
+                <div className="rounded-xl border border-primary-500/25 bg-primary-500/10 p-4">
+                  <p className="text-[var(--color-text-muted)] text-xs mb-1">api</p>
+                  <p>{t(copy.heroPanel.swagger, lang)}</p>
+                  <p className="text-primary-700 dark:text-primary-300 mt-1">{t(copy.heroPanel.health, lang)}</p>
+                </div>
+                <div className="rounded-xl bg-gradient-to-r from-primary-600 to-accent-500 text-white p-4">
+                  <p className="text-white/80 text-xs mb-1">compose</p>
+                  <p className="break-all">{t(copy.heroPanel.compose, lang)}</p>
+                </div>
+              </div>
+            </figure>
           </div>
-        </div>
-      </section>
 
-      <section className="py-16 px-4">
-        <div className="max-w-5xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold mb-8">{t(copy.featuresHeading, lang)}</h2>
-          <div className="grid md:grid-cols-2 gap-6">
-            {copy.features.map((feature) => (
-              <FeatureCard
-                key={feature.title.en}
-                title={t(feature.title, lang)}
-                description={t(feature.description, lang)}
-              />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="py-16 px-4 border-t border-[var(--color-border)] bg-[var(--color-card)]/30">
-        <div className="max-w-5xl mx-auto">
-          <h2 className="text-3xl font-bold mb-8">{t(copy.stackHeading, lang)}</h2>
-          <div className="grid sm:grid-cols-2 gap-4">
-            {copy.stack.map((item) => (
+          <div className="grid sm:grid-cols-3 gap-3 mt-12">
+            {copy.stats.map((stat) => (
               <div
-                key={item.label.en}
-                className="p-5 rounded-xl border border-[var(--color-border)] bg-[var(--color-card)]"
+                key={stat.label.en}
+                className="p-4 rounded-xl border border-[var(--color-border)] bg-[var(--color-card)]/80 backdrop-blur-sm"
               >
-                <p className="text-sm uppercase tracking-wide text-[var(--color-text-muted)] mb-2">
-                  {t(item.label, lang)}
+                <p className="text-xs uppercase tracking-wide text-[var(--color-text-muted)] mb-1">
+                  {t(stat.label, lang)}
                 </p>
-                <p className="font-semibold text-lg">{t(item.value, lang)}</p>
+                <p className="font-semibold text-lg">{t(stat.value, lang)}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="py-16 px-4 border-t border-[var(--color-border)]">
-        <div className="max-w-5xl mx-auto">
-          <h2 className="text-3xl font-bold mb-8">{t(copy.relatedHeading, lang)}</h2>
-          <ul className="space-y-3">
-            {copy.related.map((post) => (
-              <li key={post.slug}>
-                <Link
-                  href={localizePath(`/posts/${post.slug}`, lang)}
-                  className="text-lg font-medium text-primary-600 dark:text-primary-400 hover:underline"
-                >
-                  {t(post.title, lang)}
-                </Link>
-              </li>
+      {/* Features — roomfit numbered cards */}
+      <section className="py-20 px-4">
+        <div className="max-w-6xl mx-auto">
+          <p className="text-sm font-semibold uppercase tracking-wider text-primary-700 dark:text-primary-300 mb-3">
+            {t(copy.featuresEyebrow, lang)}
+          </p>
+          <h2 className="text-3xl md:text-5xl font-bold text-balance mb-12">{t(copy.featuresHeading, lang)}</h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {copy.features.map((feature, index) => (
+              <article
+                key={feature.title.en}
+                className="group p-6 md:p-7 rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] hover:border-primary-500/40 hover:shadow-lg hover:shadow-primary-500/5 transition-all"
+              >
+                <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-primary-500 to-accent-500 text-white flex items-center justify-center font-bold mb-5 shadow-md shadow-primary-500/20 group-hover:scale-105 transition-transform">
+                  {index + 1}
+                </div>
+                <h3 className="text-xl font-semibold mb-2">{t(feature.title, lang)}</h3>
+                <p className="leading-relaxed text-[var(--color-text-muted)]">{t(feature.description, lang)}</p>
+              </article>
             ))}
-          </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* Workflow — local-price 3-step */}
+      <section className="py-20 px-4 border-y border-[var(--color-border)] bg-[var(--color-card)]/40">
+        <div className="max-w-6xl mx-auto">
+          <p className="text-sm font-semibold uppercase tracking-wider text-primary-700 dark:text-primary-300 mb-3">
+            {t(copy.workflowEyebrow, lang)}
+          </p>
+          <h2 className="text-3xl md:text-4xl font-bold text-balance mb-10">{t(copy.workflowHeading, lang)}</h2>
+          <div className="grid md:grid-cols-3 gap-6">
+            {copy.workflow.map((step, index) => (
+              <article
+                key={step.title.en}
+                className="relative p-6 rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg)]"
+              >
+                <div className="w-10 h-10 rounded-full bg-primary-600 text-white flex items-center justify-center font-semibold mb-5">
+                  {index + 1}
+                </div>
+                <h3 className="text-xl font-semibold mb-2">{t(step.title, lang)}</h3>
+                <p className="leading-relaxed text-[var(--color-text-muted)]">{t(step.description, lang)}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Try it — install + aside */}
+      <section className="py-20 px-4">
+        <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-12">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-wider text-primary-700 dark:text-primary-300 mb-3">
+              {t(copy.tryEyebrow, lang)}
+            </p>
+            <h2 className="text-3xl md:text-4xl font-bold text-balance mb-8">{t(copy.tryHeading, lang)}</h2>
+            <ol className="space-y-5">
+              {copy.trySteps.map((step, index) => (
+                <li key={step.en} className="flex gap-4">
+                  <span className="shrink-0 w-9 h-9 rounded-full bg-gradient-to-br from-primary-600 to-accent-500 text-white flex items-center justify-center font-semibold shadow-sm">
+                    {index + 1}
+                  </span>
+                  <span className="pt-1.5 leading-relaxed">{t(step, lang)}</span>
+                </li>
+              ))}
+            </ol>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link
+                href={NESTJS_BACKEND_HEALTH_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center px-5 py-2.5 rounded-xl border border-primary-500/40 text-primary-700 dark:text-primary-300 hover:bg-primary-500/10 font-medium transition-colors"
+              >
+                {t(copy.ctaHealth, lang)}
+              </Link>
+              <Link
+                href={NESTJS_BACKEND_GITHUB_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center px-5 py-2.5 rounded-xl bg-primary-600 hover:bg-primary-700 text-white font-medium transition-colors"
+              >
+                {t(copy.ctaGithub, lang)}
+              </Link>
+            </div>
+          </div>
+
+          <aside className="p-7 md:p-8 rounded-2xl border border-accent-500/30 bg-gradient-to-br from-accent-500/15 via-primary-500/10 to-transparent self-start">
+            <h3 className="text-2xl font-bold mb-3">{t(copy.tryAsideTitle, lang)}</h3>
+            <p className="mb-4 leading-relaxed">{t(copy.tryAsideBody, lang)}</p>
+            <p className="text-[var(--color-text-muted)] leading-relaxed">{t(copy.tryAsideNote, lang)}</p>
+          </aside>
+        </div>
+      </section>
+
+      {/* Stack */}
+      <section className="py-20 px-4 border-t border-[var(--color-border)] bg-[var(--color-card)]/30">
+        <div className="max-w-6xl mx-auto">
+          <p className="text-sm font-semibold uppercase tracking-wider text-primary-700 dark:text-primary-300 mb-3">
+            {t(copy.stackEyebrow, lang)}
+          </p>
+          <h2 className="text-3xl md:text-4xl font-bold mb-10">{t(copy.stackHeading, lang)}</h2>
+          <div className="grid sm:grid-cols-2 gap-4">
+            {copy.stack.map((item) => (
+              <div
+                key={item.label.en}
+                className="p-6 rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] hover:border-primary-500/30 transition-colors"
+              >
+                <p className="text-sm uppercase tracking-wide text-[var(--color-text-muted)] mb-2">
+                  {t(item.label, lang)}
+                </p>
+                <p className="font-semibold text-lg md:text-xl">{t(item.value, lang)}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Related posts — card style */}
+      <section className="py-20 px-4 border-t border-[var(--color-border)]">
+        <div className="max-w-6xl mx-auto">
+          <p className="text-sm font-semibold uppercase tracking-wider text-primary-700 dark:text-primary-300 mb-3">
+            {t(copy.relatedEyebrow, lang)}
+          </p>
+          <h2 className="text-3xl md:text-4xl font-bold mb-10">{t(copy.relatedHeading, lang)}</h2>
+          <div className="grid md:grid-cols-2 gap-6">
+            {copy.related.map((post) => (
+              <Link
+                key={post.slug}
+                href={localizePath(`/posts/${post.slug}`, lang)}
+                className="group p-6 md:p-8 rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] hover:border-primary-500/40 hover:shadow-lg transition-all"
+              >
+                <h3 className="text-xl font-semibold mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+                  {t(post.title, lang)}
+                </h3>
+                <p className="text-[var(--color-text-muted)] mb-4">{t(post.blurb, lang)}</p>
+                <span className="inline-flex items-center text-primary-600 dark:text-primary-400 text-sm font-medium">
+                  {t(copy.relatedRead, lang)}
+                  <svg className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                  </svg>
+                </span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ — kids museum style */}
+      <section className="py-20 px-4 border-t border-[var(--color-border)] bg-[var(--color-card)]/40">
+        <div className="max-w-3xl mx-auto">
+          <p className="text-sm font-semibold uppercase tracking-wider text-primary-700 dark:text-primary-300 mb-3 text-center">
+            {t(copy.faqEyebrow, lang)}
+          </p>
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">{t(copy.faqHeading, lang)}</h2>
+          <div className="space-y-4">
+            {copy.faqs.map((faq) => (
+              <details
+                key={faq.question.en}
+                className="group bg-[var(--color-card)] rounded-xl border border-[var(--color-border)] overflow-hidden"
+              >
+                <summary className="flex items-center justify-between gap-4 p-5 cursor-pointer hover:bg-[var(--color-card-hover)] transition-colors font-medium list-none">
+                  <span>{t(faq.question, lang)}</span>
+                  <span className="shrink-0 text-[var(--color-text-muted)] group-open:rotate-45 transition-transform text-xl leading-none">
+                    +
+                  </span>
+                </summary>
+                <div className="px-5 pb-5 text-[var(--color-text-muted)] leading-relaxed">
+                  {t(faq.answer, lang)}
+                </div>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Bottom CTA — local-price style */}
+      <section className="py-16 px-4">
+        <div className="max-w-6xl mx-auto">
+          <div className="p-8 md:p-10 rounded-3xl bg-gradient-to-r from-primary-600 via-primary-500 to-accent-500 text-white flex flex-col md:flex-row md:items-center md:justify-between gap-8 shadow-xl shadow-primary-500/20">
+            <div className="flex items-start gap-5">
+              <Image
+                src={NESTJS_BACKEND_ICON}
+                alt=""
+                width={64}
+                height={64}
+                className="rounded-2xl shadow-lg ring-2 ring-white/20"
+                aria-hidden
+              />
+              <div>
+                <h2 className="text-2xl md:text-3xl font-bold mb-2">{t(copy.bottomCtaTitle, lang)}</h2>
+                <p className="text-primary-50/95 text-lg">{t(copy.bottomCtaBody, lang)}</p>
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-3 shrink-0">
+              <Link
+                href={NESTJS_BACKEND_DEMO_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center px-5 py-3 rounded-xl bg-white text-primary-800 hover:bg-primary-50 font-semibold transition-colors"
+              >
+                {t(copy.ctaDemo, lang)}
+              </Link>
+              <Link
+                href={NESTJS_BACKEND_GITHUB_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center px-5 py-3 rounded-xl border border-white/40 hover:bg-white/10 font-semibold transition-colors"
+              >
+                {t(copy.ctaGithub, lang)}
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
     </>

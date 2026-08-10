@@ -21,7 +21,7 @@ export const projects: ProjectCard[] = [
       en: 'Production-ready NestJS template with REST, GraphQL, auth, and a full Docker stack.',
       pt: 'Template NestJS pronto para produção com REST, GraphQL, autenticação e stack Docker completa.',
     },
-    icon: '🪺',
+    icon: '/projects/nestjs-logo.png',
     color: 'from-primary-500 to-accent-500',
     badge: {
       en: 'Template',
