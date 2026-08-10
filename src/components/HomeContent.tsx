@@ -162,24 +162,23 @@ export function GameCenterBanner() {
   const idx = translations.common.index;
 
   return (
-    <section className="py-16 px-6 bg-[var(--color-bg)] border-t border-[var(--color-border)]">
+    <section className="py-16 px-6 bg-gradient-to-r from-primary-900/40 via-primary-800/25 to-accent-900/30 border-t border-[var(--color-border)] dark:from-primary-900/50 dark:via-primary-800/30 dark:to-accent-900/40">
       <div className="max-w-4xl mx-auto">
         <a href={localizePath('/games', lang)} className="block group">
-          <div className="relative overflow-hidden flex flex-col md:flex-row items-center gap-8 p-8 rounded-2xl border border-primary-500/25 bg-gradient-to-br from-primary-500/15 via-accent-500/10 to-primary-500/5 hover:border-primary-500/50 transition-all hover:shadow-xl hover:shadow-primary-500/10">
-            <div className="absolute inset-y-0 left-0 w-1.5 bg-gradient-to-b from-primary-500 to-accent-500" aria-hidden />
-            <div className="flex gap-2 text-5xl pl-2">
+          <div className="flex flex-col md:flex-row items-center gap-8 p-8 bg-[var(--color-card)] rounded-2xl border border-[var(--color-border)] hover:border-primary-500/50 transition-all hover:shadow-xl">
+            <div className="flex gap-2 text-5xl">
               <span className="animate-bounce" style={{ animationDelay: '0s' }}>🎮</span>
               <span className="animate-bounce" style={{ animationDelay: '0.1s' }}>🎰</span>
               <span className="animate-bounce" style={{ animationDelay: '0.2s' }}>🎡</span>
             </div>
             <div className="flex-1 text-center md:text-left">
-              <h2 className="text-2xl font-bold mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+              <h2 className="text-2xl font-bold mb-2 group-hover:text-primary-500 transition-colors">
                 {t(idx.gameCenterOpen)}
               </h2>
               <p className="text-[var(--color-text-muted)] mb-4">
                 {t(idx.gameCenterDesc)}
               </p>
-              <span className="inline-flex items-center gap-2 text-primary-600 dark:text-primary-400 font-medium">
+              <span className="inline-flex items-center gap-2 text-primary-500 font-medium">
                 {t(idx.playNow)}
                 <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
