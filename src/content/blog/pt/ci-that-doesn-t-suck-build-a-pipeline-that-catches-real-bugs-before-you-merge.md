@@ -9,14 +9,16 @@ tags:
   - segurança
   - typescript
 description: >-
-  Pare de tratar CI como um checkbox. Construa um pipeline no GitHub Actions com lint, type-check, testes de contrato e varredura de segurança que roda em menos de 3 minutos e realmente previne incidentes em produção.
+  Pare de tratar CI como checkbox. Monte um pipeline no GitHub Actions com lint,
+  type-check, teste de contrato e varredura de segurança que roda em menos de
+  3 minutos e de fato evita incidente em produção.
 ---
 
-Seu pipeline de CI está mentindo para você. Aquele check verde? Significa "nada explodiu nos últimos 47 minutos", não "seu código funciona". Já vi times fazer merge de migrations quebradas, enviar vulnerabilidades de SQL injection e deployar memory leaks — tudo sob um alegre banner de "All checks passed". O problema não é o CI; é que a maioria dos pipelines é encenação. Eles rodam `npm test` num sqlite in-memory e encerram por aí. CI de verdade pega o bug para o qual você *não* escreveu teste. Falha quando sua árvore de dependências puxa um pacote malicioso. Grita quando seu contrato de API deriva. No mês passado configurei pipelines adequados para quatro repos — um frontend Next.js, uma API NestJS, um worker Python e um sidecar Go. A primeira execução pegou três bugs de produção, um segredo hardcoded e um erro de tipo que teria destruído a tabela de pagamentos. Este post mostra os workflows exatos do GitHub Actions, o harness de testes com Docker Compose e o truque que mantém tudo abaixo de três minutos. Sem engines de templating YAML. Sem upsells de SaaS "enterprise". Só config que você pode colar hoje.
+Seu pipeline de CI está mentindo pra você. Aquele check verde? Significa "nada explodiu nos últimos 47 minutos", não "seu código funciona". Já vi time fazer merge de migration quebrada, subir SQL injection e deployar memory leak — tudo sob um banner alegre de "All checks passed". O problema não é o CI; é que a maioria dos pipelines é teatro. Rodam `npm test` num sqlite in-memory e encerram por aí. CI de verdade pega o bug pro qual você *não* escreveu teste. Falha quando a árvore de dependências puxa pacote malicioso. Grita quando o contrato da API deriva. No mês passado configurei pipelines decentes pra quatro repos — frontend Next.js, API NestJS, worker Python e sidecar Go. A primeira execução pegou três bugs de produção, um segredo hardcoded e um erro de tipo que teria destruído a tabela de pagamentos. Este post mostra os workflows exatos do GitHub Actions, o harness de testes com Docker Compose e o truque que mantém tudo abaixo de três minutos. Sem engine de template YAML. Sem upsell de SaaS "enterprise". Só config que você cola hoje.
 
-## A Anatomia de um Pipeline Que Vale a Pena
+## A anatomia de um pipeline que vale o tempo
 
-A maioria dos pipelines é uma lista linear de `npm test` e uma oração. Um pipeline que vale a pena é um DAG — directed acyclic graph — onde cada estágio bloqueia o próximo e pega uma classe distinta de falha. Pule um, e você não está "indo rápido"; está emprestando tempo da produção.
+A maioria dos pipelines é uma lista linear de `npm test` e uma oração. Um pipeline que vale o tempo é um DAG — directed acyclic graph — em que cada estágio bloqueia o próximo e pega uma classe distinta de falha. Pule um e você não está "indo rápido"; está pegando tempo emprestado da produção.
 
 ```mermaid
 graph TD
@@ -31,7 +33,7 @@ graph TD
     style E fill:#95e1d3,color:#000
 ```
 
-**Estágio 1: Análise estática — o portão barato.** Lint, type-check e detecção de segredos rodam primeiro porque são rápidos e pegam erros óbvios antes de subir containers. ESLint com `plugin:@typescript-eslint/recommended-type-checked` pega vazamento de `any`. `tsc --noEmit` verifica tipos sem emitir JS. `gitleaks detect --source=. --verbose` encontra a chave AWS que você colou em `config.local.ts` às 2 da manhã. Esses rodam em paralelo — 45 segundos no total num runner novo.
+**Estágio 1: análise estática — o portão barato.** Lint, type-check e detecção de segredo rodam primeiro porque são rápidos e pegam erro óbvio antes de subir container. ESLint com `plugin:@typescript-eslint/recommended-type-checked` pega vazamento de `any`. `tsc --noEmit` verifica tipos sem emitir JS. `gitleaks detect --source=. --verbose` acha a chave AWS que você colou em `config.local.ts` às duas da manhã. Esses rodam em paralelo — 45 segundos no total num runner novo.
 
 ```yaml
 # .github/workflows/ci.yml (excerpt)
@@ -47,17 +49,17 @@ static-analysis:
     - run: npx gitleaks detect --source=. --verbose --no-git
 ```
 
-**Estágio 2: Validação de contrato — o check de handshake.** Sua spec OpenAPI é a fonte da verdade. `spectral lint` valida a spec em si. `pact-verifier` (ou `dredd` para OpenAPI) roda testes de contrato do lado do provider contra uma API stubada de verdade. Isso pega deriva: campos renomeados, params obrigatórios faltando, mudanças de enum que seus testes unitários mockam sem nem perceber. Roda em 30 segundos contra um mock server `prism` num container sidecar.
+**Estágio 2: validação de contrato — o check de handshake.** Sua spec OpenAPI é a fonte da verdade. `spectral lint` valida a spec em si. `pact-verifier` (ou `dredd` pra OpenAPI) roda teste de contrato do lado do provider contra uma API stubada de verdade. Isso pega deriva: campo renomeado, param obrigatório faltando, mudança de enum que o unitário mocka sem perceber. Roda em 30 segundos contra um mock server `prism` num container sidecar.
 
-**Estágio 3: Testes de integração — dependências reais, sem mocks.** Suba Postgres, Redis, Kafka e seus containers de serviço de verdade via Docker Compose. Rode migrations. Acesse endpoints reais. Isso pega a migration que funciona no SQLite mas dá deadlock no Postgres, o bug de expiração de chave Redis, a tempestade de rebalanceamento do consumer group Kafka. Meta: abaixo de 90 segundos com mounts `tmpfs` e `--parallel`.
+**Estágio 3: testes de integração — dependência real, sem mock.** Sobe Postgres, Redis, Kafka e seus containers de serviço de verdade via Docker Compose. Roda migration. Bate em endpoint real. Isso pega a migration que funciona no SQLite mas dá deadlock no Postgres, o bug de expiração de chave Redis, a tempestade de rebalanceamento do consumer group Kafka. Meta: abaixo de 90 segundos com mounts `tmpfs` e `--parallel`.
 
-**Estágio 4: Varredura de segurança — a camada paranoica.** `trivy fs --severity HIGH,CRITICAL .` varre seu repo e a imagem buildada. `npm audit --audit-level=high` (ou `pip-audit`, `govulncheck`) bloqueia CVEs conhecidos em dependências. `semgrep --config=auto` pega padrões SAST que seu linter não pega: crypto hardcoded, path traversal, vetores SSRF. Isso roda por último porque é o mais lento — mas se falhar, nada vai para produção.
+**Estágio 4: varredura de segurança — a camada paranoica.** `trivy fs --severity HIGH,CRITICAL .` varre o repo e a imagem buildada. `npm audit --audit-level=high` (ou `pip-audit`, `govulncheck`) bloqueia CVE conhecido em dependência. `semgrep --config=auto` pega padrão SAST que o linter não pega: crypto hardcoded, path traversal, vetor SSRF. Isso roda por último porque é o mais lento — mas se falhar, nada vai pra produção.
 
-Cada estágio falha rápido, registra artifacts e diz *por quê* — não só "tests failed". O DAG garante que você nunca roda testes de integração em código que não passa no type-check, e nunca varre uma imagem que não passou nos contratos.
+Cada estágio falha rápido, registra artifact e diz *por quê* — não só "tests failed". O DAG garante que você nunca roda integração em código que não passa no type-check, e nunca varre uma imagem que não passou nos contratos.
 
-## GitHub Actions Workflow: O Evento Principal
+## GitHub Actions workflow: o prato principal
 
-Aqui está o workflow completo. Ele fica em `.github/workflows/ci.yml` e substitui o culto de "rodar tudo em todo push" por um DAG que respeita seu tempo.
+Aqui está o workflow completo. Mora em `.github/workflows/ci.yml` e troca o culto de "rodar tudo em todo push" por um DAG que respeita seu tempo.
 
 ```yaml
 name: CI
@@ -266,11 +268,11 @@ jobs:
         uses: gitleaks/gitleaks-action@v2
 ```
 
-O job `detect-changes` usa `dorny/paths-filter` — a única action de terceiros aqui — para calcular um mapa de mudanças uma vez. Jobs downstream bloqueiam com expressões `if:` para que um typo em `apps/frontend` nunca dispare o linter Go. Service containers sobem Postgres 16 e Redis 7 com health checks; chega de "connection refused" intermitente na primeira execução de teste. O cache usa `cache-dependency-path` explícito apontando para lockfiles, não o cargo-cult de `~/.cache/pip` que invalida a cada `pip install`. O job `security` roda incondicionalmente — Trivy pega dependências vulneráveis, Gitleaks pega a chave AWS que você commitou sem querer. Tempo total: ~2m 40s com cache frio, ~45s aquecido.
+O job `detect-changes` usa `dorny/paths-filter` — a única action de terceiros aqui — pra calcular um mapa de mudanças uma vez. Jobs downstream bloqueiam com expressões `if:` pra que um typo em `apps/frontend` nunca dispare o linter Go. Service containers sobem Postgres 16 e Redis 7 com health check; chega de "connection refused" intermitente na primeira execução de teste. O cache usa `cache-dependency-path` explícito apontando pra lockfile, não aquele culto a `~/.cache/pip` que invalida a cada `pip install`. O job `security` roda sempre — Trivy pega dependência vulnerável, Gitleaks pega a chave AWS que você commitou sem querer. Tempo total: ~2m 40s com cache frio, ~45s aquecido.
 
-## Docker Compose Test Harness: Serviços Reais, Sem Mocks
+## Harness Docker Compose: serviço real, sem mock
 
-Mocks mentem. Eles retornam JSON happy-path enquanto seu Postgres de produção dá deadlock num índice faltando. Suba serviços reais no CI — é mais rápido do que debugar uma suite de testes flaky às 2 da manhã.
+Mock mente. Devolve JSON de happy path enquanto o Postgres de produção dá deadlock num índice faltando. Sobe serviço de verdade no CI — é mais rápido do que debugar suite flaky às duas da manhã.
 
 ```yaml
 # docker-compose.ci.yml
@@ -329,9 +331,9 @@ services:
       retries: 30
 ```
 
-Mounts `tmpfs` mantêm dados na RAM — sem I/O de disco, sem cleanup. Healthchecks com intervalos sub-segundo fazem a stack ficar pronta em ~12 segundos nos runners do GitHub. LocalStack leva mais tempo; aumente os retries se estiver numa máquina mais lenta.
+Mounts `tmpfs` mantêm dado na RAM — sem I/O de disco, sem cleanup. Healthcheck com intervalo sub-segundo deixa a stack pronta em ~12 segundos nos runners do GitHub. LocalStack demora mais; aumente os retries se estiver numa máquina mais lenta.
 
-Agora a cola. Salve isso como `scripts/wait-for-services.sh`:
+Agora a fila. Salve isso como `scripts/wait-for-services.sh`:
 
 ```bash
 #!/usr/bin/env bash
@@ -350,7 +352,7 @@ echo "All services ready."
 
 Torne executável (`chmod +x scripts/wait-for-services.sh`). O check com `nc` (netcat) é mais leve que `curl` e já vem na imagem do runner.
 
-Helper de teste — coloque isso em `tests/helpers/setup.ts` (adapte para sua linguagem):
+Helper de teste — coloque em `tests/helpers/setup.ts` (adapte pra sua linguagem):
 
 ```typescript
 import { execSync } from 'node:child_process';
@@ -378,15 +380,15 @@ export async function teardownTestDb() {
 }
 ```
 
-Rode `setupTestDb()` no `beforeAll` da sua suite de testes, `teardownTestDb()` no `afterAll`. Sem nonsense de `sqlite` in-memory — suas queries batem no mesmo planner, mesmos índices, mesmo comportamento de locking da produção. Se uma migration quebrar, o CI pega. Se um plano de query regredir, o CI pega. Esse é o trabalho.
+Rode `setupTestDb()` no `beforeAll` da suite, `teardownTestDb()` no `afterAll`. Sem gambiarra de `sqlite` in-memory — suas queries batem no mesmo planner, mesmos índices, mesmo comportamento de locking da produção. Se uma migration quebrar, o CI pega. Se um plano de query regredir, o CI pega. Esse é o trabalho.
 
-## Contract Testing: Pare de Quebrar Seu Frontend
+## Contract testing: para de quebrar o frontend
 
-Seu frontend espera que `user.email` seja uma string. Sua API acabou de mudar para `null` porque "o negócio disse que alguns usuários não têm email". Seus testes passam. O deploy funciona. O dashboard fica em branco. Contract testing pega isso antes do PR fazer merge — sem Pact Broker, sem infra extra, só artifacts passados entre jobs do workflow.
+Seu frontend espera que `user.email` seja string. Sua API acabou de mudar pra `null` porque "o negócio disse que alguns usuários não têm email". Seus testes passam. O deploy sobe. O dashboard fica em branco. Contract testing pega isso antes do PR fazer merge — sem Pact Broker, sem infra extra, só artifact passado entre jobs do workflow.
 
-### Lado da API: Gerar e Publicar o Contrato
+### Lado da API: gerar e publicar o contrato
 
-Adicione Pact à sua suite de testes NestJS (ou Express, Fastify, o que for). Escreva um teste de provider que sobe sua app de verdade, acessa endpoints reais e verifica se o contrato bate com o que os consumers esperam.
+Adicione Pact à suite de testes NestJS (ou Express, Fastify, o que for). Escreva um teste de provider que sobe a app de verdade, bate em endpoint real e verifica se o contrato bate com o que os consumers esperam.
 
 ```typescript
 // test/contract/provider.test.ts
@@ -449,7 +451,7 @@ contract-test:
         path: pacts/verification-results.json
 ```
 
-### Lado do Frontend: Gerar o Contrato do Consumer
+### Lado do frontend: gerar o contrato do consumer
 
 Seus testes de frontend definem o que *esperam* da API. Pact grava essas interações e cospe um contrato JSON.
 
@@ -488,7 +490,7 @@ describe('API Contract', () => {
 });
 ```
 
-Publique o contrato como artifact para o repo da API consumir:
+Publique o contrato como artifact pro repo da API consumir:
 
 ```yaml
 # .github/workflows/ci.yml (Frontend repo)
@@ -505,19 +507,19 @@ generate-contract:
         retention-days: 7
 ```
 
-### A Dança Entre Repos
+### A dança entre repos
 
 Dois repos, uma fonte da verdade. O workflow do frontend roda em todo PR, faz upload de `frontend-contract`. O workflow da API dispara no mesmo PR (via `workflow_dispatch` ou sync agendado), baixa aquele artifact, verifica contra o código atual. Breaking change? A verificação do provider falha. Check vermelho. Sem merge.
 
-Sem broker para manter. Sem dor de cabeça de versionamento. Só `upload-artifact` / `download-artifact` e um entendimento compartilhado de que contratos vivem no repo do consumer — porque *eles* definem o que precisam.
+Sem broker pra manter. Sem dor de cabeça de versionamento. Só `upload-artifact` / `download-artifact` e um entendimento compartilhado: contrato mora no repo do consumer — porque *eles* definem o que precisam.
 
-## Varredura de Segurança Que Não Te Afoga em Ruído
+## Varredura de segurança que não te afoga em ruído
 
-A maioria dos scanners de segurança é barulhenta demais — gritam sobre um DoS regex de severidade LOW numa dev dependency que você não toca desde 2019. Você ignora. Aí um RCE CRITICAL passa porque a fadiga de alertas era real. Vamos consertar a relação sinal-ruído.
+A maioria dos scanners de segurança é barulhenta demais — gritam sobre DoS regex de severidade LOW numa dev dependency que você não toca desde 2019. Você ignora. Aí um RCE CRITICAL passa porque fadiga de alerta era real. Vamos consertar a relação sinal-ruído.
 
-### Varredura de Container com Trivy
+### Varredura de container com Trivy
 
-Trivy varre sua imagem buildada, não o Dockerfile. Isso importa — pega vulnerabilidades puxadas no build time, não só o que você declarou.
+Trivy varre a imagem buildada, não o Dockerfile. Isso importa — pega vulnerabilidade puxada no build time, não só o que você declarou.
 
 ```yaml
 # .github/workflows/ci.yml (job: security)
@@ -549,9 +551,9 @@ trivy:
         category: container
 ```
 
-`ignore-unfixed: true` é o segredo — pula vulnerabilidades sem patch ainda, para você não ficar bloqueado esperando maintainers upstream. `vuln-type: 'os,library'` pula ruído de config-audit (como "root user in container") que pertence ao linter do Dockerfile, não ao scanner de vulns.
+`ignore-unfixed: true` é o segredo — pula vulnerabilidade sem patch ainda, pra você não ficar bloqueado esperando maintainer upstream. `vuln-type: 'os,library'` pula ruído de config-audit (tipo "root user in container") que pertence ao linter do Dockerfile, não ao scanner de vulns.
 
-### Varredura de Dependências: Uma Flag Por Ecossistema
+### Varredura de dependências: uma flag por ecossistema
 
 ```yaml
 deps:
@@ -587,9 +589,9 @@ deps:
         category: dependencies
 ```
 
-O `|| true` impede que o job falhe nos achados — o upload SARIF cuida do bloqueio. A aba de segurança do GitHub agora mostra um período de graça de 7 dias para alertas existentes automaticamente. Achados novos HIGH/CRITICAL bloqueiam o PR; os antigos só te cutucam.
+O `|| true` impede que o job falhe nos achados — o upload SARIF cuida do bloqueio. A aba de segurança do GitHub agora mostra um período de graça de 7 dias pra alertas existentes automaticamente. Achado novo HIGH/CRITICAL bloqueia o PR; os antigos só te cutucam.
 
-### Segredos: Gitleaks com Supressão Inline
+### Segredos: Gitleaks com supressão inline
 
 ```yaml
 secrets:
@@ -617,17 +619,17 @@ secrets:
         category: secrets
 ```
 
-A env var `GITLEAKS_CONFIG` embute sua allowlist *no workflow* — sem `.gitleaks.toml` separado para sair de sync. Fixtures de teste, chaves de exemplo em docs, aquele JWT hardcoded em `mocks/auth.go` — suprima inline com um comentário explicando por quê. O você do futuro agradece ao você do presente quando o log de auditoria mostrar *por que* aquela regra existe.
+A env var `GITLEAKS_CONFIG` embute sua allowlist *no workflow* — sem `.gitleaks.toml` separado pra sair de sync. Fixture de teste, chave de exemplo em docs, aquele JWT hardcoded em `mocks/auth.go` — suprima inline com um comentário explicando por quê. O você do futuro agradece ao você do presente quando o log de auditoria mostrar *por que* aquela regra existe.
 
-### O Período de Graça É Automático
+### O período de graça é automático
 
-A UI de alertas de code scanning do GitHub cuida do período de graça de 7 dias para você. Quando um achado novo HIGH/CRITICAL aparece em `main`, mostra "Introduced 3 days ago." Depois de 7 dias em `main` sem fix, vira um alerta "persistent" e começa a falhar PRs que tocam o arquivo afetado. Sem cron jobs, sem dashboards externos, sem encenação de "time de segurança vai revisar".
+A UI de alertas de code scanning do GitHub cuida do período de graça de 7 dias pra você. Quando um achado novo HIGH/CRITICAL aparece em `main`, mostra "Introduced 3 days ago." Depois de 7 dias em `main` sem fix, vira alerta "persistent" e começa a falhar PRs que tocam o arquivo afetado. Sem cron job, sem dashboard externo, sem teatro de "time de segurança vai revisar".
 
-Rode `gh api repos/:owner/:repo/code-scanning/alerts --jq '.[] | select(.state=="open") | {rule: .rule.id, severity: .rule.severity, file: .most_recent_instance.location.path}'` para auditar o que está realmente aberto. Você vai se surpreender com a velocidade que a lista encolhe quando o ruído para.
+Rode `gh api repos/:owner/:repo/code-scanning/alerts --jq '.[] | select(.state=="open") | {rule: .rule.id, severity: .rule.severity, file: .most_recent_instance.location.path}'` pra auditar o que está realmente aberto. Você se surpreende com a velocidade que a lista encolhe quando o ruído para.
 
-## Speed Runs: Mantendo Abaixo de Três Minutos
+## Cortando tempo: mantendo abaixo de três minutos
 
-Seu pipeline é lento porque você reconstrói o universo a cada commit. Pare com isso. Profile primeiro — `act` roda o workflow localmente com as mesmas imagens Docker que o GitHub usa, menos o tempo de fila.
+Seu pipeline é lento porque você reconstrói o universo a cada commit. Para com isso. Profile primeiro — `act` roda o workflow localmente com as mesmas imagens Docker que o GitHub usa, sem o tempo de fila.
 
 ```bash
 act push --container-architecture linux/amd64 \
@@ -635,13 +637,13 @@ act push --container-architecture linux/amd64 \
   -v
 ```
 
-A flag `-v` monta seu repo read-only para você iterar no YAML sem push. Quando a execução local estiver limpa, envie e audite a coisa real:
+A flag `-v` monta o repo read-only pra você iterar no YAML sem push. Quando a execução local estiver limpa, envie e audite a coisa real:
 
 ```bash
 gh run view --log --repo owner/repo --json conclusion,createdAt,updatedAt,jobs
 ```
 
-Três otimizações cortaram 12 minutos da minha execução fria. Primeiro, **cache de workspace pnpm com Turborepo**. A chave padrão do `actions/cache` é um hash de `pnpm-lock.yaml` — ok para um pacote, inútil para um monorepo onde `packages/ui` muda mas `packages/api` não. Turbo calcula um hash de conteúdo por pacote e só restaura o que foi afetado.
+Três otimizações cortaram 12 minutos da minha execução fria. Primeiro, **cache de workspace pnpm com Turborepo**. A chave padrão do `actions/cache` é um hash de `pnpm-lock.yaml` — ok pra um pacote, inútil pra monorepo onde `packages/ui` muda mas `packages/api` não. Turbo calcula um hash de conteúdo por pacote e só restaura o que foi afetado.
 
 ```yaml
 # .github/workflows/ci.yml
@@ -657,7 +659,7 @@ Três otimizações cortaram 12 minutos da minha execução fria. Primeiro, **ca
       turbo-${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}-
 ```
 
-Combine com `turbo run build test --filter=...[origin/main]` no step do job. Turbo pula pacotes intocados desde `main` — sem malabarismos de `if: github.event_name == 'pull_request'`.
+Combine com `turbo run build test --filter=...[origin/main]` no step do job. Turbo pula pacote intocado desde `main` — sem malabarismo de `if: github.event_name == 'pull_request'`.
 
 Segundo, **split da matrix por pacotes afetados** usando `dorny/paths-filter`. Seu monorepo de 12 pacotes não precisa de 12 jobs de teste quando só `packages/billing` mudou.
 
@@ -687,9 +689,9 @@ Segundo, **split da matrix por pacotes afetados** usando `dorny/paths-filter`. S
     fail-fast: false
 ```
 
-A composite action `.github/actions/test-package/action.yml` roda `pnpm --filter=${{ inputs.package }} test` dentro do harness Docker Compose. Pacotes intocados = zero minutos de runner.
+A composite action `.github/actions/test-package/action.yml` roda `pnpm --filter=${{ inputs.package }} test` dentro do harness Docker Compose. Pacote intocado = zero minuto de runner.
 
-Terceiro, **substitua `docker build` sequencial por `docker buildx bake`** para imagens multi-arch em paralelo. O jeito antigo: build `api`, espera, build `worker`, espera, push nos dois. Bake lê um arquivo HCL e builda todos os targets em paralelo no BuildKit.
+Terceiro, **troque `docker build` sequencial por `docker buildx bake`** pra imagens multi-arch em paralelo. O jeito antigo: build `api`, espera, build `worker`, espera, push nos dois. Bake lê um arquivo HCL e builda todos os targets em paralelo no BuildKit.
 
 ```hcl
 # docker-bake.hcl
@@ -715,7 +717,6 @@ target "worker" {
   cache-to = ["type=gha,mode=max"]
 }
 ```
-
 ```yaml
 - name: Build and push images
   uses: docker/build-push-action@v6
@@ -726,16 +727,16 @@ target "worker" {
     load: false
 ```
 
-O export/import de cache do BuildKit (`type=gha`) significa reuso de layers entre execuções — chega de dança de warmup com `docker pull`.
+O export/import de cache do BuildKit (`type=gha`) significa reuso de layer entre execuções — chega de dança de warmup com `docker pull`.
 
-### Checklist: Onboard de um Novo Repo em 10 Minutos
+### Checklist: onboard de um repo novo em 10 minutos
 
 - [ ] `cp -r .github/workflows/ci.yml .github/actions/ docker-compose.ci.yml docker-bake.hcl turbo.json .`
 - [ ] `pnpm add -D turbo @types/node typescript` (ou equivalente da sua linguagem)
 - [ ] Edite o pipeline do `turbo.json`: tasks `build`, `test`, `lint`, `typecheck` com `dependsOn`
 - [ ] Adicione filtros `dorny/paths-filter` batendo com seus globs de pacote
-- [ ] Rode `act push -v` — corrija secrets faltando, volume mounts, healthchecks de serviço
-- [ ] Push para uma branch de teste, acompanhe `gh run view --log` para o primeiro DAG verde
+- [ ] Rode `act push -v` — corrija secret faltando, volume mount, healthcheck de serviço
+- [ ] Push pra uma branch de teste, acompanhe `gh run view --log` até o primeiro DAG verde
 - [ ] Apague o workflow antigo de `npm test`. Apague o `Dockerfile` antigo que faz `COPY . .` — você tem `docker-bake.hcl` agora.
 
-Três minutos. Checks verdes que significam algo. Vá fazer merge de algo assustador.
+Três minutos. Check verde que significa alguma coisa. Vai fazer merge de algo assustador.

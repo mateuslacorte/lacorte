@@ -1,6 +1,8 @@
 'use client';
 
 import { FormEvent, useCallback, useEffect, useState } from 'react';
+import { dateLocale } from '@/i18n';
+import { useTranslation } from '@/i18n/useTranslation';
 import { ensureSession } from '@/lib/supabase';
 
 export interface BlogComment {
@@ -16,6 +18,8 @@ interface BlogCommentsProps {
 }
 
 export default function BlogComments({ slug }: BlogCommentsProps) {
+  const { t, lang, translations } = useTranslation();
+  const copy = translations.common.blog;
   const [comments, setComments] = useState<BlogComment[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -28,14 +32,14 @@ export default function BlogComments({ slug }: BlogCommentsProps) {
     try {
       const res = await fetch(`/api/posts/${encodeURIComponent(slug)}/comments`);
       const data = (await res.json()) as { comments?: BlogComment[]; error?: string };
-      if (!res.ok) throw new Error(data.error ?? 'Failed to load comments');
+      if (!res.ok) throw new Error(t(copy.commentsLoadError));
       setComments(data.comments ?? []);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load comments');
+    } catch {
+      setError(t(copy.commentsLoadError));
     } finally {
       setLoading(false);
     }
-  }, [slug]);
+  }, [slug, t, copy.commentsLoadError]);
 
   useEffect(() => {
     void load();
@@ -62,7 +66,7 @@ export default function BlogComments({ slug }: BlogCommentsProps) {
         body: JSON.stringify({ authorName, body }),
       });
       const data = (await res.json()) as { comment?: BlogComment; error?: string };
-      if (!res.ok) throw new Error(data.error ?? 'Failed to post comment');
+      if (!res.ok) throw new Error(t(copy.commentPostError));
       if (data.comment) {
         setComments((prev) => [...prev, data.comment!]);
       }
@@ -72,8 +76,8 @@ export default function BlogComments({ slug }: BlogCommentsProps) {
         /* ignore */
       }
       setBody('');
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to post comment');
+    } catch {
+      setError(t(copy.commentPostError));
     } finally {
       setSubmitting(false);
     }
@@ -81,15 +85,13 @@ export default function BlogComments({ slug }: BlogCommentsProps) {
 
   return (
     <section className="mt-16 border-t border-[var(--color-border)] pt-10">
-      <h2 className="mb-2 text-2xl font-bold tracking-tight">Comments</h2>
-      <p className="mb-8 text-sm text-[var(--color-text-muted)]">
-        Keep it useful — questions, corrections, and war stories welcome.
-      </p>
+      <h2 className="mb-2 text-2xl font-bold tracking-tight">{t(copy.comments)}</h2>
+      <p className="mb-8 text-sm text-[var(--color-text-muted)]">{t(copy.commentsIntro)}</p>
 
       <form onSubmit={(e) => void onSubmit(e)} className="mb-10 space-y-4">
         <div>
           <label htmlFor="comment-name" className="mb-1.5 block text-sm font-medium">
-            Name
+            {t(copy.commentName)}
           </label>
           <input
             id="comment-name"
@@ -98,12 +100,12 @@ export default function BlogComments({ slug }: BlogCommentsProps) {
             maxLength={80}
             required
             className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg)] px-3 py-2 text-sm outline-none focus:border-primary-500"
-            placeholder="How should we credit you?"
+            placeholder={t(copy.commentNamePlaceholder)}
           />
         </div>
         <div>
           <label htmlFor="comment-body" className="mb-1.5 block text-sm font-medium">
-            Comment
+            {t(copy.commentLabel)}
           </label>
           <textarea
             id="comment-body"
@@ -113,7 +115,7 @@ export default function BlogComments({ slug }: BlogCommentsProps) {
             required
             rows={4}
             className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg)] px-3 py-2 text-sm outline-none focus:border-primary-500"
-            placeholder="Add your take…"
+            placeholder={t(copy.commentPlaceholder)}
           />
         </div>
         {error && (
@@ -126,14 +128,14 @@ export default function BlogComments({ slug }: BlogCommentsProps) {
           disabled={submitting || !authorName.trim() || !body.trim()}
           className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-primary-950 hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {submitting ? 'Posting…' : 'Post comment'}
+          {submitting ? t(copy.commentSubmitting) : t(copy.commentSubmit)}
         </button>
       </form>
 
       {loading ? (
-        <p className="text-sm text-[var(--color-text-muted)]">Loading comments…</p>
+        <p className="text-sm text-[var(--color-text-muted)]">{t(copy.commentsLoading)}</p>
       ) : comments.length === 0 ? (
-        <p className="text-sm text-[var(--color-text-muted)]">No comments yet. Start the thread.</p>
+        <p className="text-sm text-[var(--color-text-muted)]">{t(copy.commentsEmpty)}</p>
       ) : (
         <ul className="space-y-6">
           {comments.map((comment) => (
@@ -147,7 +149,7 @@ export default function BlogComments({ slug }: BlogCommentsProps) {
                   dateTime={comment.createdAt}
                   className="text-xs text-[var(--color-text-muted)]"
                 >
-                  {new Date(comment.createdAt).toLocaleString()}
+                  {new Date(comment.createdAt).toLocaleString(dateLocale(lang))}
                 </time>
               </div>
               <p className="whitespace-pre-wrap text-sm leading-relaxed text-[var(--color-text)]">

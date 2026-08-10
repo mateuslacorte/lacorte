@@ -9,21 +9,21 @@ tags:
   - redes
   - vercel
 description: >-
-  Um fluxo completo para rastrear cache misses entre navegador, CDN e origem
-  usando curl, headers e logs de runtime — sem depender de dashboards de vendor.
+  Um fluxo completo pra rastrear cache miss entre navegador, CDN e origem com
+  curl, headers e logs de runtime — sem depender de dashboard de vendor.
 ---
 
-Você fez deploy na sexta. Sábado de manhã o site parece lento. Abre o DevTools, vê `x-cache: MISS`, e começa o ritual: purge no CDN, invalida o Cloudflare, reinicia o servidor, acende uma vela para os deuses do cache. Nada funciona. Segunda você descobre um header `Cache-Control: no-store` que você não configurou, enterrado num middleware que você tinha esquecido que existia.
+Você fez deploy na sexta. Sábado de manhã o site parece lento. Abre o DevTools, vê `x-cache: MISS`, e começa o ritual: purge no CDN, invalida o Cloudflare, reinicia o servidor, acende uma vela pros deuses do cache. Nada resolve. Segunda você descobre um header `Cache-Control: no-store` que você não configurou, enterrado num middleware que tinha esquecido que existia.
 
-Cache é o único sistema em que todo mundo assume que funciona, ninguém instrumenta, e o modo de falha é silencioso: seus usuários só recebem uma experiência mais lenta enquanto você queima orçamento em egress da origem.
+Cache é o único sistema em que todo mundo assume que funciona, ninguém instrumenta, e o modo de falha é silencioso: o usuário só recebe uma experiência mais lenta enquanto você queima orçamento em egress da origem.
 
-Este post não é sobre configurar cache — é sobre *diagnosticar*. Vamos montar um fluxo repetível, CLI-first, para responder a única pergunta que importa: "Por que isso não foi um hit?" Do cache em disco do navegador à borda do CDN até os headers de resposta da sua origem, você vai aprender a rastrear uma requisição em cada camada usando só `curl`, `httpie` e os headers que sua plataforma já emite. Sem dashboards de vendor, sem agentes proprietários, sem "insights com IA." Só a conversa HTTP crua e os controles que realmente fazem diferença.
+Este post não é sobre *configurar* cache — é sobre *diagnosticar*. Vamos montar um fluxo repetível, CLI-first, pra responder a única pergunta que importa: "Por que isso não foi hit?" Do cache em disco do navegador à borda do CDN até os headers de resposta da origem, você aprende a rastrear uma requisição em cada camada usando só `curl`, `httpie` e os headers que sua plataforma já emite. Sem dashboard de vendor, sem agente proprietário, sem "insight com IA." Só a conversa HTTP crua e os controles que de fato fazem diferença.
 
-No final, você terá uma checklist de debug que roda em 60 segundos antes de abrir um ticket de suporte — e os snippets de config para corrigir as três armadilhas mais comuns: colisões de `ETag` obsoleto, inchaço do header `Vary`, e a diretiva `Cache-Control` que mata silenciosamente sua taxa de acerto.
+No final, você tem uma checklist de debug que roda em 60 segundos antes de abrir ticket de suporte — e os snippets de config pra corrigir as três armadilhas mais comuns: colisão de `ETag` obsoleto, inchaço do header `Vary`, e a diretiva `Cache-Control` que mata silenciosamente sua taxa de acerto.
 
-## A Stack de Cache: Por Onde Sua Requisição Realmente Passa
+## A stack de cache: por onde sua requisição realmente passa
 
-Antes de depurar um cache miss, você precisa saber quem está com as chaves. Toda requisição HTTP passa por um corredor de quatro camadas de cache distintas, cada uma com sua própria agenda, seu próprio vocabulário de headers, e sua própria forma de ignorar silenciosamente o `Cache-Control` que você elaborou com cuidado.
+Antes de depurar um cache miss, você precisa saber quem está com as chaves. Toda requisição HTTP atravessa um corredor de quatro camadas de cache distintas, cada uma com sua própria agenda, seu próprio vocabulário de headers, e sua própria forma de ignorar em silêncio o `Cache-Control` que você elaborou com carinho.
 
 ```mermaid
 flowchart LR
@@ -38,15 +38,15 @@ flowchart LR
     style E fill:#fce4ec
 ```
 
-### Camada 1: Cache do Navegador (Memória e Disco)
+### Camada 1: cache do navegador (memória e disco)
 
-Seu navegador mantém dois caches: um store rápido em memória para a sessão atual e um cache persistente em disco que sobrevive a reinicializações. Ambos obedecem `Cache-Control`, `Expires`, `ETag` e `Last-Modified` — mas *somente* para respostas `GET` e `HEAD`. Requisições `POST` nunca entram no cache do navegador, a menos que você tenha configurado explicitamente um service worker para interceptá-las.
+O navegador mantém dois caches: um store rápido em memória pra sessão atual e um cache persistente em disco que sobrevive a restart. Os dois obedecem `Cache-Control`, `Expires`, `ETag` e `Last-Modified` — mas *somente* pra respostas `GET` e `HEAD`. Requisição `POST` nunca entra no cache do browser, a menos que você tenha configurado explicitamente um service worker pra interceptá-la.
 
-**Teste rápido:** `curl -I -H "Cache-Control: no-cache" https://example.com/asset.js` — o `no-cache` força revalidação, mas o navegador *ainda* serve do disco se a resposta estiver fresca. Isso não é bug; é a spec.
+**Teste rápido:** `curl -I -H "Cache-Control: no-cache" https://example.com/asset.js` — o `no-cache` força revalidação, mas o navegador *ainda* serve do disco se a resposta estiver fresca. Não é bug; é a spec.
 
-### Camada 2: Service Worker
+### Camada 2: service worker
 
-Se você registrou um SW, ele fica *entre* o cache do navegador e a rede. Pode servir do próprio storage da `Cache API`, sintetizar respostas ou encaminhar para a rede. Por padrão, não respeita *nada* — você escreve a lógica. Os headers que importam aqui são os que o seu handler de `fetch` decide honrar.
+Se você registrou um SW, ele fica *entre* o cache do navegador e a rede. Pode servir do próprio storage da `Cache API`, sintetizar respostas ou encaminhar pra rede. Por padrão, não respeita *nada* — você escreve a lógica. Os headers que importam aqui são os que o seu handler de `fetch` decide honrar.
 
 ```bash
 # Check if a SW controls the page
@@ -54,20 +54,20 @@ curl -I https://example.com/ | grep -i service-worker
 # Returns nothing? No SW. Returns headers? Inspect sw.js
 ```
 
-### Camada 3: Borda do CDN
+### Camada 3: borda do CDN
 
-Cloudflare, Fastly, CloudFront, Bunny — todos implementam RFC 9111 (HTTP Caching) com extensões de vendor. Os headers que eles *realmente* respeitam:
+Cloudflare, Fastly, CloudFront, Bunny — todos implementam a RFC 9111 (HTTP Caching) com extensões de vendor. Os headers que eles *de fato* respeitam:
 
-| Header | CDN Behavior |
-|--------|--------------|
-| `Cache-Control: public, max-age=31536000, immutable` | Gold standard — long-term cache, no revalidation |
-| `Cache-Control: s-maxage=600` | CDN-only TTL, browser ignores it |
-| `Vary: Accept-Encoding` | Required for brotli/gzip variants |
-| `Vary: Cookie` | **Kills cache** for authenticated users — use sparingly |
-| `Surrogate-Control` / `CDN-Cache-Control` | Vendor-specific overrides (Cloudflare, Fastly) |
-| `x-cache: HIT/MISS/BYPASS` | Debug header — *always* emitted by major CDNs |
+| Header | Comportamento no CDN |
+|--------|----------------------|
+| `Cache-Control: public, max-age=31536000, immutable` | Padrão ouro — cache longo, sem revalidação |
+| `Cache-Control: s-maxage=600` | TTL só do CDN; o navegador ignora |
+| `Vary: Accept-Encoding` | Obrigatório pra variantes brotli/gzip |
+| `Vary: Cookie` | **Mata o cache** pra usuário autenticado — use com parcimônia |
+| `Surrogate-Control` / `CDN-Cache-Control` | Override específico de vendor (Cloudflare, Fastly) |
+| `x-cache: HIT/MISS/BYPASS` | Header de debug — *sempre* emitido pelos CDNs grandes |
 
-### Camada 4: Sua Origem
+### Camada 4: sua origem
 
 É aqui que o `Cache-Control` é *gerado*. Seu framework (Next.js, NestJS, Django, Go) define headers com base em config de rota, middleware ou objetos de resposta explícitos. Um único `res.setHeader('Cache-Control', 'no-store')` esquecido num middleware de logging envenena todas as camadas abaixo.
 
@@ -75,29 +75,29 @@ Cloudflare, Fastly, CloudFront, Bunny — todos implementam RFC 9111 (HTTP Cachi
 
 | Header | Browser | Service Worker | CDN | Origin |
 |--------|---------|----------------|-----|--------|
-| `Cache-Control: max-age` | ✅ | ⚠️ Your code | ✅ | ✅ Source |
-| `Cache-Control: s-maxage` | ❌ | ⚠️ Your code | ✅ | ✅ Source |
-| `Cache-Control: no-store` | ✅ | ⚠️ Your code | ✅ | ✅ Source |
-| `ETag` / `If-None-Match` | ✅ | ⚠️ Your code | ✅ | ✅ Source |
-| `Vary` | ✅ | ⚠️ Your code | ✅ | ✅ Source |
-| `Surrogate-Control` | ❌ | ❌ | ✅ | ✅ Source |
-| `Cache-Tag` (purge) | ❌ | ❌ | ✅ | ✅ Source |
+| `Cache-Control: max-age` | ✅ | ⚠️ Seu código | ✅ | ✅ Fonte |
+| `Cache-Control: s-maxage` | ❌ | ⚠️ Seu código | ✅ | ✅ Fonte |
+| `Cache-Control: no-store` | ✅ | ⚠️ Seu código | ✅ | ✅ Fonte |
+| `ETag` / `If-None-Match` | ✅ | ⚠️ Seu código | ✅ | ✅ Fonte |
+| `Vary` | ✅ | ⚠️ Seu código | ✅ | ✅ Fonte |
+| `Surrogate-Control` | ❌ | ❌ | ✅ | ✅ Fonte |
+| `Cache-Tag` (purge) | ❌ | ❌ | ✅ | ✅ Fonte |
 
 O padrão: navegador e CDN seguem os padrões; service worker segue *você*; origem *escreve* as regras. Seu trabalho de debug é verificar se as regras sobrevivem intactas à jornada.
 
-A seguir: montamos o kit CLI para interrogar cada camada sem sair do terminal.
+A seguir: montamos o kit CLI pra interrogar cada camada sem sair do terminal.
 
-## CLI First: Interrogando a Origem Antes da Borda
+## CLI first: interrogue a origem antes da borda
 
-Seu CDN mente. Não de propósito — ele só tem uma definição diferente de "fresco" da sua. Antes de perder uma hora depurando analytics de cache do Cloudflare, você precisa da verdade absoluta: o que sua origem *realmente* enviou. Contorne a borda por completo.
+Seu CDN mente. Não de má fé — ele só tem uma definição diferente de "fresco" da sua. Antes de perder uma hora depurando analytics de cache do Cloudflare, você precisa da verdade absoluta: o que sua origem *realmente* enviou. Contorne a borda por completo.
 
 ```bash
 curl -I -H "Host: lacorte.dev" http://origin-ip:8080/articles/debugging-cache
 ```
 
-A flag `-I` envia uma requisição `HEAD` — mesmos headers, sem body, sem desperdiçar banda. O header `Host` importa: se sua origem serve múltiplos domínios (olá, virtual hosts), pular ele retorna os headers do vhost padrão, que são inúteis. Aprendi isso da pior forma num box Hetzner onde `curl -I http://1.2.3.4` retornava alegremente `Cache-Control: no-cache` de um endpoint de health-check enquanto o app real servia `public, max-age=3600`.
+A flag `-I` manda um `HEAD` — mesmos headers, sem body, sem desperdiçar banda. O header `Host` importa: se a origem serve vários domínios (olá, virtual hosts), pular ele devolve os headers do vhost padrão, que não servem pra nada. Aprendi isso do jeito difícil num box Hetzner onde `curl -I http://1.2.3.4` devolvia alegremente `Cache-Control: no-cache` de um endpoint de health-check enquanto o app real servia `public, max-age=3600`.
 
-Prefere `httpie` pela legibilidade? Mesmos dados, saída mais bonita:
+Prefere `httpie` pela legibilidade? Mesmos dados, saída mais limpa:
 
 ```bash
 http --print=Hh GET http://origin-ip:8080/articles/debugging-cache Host:lacorte.dev
@@ -122,19 +122,19 @@ vary: Accept-Encoding
 age: 0
 ```
 
-**`Age: 0` é sua linha de base da verdade.** A origem *acabou de gerar* essa resposta. Qualquer `Age > 0` na borda significa que o CDN serviu uma cópia armazenada — e o valor diz exatamente quantos segundos ela está lá parada. Se sua origem algum dia retornar `Age: 300`, algo upstream (um reverse proxy, um nginx `proxy_cache` mal configurado) já está cacheando antes do CDN ver. Corrija isso primeiro.
+**`Age: 0` é sua linha de base da verdade.** A origem *acabou de gerar* essa resposta. Qualquer `Age > 0` na borda significa que o CDN serviu uma cópia armazenada — e o valor diz exatamente há quantos segundos ela está parada ali. Se sua origem algum dia devolver `Age: 300`, algo upstream (um reverse proxy, um nginx `proxy_cache` mal configurado) já está cacheando antes do CDN ver. Corrija isso primeiro.
 
-As diretivas de `Cache-Control` são seu contrato. `public` significa "qualquer cache pode armazenar isso." `private` significa "só navegador — CDN, fica fora." `no-store` significa "ninguém armazena isso, nunca." `max-age` é em segundos; `s-maxage` sobrescreve *somente* para caches compartilhados (CDNs). `stale-while-revalidate` e `stale-if-error` são suas redes de segurança — permitem que a borda sirva conteúdo obsoleto enquanto revalida em background, ou quando a origem está fora.
+As diretivas de `Cache-Control` são seu contrato. `public` significa "qualquer cache pode guardar isso." `private` significa "só navegador — CDN, fica fora." `no-store` significa "ninguém guarda isso, nunca." `max-age` é em segundos; `s-maxage` sobrescreve *somente* pra caches compartilhados (CDNs). `stale-while-revalidate` e `stale-if-error` são suas redes de segurança — permitem que a borda sirva conteúdo velho enquanto revalida em background, ou quando a origem está fora.
 
-`ETag` e `Last-Modified` são validadores. O prefixo `W/` no `ETag` significa validação *fraca* — semanticamente equivalente, não byte a byte idêntico. Tags fracas funcionam bem para HTML; quebram se você está cacheando assets binários e o CDN faz range requests.
+`ETag` e `Last-Modified` são validadores. O prefixo `W/` no `ETag` significa validação *fraca* — semanticamente equivalente, não idêntico byte a byte. Tag fraca funciona bem pra HTML; quebra se você está cacheando asset binário e o CDN faz range request.
 
-`Vary: Accept-Encoding` está correto: diz aos caches para armazenar entradas separadas para gzip, brotli e identity. `Vary: User-Agent` é uma armadilha — cada string de UA distinta ganha sua própria chave de cache. Já vi `Vary: Cookie` num blog público porque um middleware adicionou cegamente. Isso matou a taxa de acerto na hora.
+`Vary: Accept-Encoding` está certo: diz aos caches pra guardar entradas separadas pra gzip, brotli e identity. `Vary: User-Agent` é armadilha — cada string de UA distinta ganha sua própria chave de cache. Já vi `Vary: Cookie` num blog público porque um middleware adicionou cegamente. Isso matou a taxa de acerto na hora.
 
-Rode isso contra *cada* tipo de rota: assets estáticos, endpoints de API, páginas HTML. Salve a saída. Esse é seu documento fonte da verdade. Quando o CDN se comportar diferente, você saberá exatamente qual header a borda ignorou, mutou ou inventou.
+Rode isso contra *cada* tipo de rota: asset estático, endpoint de API, página HTML. Salve a saída. Esse é seu documento fonte da verdade. Quando o CDN se comportar diferente, você vai saber exatamente qual header a borda ignorou, mutou ou inventou.
 
-## Lendo a Mente do CDN: Decodificando `x-cache`, `cf-cache-status` e o Cache Reason da Vercel
+## Lendo a mente do CDN: decodificando `x-cache`, `cf-cache-status` e o Cache Reason da Vercel
 
-Seu CDN não é uma caixa preta — ele fala bastante se você souber quais headers ler. Toda plataforma de borda relevante emite headers de diagnóstico, mas falam dialetos diferentes. Aqui está sua camada de tradução.
+Seu CDN não é caixa-preta — ele fala bastante se você souber quais headers ler. Toda plataforma de borda relevante emite headers de diagnóstico, mas cada uma fala um dialeto. Aqui vai sua camada de tradução.
 
 ### Cloudflare: `cf-cache-status`
 
@@ -144,7 +144,7 @@ O header do Cloudflare é o mais verboso do grupo. Acerte com uma requisição l
 curl -sI -H "Host: lacorte.dev" https://lacorte.dev/ | grep -i cf-cache
 ```
 
-Você verá um destes:
+Você vai ver um destes:
 
 ```
 cf-cache-status: HIT          # Served from edge, fresh
@@ -156,7 +156,7 @@ cf-cache-status: REVALIDATED  # Conditional request, 304 from origin
 cf-cache-status: DYNAMIC      # Not cacheable (no-store, private, etc.)
 ```
 
-O header `cf-ray` te dá o colo de borda e o ID da requisição — útil quando o suporte pergunta "qual POP?" Dica: `cf-cache-status: EXPIRED` com um `HIT` rápido em seguida significa que seu `Cache-Control: max-age` é curto demais para o padrão de tráfego.
+O header `cf-ray` te dá o colo de borda e o ID da requisição — útil quando o suporte pergunta "qual POP?" Dica: `cf-cache-status: EXPIRED` com um `HIT` rápido em seguida significa que seu `Cache-Control: max-age` está curto demais pro padrão de tráfego.
 
 ### Vercel: `x-vercel-cache` + `Cache Reason`
 
@@ -180,20 +180,20 @@ x-vercel-cache: MISS
 cache-reason: query-string
 ```
 
-Valores de `Cache Reason` que você realmente vai encontrar:
+Valores de `Cache Reason` que você realmente encontra:
 
-| Reason | Translation |
-|--------|-------------|
-| `max-age` | Fresh per `Cache-Control: max-age` |
-| `stale-while-revalidate` | Served stale, background refresh |
-| `query-string` | Query params not in `ignoreQuery` config |
-| `cookie` | Request had cookies, page not marked `public` |
-| `no-store` | Origin sent `Cache-Control: no-store` |
-| `private` | Origin sent `Cache-Control: private` |
-| `authorization` | `Authorization` header present |
-| `range` | Range request (partial content) |
+| Reason | Tradução |
+|--------|----------|
+| `max-age` | Fresco conforme `Cache-Control: max-age` |
+| `stale-while-revalidate` | Serviu stale, refresh em background |
+| `query-string` | Query params fora do `ignoreQuery` |
+| `cookie` | Request tinha cookies; página não marcada `public` |
+| `no-store` | Origem mandou `Cache-Control: no-store` |
+| `private` | Origem mandou `Cache-Control: private` |
+| `authorization` | Header `Authorization` presente |
+| `range` | Range request (conteúdo parcial) |
 
-Uma vez passei duas horas me perguntando por que meus posts de blog não cacheavam. `cache-reason: query-string` — o `ignoreQuery` padrão da Vercel só ignora `utm_*` e `fbclid`. Minha busca interna usava `?q=term`. Corrigido no `vercel.json`:
+Uma vez passei duas horas me perguntando por que os posts do blog não cacheavam. `cache-reason: query-string` — o `ignoreQuery` padrão da Vercel só ignora `utm_*` e `fbclid`. Minha busca interna usava `?q=term`. Corrigido no `vercel.json`:
 
 ```json
 {
@@ -222,7 +222,7 @@ x-cache: HIT, HIT
 x-cache-hits: 3, 12
 ```
 
-Dois valores = shield POP + edge POP. `x-cache-hits` incrementa por camada. Se você vir `MISS, HIT`, seu nó shield cacheou mas a borda não — geralmente um mismatch de `Vary`.
+Dois valores = shield POP + edge POP. `x-cache-hits` incrementa por camada. Se você vir `MISS, HIT`, o nó shield cacheou mas a borda não — em geral mismatch de `Vary`.
 
 ### CloudFront: `x-cache` + `x-amz-cf-pop`
 
@@ -239,9 +239,9 @@ x-amz-cf-pop: FRA50-C1
 
 `Hit from cloudfront` significa hit na borda. `RefreshHit from cloudfront` significa que stale-while-revalidate serviu. O código POP diz qual borda — útil ao depurar inconsistência regional de cache.
 
-### O One-Liner Universal de Debug
+### O one-liner universal de debug
 
-Coloque isso no seu `.bashrc` ou `.zshrc`:
+Coloque isso no `.bashrc` ou `.zshrc`:
 
 ```bash
 cdn-debug() {
@@ -252,13 +252,13 @@ cdn-debug() {
 
 Uso: `cdn-debug https://lacorte.dev/blog/stop-guessing`. Agora você fala a língua de todo CDN sem sair do terminal.
 
-## Os Três Assassinos Silenciosos: Padrões de Config Que Destroem Taxas de Acerto
+## Os três assassinos silenciosos: configs que destroem taxa de acerto
 
 Você rastreou os headers. Xingou o CDN. Agora conheça as três linhas de config que transformam silenciosamente uma taxa de acerto de 95% em arredondamento. Cada uma parece razoável isolada. Cada uma passa no code review. Cada uma custa dinheiro de verdade.
 
-### 1. A Explosão de `Vary`: `Vary: Accept-Encoding, User-Agent, Cookie`
+### 1. A explosão de `Vary`: `Vary: Accept-Encoding, User-Agent, Cookie`
 
-Sua origem emite isso porque algum middleware adicionou `User-Agent` e `Cookie` ao `Vary` "por correção." Agora cada combinação única de navegador/cookie ganha sua própria chave de cache. Um arquivo CSS vira 500 entradas. O CDN despeja assets quentes para armazenar variantes frias. Sua taxa de acerto despenca.
+Sua origem emite isso porque algum middleware "ajudou" adicionando `User-Agent` e `Cookie` ao `Vary` "por correção." Agora cada combinação única de navegador/cookie ganha sua própria chave de cache. Um arquivo CSS vira 500 entradas. O CDN despeja assets quentes pra guardar variantes frias. Sua taxa de acerto despenca.
 
 **Diagnostique:**
 ```bash
@@ -283,13 +283,13 @@ headers.set('vary', 'Accept-Encoding')
 return new Response(resp.body, { headers })
 ```
 
-Uma linha. `Vary: Accept-Encoding` é o único valor válido para assets estáticos. Varies de `User-Agent` são relíquia de detecção WAP de 2005. Varies de `Cookie` pertencem a HTML *autenticado* apenas — nunca em `/assets/*`.
+Uma linha. `Vary: Accept-Encoding` é o único valor válido pra assets estáticos. Vary de `User-Agent` é relíquia de detecção WAP de 2005. Vary de `Cookie` pertence a HTML *autenticado* apenas — nunca em `/assets/*`.
 
 ---
 
-### 2. A Loteria de `ETag`: `mtime` do Filesystem Entre Restarts de Container
+### 2. A loteria do `ETag`: `mtime` do filesystem entre restarts de container
 
-Seu app Node/Go/Python roda num container. O framework gera `ETag: W/"<mtime>-<size>"` do filesystem. Você faz deploy. O container reinicia. O `mtime` do arquivo muda (cópia de layer Docker, timestamp de `COPY`, extração de artefato no CI). Todo asset ganha um `ETag` novo. Toda requisição condicional `If-None-Match` vira `200 OK` com body completo. Sua taxa de `304 Not Modified` cai para zero.
+Seu app Node/Go/Python roda num container. O framework gera `ETag: W/"<mtime>-<size>"` do filesystem. Você faz deploy. O container reinicia. O `mtime` do arquivo muda (cópia de layer Docker, timestamp de `COPY`, extração de artefato no CI). Todo asset ganha um `ETag` novo. Toda requisição condicional `If-None-Match` vira `200 OK` com body completo. Sua taxa de `304 Not Modified` cai pra zero.
 
 **Diagnostique:**
 ```bash
@@ -323,9 +323,9 @@ response.headers["ETag"] = f'W/"{etag}"'
 
 ---
 
-### 3. A Armadilha do `max-age=0`: `Cache-Control: max-age=0, must-revalidate`
+### 3. A armadilha do `max-age=0`: `Cache-Control: max-age=0, must-revalidate`
 
-Você vê `max-age=0` e pensa "sem cache." A spec diz: "a resposta fica obsoleta imediatamente, mas *pode* ser servida obsoleta em caso de erro." Seu CDN lê isso como "revalide toda requisição" — o que faz, adicionando latência. Mas se a origem falhar, o CDN *ainda serve obsoleto* porque `must-revalidate` só bloqueia obsoleto em falha de revalidação *bem-sucedida*. Você fica com o pior dos dois mundos: origem martelada a cada requisição, *e* conteúdo obsoleto durante outages.
+Você vê `max-age=0` e pensa "sem cache." A spec diz: "a resposta fica obsoleta na hora, mas *pode* ser servida obsoleta em caso de erro." Seu CDN lê isso como "revalide toda requisição" — e faz, adicionando latência. Mas se a origem falhar, o CDN *ainda serve obsoleto* porque `must-revalidate` só bloqueia obsoleto em falha de revalidação *bem-sucedida*. Você fica com o pior dos dois mundos: origem martelada a cada request, *e* conteúdo velho durante outage.
 
 **Diagnostique:**
 ```bash
@@ -335,7 +335,7 @@ curl -sI https://lacorte.dev/api/user | grep -i cache-control
 
 **Corrija (escolha um, não os dois):**
 
-Realmente não cacheável — sem obsoleto, sem store:
+Realmente não cacheável — sem stale, sem store:
 ```nginx
 add_header Cache-Control "no-store, private" always;
 ```
@@ -345,15 +345,15 @@ Stale-while-revalidate — hits rápidos, refresh em background:
 add_header Cache-Control "max-age=60, stale-while-revalidate=300" always;
 ```
 
-A segunda linha é a que você quer para 90% dos endpoints "dinâmicos". `max-age=0, must-revalidate` é uma mentira que você conta para si mesmo. Pare de contar.
+A segunda linha é a que você quer pra 90% dos endpoints "dinâmicos". `max-age=0, must-revalidate` é uma mentira que você conta pra si mesmo. Pare de contar.
 
 ---
 
 Três greps. Três correções de uma linha. Seu gráfico de taxa de acerto vai agradecer na segunda de manhã.
 
-## Automatize a Verificação: Um Script `cache-audit` Para Colocar no CI
+## Automatize a verificação: um script `cache-audit` pra colocar no CI
 
-Você rastreou headers manualmente. Encontrou o `Vary: User-Agent` que transformou seu cache numa fábrica de flocos de neve. Agora automatize a parte em que você lembra de verificar na semana que vem. Aqui está um script Python de arquivo único que vive em `scripts/cache-audit.py`, roda no CI, e falha o build quando sua taxa de acerto cai ou um `no-store` escorre para produção. Zero dependências — só a stdlib em que você já confia.
+Você rastreou headers na mão. Achou o `Vary: User-Agent` que transformou o cache numa fábrica de entradas únicas. Agora automatize a parte em que você lembra de checar na semana que vem. Aqui vai um script Python de arquivo único que vive em `scripts/cache-audit.py`, roda no CI e falha o build quando a taxa de acerto cai ou um `no-store` escorre pra produção. Zero dependências — só a stdlib em que você já confia.
 
 ```python
 #!/usr/bin/env python3
@@ -520,7 +520,7 @@ if __name__ == "__main__":
     sys.exit(main())
 ```
 
-Coloque isso em `scripts/`, dê `chmod +x`, e adicione um step no CI:
+Coloque em `scripts/`, dê `chmod +x` e adicione um step no CI:
 
 ```yaml
 # .github/workflows/cache-audit.yml
@@ -530,25 +530,25 @@ Coloque isso em `scripts/`, dê `chmod +x`, e adicione um step no CI:
     python scripts/cache-audit.py urls.txt --expect-hit-rate 0.9 --origin-only
 ```
 
-O `urls.txt` é só uma lista delimitada por newline — commite junto com sua config de deploy. Agora quando um dev júnior adiciona `Vary: Cookie` no middleware de auth, o build falha antes de chegar em staging. Você consertou o vazamento uma vez; o script garante que fique consertado.
+O `urls.txt` é só uma lista delimitada por newline — commite junto com a config de deploy. Agora, quando um júnior adiciona `Vary: Cookie` no middleware de auth, o build falha antes de chegar em staging. Você consertou o vazamento uma vez; o script garante que continue consertado.
 
-## Quando a Borda Mente: Validando Se Purge e Invalidação Realmente Funcionaram
+## Quando a borda mente: validando se purge e invalidação realmente funcionaram
 
-Você clicou em "Purge Everything" no dashboard. O spinner girou. A notificação toast brilhou verde. Você se sente bem. Você está errado.
+Você clicou em "Purge Everything" no dashboard. O spinner girou. O toast brilhou verde. Você se sente bem. Você está errado.
 
-Dashboards reportam *intenção*, não *realidade*. Uma chamada de API de purge retorna `200 OK` no momento em que é aceita — não quando o último POP expulsa o objeto. Já vi o Cloudflare reportar "purged" enquanto `x-cache: HIT` persistia em Frankfurt por mais 90 segundos. A "invalidação instantânea de cache" da Vercel é instantânea por região, não instantânea global. Seus usuários em Singapura ainda estão comendo HTML obsoleto enquanto você comemora o deploy.
+Dashboard reporta *intenção*, não *realidade*. Uma chamada de API de purge devolve `200 OK` no momento em que é aceita — não quando o último POP expulsa o objeto. Já vi o Cloudflare reportar "purged" enquanto `x-cache: HIT` persistia em Frankfurt por mais 90 segundos. A "invalidação instantânea de cache" da Vercel é instantânea por região, não global. Seus usuários em Singapura ainda estão comendo HTML velho enquanto você comemora o deploy.
 
 Confie nos headers. Não nos toasts.
 
-### O Protocolo de Verificação de Purge
+### O protocolo de verificação de purge
 
 Três sinais confirmam que um purge realmente propagou:
 
-1. **`Age` reseta para `0`** — O objeto foi expulso; a próxima resposta vem fresca da origem.
-2. **`x-cache` (ou `cf-cache-status`, `x-vercel-cache`) vira `MISS` → `HIT`** — A primeira requisição após o purge é miss (hit na origem), a segunda é hit (borda cacheou a cópia fresca).
-3. **Seus logs de acesso da origem mostram a requisição de revalidação** — Se a borda ainda tem cópia obsoleta, serve silenciosamente. Um purge real força uma requisição forward.
+1. **`Age` reseta pra `0`** — O objeto foi expulso; a próxima resposta vem fresca da origem.
+2. **`x-cache` (ou `cf-cache-status`, `x-vercel-cache`) vira `MISS` → `HIT`** — A primeira request após o purge é miss (bate na origem); a segunda é hit (borda cacheou a cópia fresca).
+3. **Os logs de acesso da origem mostram a request de revalidação** — Se a borda ainda tem cópia velha, serve em silêncio. Um purge de verdade força um forward.
 
-Rode esta sequência imediatamente após disparar um purge. Substitua a URL pelo seu asset real:
+Rode esta sequência logo depois de disparar um purge. Troque a URL pelo seu asset real:
 
 ```bash
 # 1. Prime the pump — get a baseline HIT (if cached)
@@ -585,11 +585,11 @@ x-cache: HIT
 date: Sat, 15 Mar 2025 10:00:04 GMT
 ```
 
-`Age: 0` na primeira resposta prova que a borda buscou na origem. A virada para `HIT` na segunda prova que cacheou a cópia fresca. Se você vir `Age: 342` e `HIT` na tentativa 1 — o purge ainda não chegou naquele POP.
+`Age: 0` na primeira resposta prova que a borda buscou na origem. A virada pra `HIT` na segunda prova que cacheou a cópia fresca. Se você vir `Age: 342` e `HIT` na tentativa 1 — o purge ainda não chegou naquele POP.
 
-### Monitore Propagação Entre POPs com `watch`
+### Monitore propagação entre POPs com `watch`
 
-Checagens de requisição única mentem. Você precisa ver *quais* nós de borda ainda estão obsoletos. Use `watch` com um resolvedor DNS geográfico para amostrar múltiplos POPs do seu laptop:
+Checagem de request única mente. Você precisa ver *quais* nós de borda ainda estão velhos. Use `watch` com resolvedor DNS geográfico pra amostrar vários POPs do laptop:
 
 ```bash
 watch -n 3 'for resolver in 1.1.1.1 8.8.8.8 9.9.9.9 208.67.222.222; do
@@ -599,9 +599,9 @@ watch -n 3 'for resolver in 1.1.1.1 8.8.8.8 9.9.9.9 208.67.222.222; do
 done'
 ```
 
-Cada resolvedor tende a acertar POPs diferentes (Cloudflare, Google, Quad9, OpenDNS). Você verá `MISS`/`Age: 0` propagar pela grade em 30–120 segundos. Quando os quatro mostrarem `HIT` com `Age > 0`, o purge é global.
+Cada resolvedor tende a acertar POPs diferentes (Cloudflare, Google, Quad9, OpenDNS). Você vai ver `MISS`/`Age: 0` se espalhar pela grade em 30–120 segundos. Quando os quatro mostrarem `HIT` com `Age > 0`, o purge é global.
 
-### Verifique Se a Origem Viu a Requisição
+### Verifique se a origem viu a request
 
 A verdade definitiva mora nos logs da origem. Faça tail durante o purge:
 
@@ -613,20 +613,20 @@ journalctl -u nginx -f | grep "main.css"
 tail -f /var/log/nginx/access.log | grep "main.css"
 ```
 
-Você deve ver exatamente **uma** requisição para aquele asset após o purge — o fetch de revalidação. Zero requisições significa que a borda serviu obsoleto (purge falhou). Mais de uma significa múltiplos POPs buscando independentemente (normal) ou thundering herd (adicione `Cache-Control: stale-while-revalidate` para suavizar).
+Você deve ver exatamente **uma** request pra aquele asset após o purge — o fetch de revalidação. Zero requests significa que a borda serviu stale (purge falhou). Mais de uma significa múltiplos POPs buscando por conta própria (normal) ou uma avalanche de requests (adicione `Cache-Control: stale-while-revalidate` pra suavizar).
 
-### A Armadilha do "Soft Purge"
+### A armadilha do "soft purge"
 
-Algumas plataformas (Cloudflare Enterprise, Fastly) suportam "soft purge" — marcar conteúdo como obsoleto mas servir enquanto revalida assincronamente. Seu `cf-cache-status` permanece `HIT`, `Age` continua subindo, mas `Server-Timing: cdn-cache; desc=STALE` aparece. Dashboard diz "purged." Usuários recebem conteúdo obsoleto. Origem vê *zero* requisições até o fetch em background completar.
+Algumas plataformas (Cloudflare Enterprise, Fastly) suportam "soft purge" — marcar conteúdo como stale mas servir enquanto revalida em background. Seu `cf-cache-status` permanece `HIT`, `Age` continua subindo, mas `Server-Timing: cdn-cache; desc=STALE` aparece. Dashboard diz "purged." Usuário recebe conteúdo velho. Origem vê *zero* requests até o fetch em background completar.
 
-Correção: sempre faça purge com `"purge_everything": true` ou hard purge baseado em tag. Soft purge é para "vou atualizar este post em 5 minutos, tudo bem se alguém ver a versão antiga por 30 segundos." Não é para "acabei de fazer deploy de um fix de segurança."
+Correção: sempre faça purge com `"purge_everything": true` ou hard purge baseado em tag. Soft purge é pra "vou atualizar este post em 5 minutos, tudo bem se alguém ver a versão antiga por 30 segundos." Não é pra "acabei de fazer deploy de um fix de segurança."
 
 ---
 
-**Checklist para cada deploy:**
+**Checklist pra cada deploy:**
 - [ ] Purge disparado via API (scripte, não clique)
 - [ ] Loop com `watch` mostra `MISS` → `HIT` + `Age: 0` em 3+ resolvedores
-- [ ] Logs da origem mostram exatamente uma requisição de revalidação por asset
-- [ ] Sem headers de timing `STALE` ou `REVALIDATED` em cargas subsequentes
+- [ ] Logs da origem mostram exatamente uma request de revalidação por asset
+- [ ] Sem headers de timing `STALE` ou `REVALIDATED` em cargas seguintes
 
 Se qualquer verificação falhar, o purge não funcionou. O dashboard está te enganando.

@@ -1,5 +1,5 @@
 ---
-title: 'Script RouterOS Para o BetterStack: Por Que Eu Fiz Isso?'
+title: 'Script RouterOS pro BetterStack: por que eu fiz isso?'
 date: '2026-01-10'
 tags:
   - routeros
@@ -8,50 +8,50 @@ tags:
   - logs
   - portfólio
 description: >-
-  Criei um script RouterOS para enviar logs ao BetterStack num momento
-  completamente inoportuno. Eu deveria ter descansado. Mas não descansei. E
-  agora estou aqui escrevendo sobre isso.
+  Fiz um script RouterOS pra mandar logs pro BetterStack num momento
+  completamente errado. Eu deveria ter descansado. Mas não descansei. E agora
+  estou aqui escrevendo sobre isso.
 ---
 
 
-Olá, queridos leitores. Hoje vou contar sobre um dos projetos mais desnecessários e exaustivos que já criei, num momento completamente errado. Sim, estamos falando de um script RouterOS para enviar logs ao BetterStack. Empolgante, não é? *Não.*
+Olá, queridos leitores. Hoje vou contar de um dos projetos mais desnecessários e exaustivos que já montei, num momento completamente errado. Sim, estamos falando de um script RouterOS pra enviar logs ao BetterStack. Empolgante, não é? *Não.*
 
 
-## O Timing Poderia Ser Pior?
+## O timing poderia ser pior?
 
 
-Deixa eu contextualizar a bagunça que eu fiz. Eu estava passando por uma daquelas fases em que o humor depressivo decidiu aparecer, combinado com um cansaço absurdo que fazia qualquer tarefa simples parecer uma maratona. Aquele tipo de cansaço que não é físico, mas mental — aquele cansaço que te faz questionar por que você ainda está acordado mexendo em scripts RouterOS quando deveria estar dormindo.
+Deixa eu contextualizar a bagunça. Eu estava numa daquelas fases em que o humor depressivo resolveu aparecer, misturado com um cansaço absurdo que fazia qualquer tarefa simples parecer maratona. Aquele cansaço que não é físico, é mental — o tipo que te faz questionar por que você ainda está acordado mexendo em script RouterOS quando deveria estar dormindo.
 
 
-Mas não. Em vez de simplesmente **desligar o computador e ir descansar** como qualquer pessoa sã faria, decidi que era o momento perfeito para criar um script que envia logs do RouterOS para o BetterStack. Por quê? **Eu nem sei.** Sinceramente, olhando para trás, não faço ideia do que se passou pela minha cabeça. Talvez fosse uma forma de procrastinar algo importante. *Sim, era isso...* Talvez fosse o cansaço me fazendo acreditar que isso era necessário. *Isso também...* Ou talvez fosse só meu cérebro deprimido tentando criar qualquer coisa para se sentir útil. *Mesma coisa, só que diferente...*
+Mas não. Em vez de simplesmente **desligar o computador e ir descansar** como qualquer pessoa sã faria, decidi que era o momento perfeito pra criar um script que manda logs do RouterOS pro BetterStack. Por quê? **Eu nem sei.** Sinceramente, olhando pra trás, não faço ideia do que passou pela minha cabeça. Talvez fosse procrastinação de algo importante. *Sim, era isso...* Talvez fosse o cansaço me convencendo de que isso era necessário. *Isso também...* Ou talvez fosse só meu cérebro deprimido tentando criar qualquer coisa pra se sentir útil. *Mesma coisa, só que diferente...*
 
 
-## O Projeto
+## O projeto
 
 
-O script em si é relativamente simples — e aqui está a ironia: eu poderia simplesmente ter *comprado* uma solução pronta ou usado algo que já existisse. Mas não. Meu cérebro cansado e deprimido decidiu que era hora de reinventar a roda e desperdiçar minha tarde toda.
+O script em si é relativamente simples — e aqui está a ironia: eu poderia simplesmente ter *comprado* uma solução pronta ou usado algo que já existisse. Mas não. Meu cérebro cansado e deprimido decidiu que era hora de reinventar a roda e queimar a tarde inteira.
 
 
-### O Que o Script Faz
+### O que o script faz
 
 
 O script basicamente:
 
 
-1. Pega os logs do RouterOS armazenados na memória
-2. Converte o formato de data do RouterOS (que é ridículo) para um formato ISO legível
+1. Pega os logs do RouterOS guardados na memória
+2. Converte o formato de data do RouterOS (que é ridículo) pra um formato ISO legível
 3. Processa cada log individualmente
-4. Envia via HTTPS para o BetterStack usando curl
+4. Envia via HTTPS pro BetterStack usando curl
 5. Faz tudo isso a cada 30 segundos porque sim
 
 
-Parece útil, né? **Não é.** Pelo menos não nesse momento. Eu não estava trabalhando em nenhum projeto que precisasse disso. Não tinha nenhum cliente pedindo isso. Não tinha nenhuma necessidade urgente. Era literalmente só meu cérebro cansado e deprimido criando trabalho desnecessário para mim mesmo.
+Parece útil, né? **Não é.** Pelo menos não naquele momento. Eu não estava em nenhum projeto que precisasse disso. Não tinha cliente pedindo. Não tinha urgência nenhuma. Era literalmente só meu cérebro cansado e deprimido inventando trabalho desnecessário pra mim mesmo.
 
 
-## Análise do Script: Bloco por Bloco
+## Análise do script: bloco por bloco
 
 
-Agora, deixa eu explicar como esse script realmente funciona. Porque se você vai sofrer lendo sobre isso, é bom que entenda o que está acontecendo. Aviso justo: o RouterOS Script é... especial. É como se alguém tivesse pegado uma linguagem de programação e removido todas as partes boas.
+Agora deixa eu explicar como esse script realmente funciona. Porque se você vai sofrer lendo sobre isso, pelo menos entenda o que está acontecendo. Aviso justo: RouterOS Script é… especial. É como se alguém tivesse pegado uma linguagem de programação e removido todas as partes boas.
 
 
 ### Bloco 1: Limpeza (Linhas 6-10)
@@ -66,7 +66,7 @@ Agora, deixa eu explicar como esse script realmente funciona. Porque se você va
 Essa é a seção de limpeza. Antes de criar qualquer coisa nova, removemos qualquer scheduler ou script existente com o mesmo nome. O `on-error={}` significa "se não existir, tudo bem, só continua." O RouterOS não tem um bom check de "se existe", então a gente simplesmente tenta remover e ignora os erros. Elegante, né? (Não.)
 
 
-### Bloco 2: Variáveis Globais (Linhas 12-16)
+### Bloco 2: Variáveis globais (Linhas 12-16)
 
 
 ```routeros
@@ -75,10 +75,10 @@ Essa é a seção de limpeza. Antes de criar qualquer coisa nova, removemos qual
 ```
 
 
-Aqui definimos as variáveis globais que serão usadas ao longo do script. Elas precisam ser configuradas manualmente pelo usuário. O token é o seu token de fonte do BetterStack, e o endpoint é a sua URL de ingestão do BetterStack. Você tem que configurar isso manualmente porque o RouterOS não tem variáveis de ambiente nem um sistema de arquivo de configuração legal. Você só... define variáveis globais. Bem-vindo ao RouterOS.
+Aqui definimos as variáveis globais que serão usadas ao longo do script. Elas precisam ser configuradas na mão pelo usuário. O token é o token de fonte do BetterStack, e o endpoint é a URL de ingestão. Você configura isso manualmente porque o RouterOS não tem variável de ambiente nem um sistema de arquivo de configuração decente. Você só… define variável global. Bem-vindo ao RouterOS.
 
 
-### Bloco 3: Função de Conversão de Data (Linhas 18-49)
+### Bloco 3: Função de conversão de data (Linhas 18-49)
 
 
 ```routeros
@@ -105,20 +105,20 @@ Aqui definimos as variáveis globais que serão usadas ao longo do script. Elas 
 ```
 
 
-É aqui que a diversão começa. O RouterOS usa um formato de data tipo "jan/06/2026" que precisa ser convertido para "2026-01-06". Essa função:
+É aqui que a diversão começa. O RouterOS usa um formato de data tipo "jan/06/2026" que precisa virar "2026-01-06". Essa função:
 
 
 1. Pega a string de data do RouterOS
-2. Divide ela num array usando `:toarray`
+2. Divide num array com `:toarray`
 3. Extrai os 3 primeiros caracteres do mês (jan, feb, mar, etc.)
-4. Mapeia cada abreviação de mês para o equivalente numérico usando uma série de if statements (porque o RouterOS não tem switch/case nem dicionários)
+4. Mapeia cada abreviação de mês pro equivalente numérico com uma série de if (porque o RouterOS não tem switch/case nem dicionário)
 5. Concatena tudo em formato ISO
 
 
-Sim, tem 12 if statements separados. Não, não existe uma forma melhor no RouterOS Script. Essa é a sua vida agora, aceite!
+Sim, tem 12 if separados. Não, não existe jeito melhor no RouterOS Script. Essa é a sua vida agora, aceite!
 
 
-### Bloco 4: Script Principal - Verificação de Configuração (Linhas 55-68)
+### Bloco 4: Script principal - verificação de configuração (Linhas 55-68)
 
 
 ```routeros
@@ -137,10 +137,10 @@ Sim, tem 12 if statements separados. Não, não existe uma forma melhor no Route
 ```
 
 
-Esse é o começo do script principal. Primeiro, acessamos as variáveis globais que definimos antes. Depois checamos se elas foram configuradas. Se ainda tiverem valores placeholder, simplesmente retornamos cedo e não fazemos nada. É uma validação básica, mas é melhor do que nada, considerando que esses desgraçados somem depois de um reboot.
+Esse é o começo do script principal. Primeiro, acessamos as variáveis globais que definimos antes. Depois checamos se foram configuradas. Se ainda tiverem valor placeholder, simplesmente retornamos cedo e não fazemos nada. É validação básica, mas é melhor do que nada — considerando que esses desgraçados somem depois de um reboot.
 
 
-### Bloco 5: Buscando os Logs (Linhas 70-74)
+### Bloco 5: Buscando os logs (Linhas 70-74)
 
 
 ```routeros
@@ -151,10 +151,10 @@ Esse é o começo do script principal. Primeiro, acessamos as variáveis globais
 ```
 
 
-Aqui buscamos todos os logs do buffer de memória. O RouterOS pode armazenar logs em memória, e estamos pegando todos eles. Também inicializamos contadores para rastrear quantos logs enviamos com sucesso e quantos falham.
+Aqui buscamos todos os logs do buffer de memória. O RouterOS pode guardar logs em memória, e estamos pegando todos. Também inicializamos contadores pra rastrear quantos logs enviamos com sucesso e quantos falham.
 
 
-### Bloco 6: Processando Cada Log - Conversão de Data (Linhas 77-133)
+### Bloco 6: Processando cada log - conversão de data (Linhas 77-133)
 
 
 ```routeros
@@ -190,10 +190,10 @@ Aqui buscamos todos os logs do buffer de memória. O RouterOS pode armazenar log
 ```
 
 
-Para cada log, extraímos a mensagem, os tópicos e o timestamp. Depois convertemos o formato de data. Se a conversão falhar (porque os formatos de data do RouterOS são inconsistentes), caímos de volta para usar a data atual do sistema. Percebeu como temos que duplicar toda a lógica de mapeamento de meses? Pois é, o RouterOS Script não tem funções que você possa chamar facilmente de dentro de outras funções. É... especial.
+Pra cada log, extraímos a mensagem, os tópicos e o timestamp. Depois convertemos o formato de data. Se a conversão falhar (porque os formatos de data do RouterOS são inconsistentes), caímos de volta pra data atual do sistema. Percebeu como temos que duplicar toda a lógica de mapeamento de meses? Pois é, o RouterOS Script não tem funções que você chame fácil de dentro de outras funções. É… especial.
 
 
-### Bloco 7: Extração de Horário (Linhas 135-150)
+### Bloco 7: Extração de horário (Linhas 135-150)
 
 
 ```routeros
@@ -213,7 +213,7 @@ Para cada log, extraímos a mensagem, os tópicos e o timestamp. Depois converte
 ```
 
 
-Extraímos a parte do horário do timestamp. Se não conseguirmos extrair, usamos o horário atual do sistema. Depois combinamos data e horário numa string de timestamp UTC. Simples o suficiente, mas de novo, muita manipulação manual de strings porque o RouterOS não tem boas bibliotecas de data/hora.
+Extraímos a parte do horário do timestamp. Se não der, usamos o horário atual do sistema. Depois juntamos data e horário numa string de timestamp UTC. Simples o bastante, mas de novo: muita manipulação manual de string porque o RouterOS não tem lib decente de data/hora.
 
 
 ### Bloco 8: Escape de JSON (Linhas 152-163)
@@ -232,10 +232,10 @@ Extraímos a parte do horário do timestamp. Se não conseguirmos extrair, usamo
 ```
 
 
-Esse é o pesadelo do escape de JSON. O RouterOS não tem uma biblioteca de JSON, então temos que escapar manualmente os caracteres especiais. Iteramos por cada caractere da mensagem de log e escapamos aspas e barras invertidas. Isso é feito caractere por caractere porque o RouterOS não tem uma função `replace`. Sim, isso é tão tedioso quanto parece.
+Esse é o pesadelo do escape de JSON. O RouterOS não tem biblioteca de JSON, então temos que escapar na mão os caracteres especiais. Iteramos caractere por caractere da mensagem e escapamos aspas e barras invertidas. Caractere por caractere porque o RouterOS não tem uma função `replace`. Sim, é tão tedioso quanto parece.
 
 
-### Bloco 9: Construção do JSON e Requisição HTTP (Linhas 165-177)
+### Bloco 9: Construção do JSON e requisição HTTP (Linhas 165-177)
 
 
 ```routeros
@@ -252,10 +252,10 @@ Esse é o pesadelo do escape de JSON. O RouterOS não tem uma biblioteca de JSON
 ```
 
 
-Aqui construímos o payload JSON manualmente (porque não tem biblioteca de JSON) e enviamos via HTTP POST. O formato do header é... interessante. O RouterOS espera os headers como uma string separada por vírgulas, não campos de header separados. Desabilitamos a verificação de certificado porque a validação de certificado do RouterOS pode dar problema. Envolvemos tudo num try-catch (o bloco `:do { } on-error={}`) para lidar com falhas de forma tranquila.
+Aqui montamos o payload JSON na mão (porque não tem lib de JSON) e enviamos via HTTP POST. O formato do header é… interessante. O RouterOS espera os headers como uma string separada por vírgulas, não campos separados. Desabilitamos a verificação de certificado porque a validação de certificado do RouterOS pode dar problema. Envolvemos tudo num try-catch (o bloco `:do { } on-error={}`) pra lidar com falha sem drama.
 
 
-### Bloco 10: Reset do Buffer (Linhas 180-185)
+### Bloco 10: Reset do buffer (Linhas 180-185)
 
 
 ```routeros
@@ -267,10 +267,10 @@ Aqui construímos o payload JSON manualmente (porque não tem biblioteca de JSON
 ```
 
 
-Depois de enviar os logs com sucesso, resetamos o buffer de memória. Fazemos isso configurando ele temporariamente para 1 linha (o que limpa ele), esperando 200ms, depois configurando de volta para 100 linhas. É uma gambiarra, mas funciona. O RouterOS não tem um comando "limpar buffer", então trabalhamos com o que temos.
+Depois de enviar os logs com sucesso, resetamos o buffer de memória. Fazemos isso configurando ele temporariamente pra 1 linha (o que limpa), esperando 200ms, depois voltando pra 100 linhas. É gambiarra, mas funciona. O RouterOS não tem um comando "limpar buffer", então a gente trabalha com o que tem.
 
 
-### Bloco 11: Configuração do Scheduler (Linhas 190-194)
+### Bloco 11: Configuração do scheduler (Linhas 190-194)
 
 
 ```routeros
@@ -282,42 +282,41 @@ Depois de enviar os logs com sucesso, resetamos o buffer de memória. Fazemos is
 ```
 
 
-Finalmente, criamos um scheduler que roda o script a cada 30 segundos. Ele também roda na inicialização. Isso garante que os logs sejam enviados regularmente em lotes, exceto que não tem porra nenhuma de globals na inicialização. Sim, de novo... aqueles desgraçados somem depois de um reboot!
+Por fim, criamos um scheduler que roda o script a cada 30 segundos. Ele também roda na inicialização. Isso garante que os logs sejam enviados em lote com regularidade — exceto que não tem porra nenhuma de globals na inicialização. Sim, de novo… aqueles desgraçados somem depois de um reboot!
 
 
-## Por Que Isso Foi Uma Má Ideia
+## Por que isso foi uma má ideia
 
 
-Deixa eu deixar claro: **eu deveria ter descansado.** Ponto final. Não havia razão nenhuma para estar criando esse script naquele momento. Era desnecessário, exaustivo, e só piorou meu humor depressivo porque me fez sentir que estava desperdiçando tempo e energia em algo inútil.
+Deixa eu deixar claro: **eu deveria ter descansado.** Ponto final. Não havia motivo nenhum pra estar criando esse script naquele momento. Era desnecessário, exaustivo, e só piorou o humor depressivo porque me fez sentir que estava queimando tempo e energia em coisa inútil.
 
 
-Mas aqui está a ironia: agora estou aqui, escrevendo sobre isso no meu blog, como se fosse importante ou interessante. A vida é engraçada assim, né? (Não é.) E a pior parte é eu escrever esse post inútil pra caramba que ninguém vai ler, depois de fazer todo esse trabalho inútil para algo que eu não preciso. Que momento incrível... Épico!
+Mas aqui está a ironia: agora estou aqui, escrevendo sobre isso no blog, como se fosse importante ou interessante. A vida é engraçada assim, né? (Não é.) E a pior parte é eu escrever esse post inútil pra caramba que ninguém vai ler, depois de fazer todo esse trabalho inútil pra algo que eu não preciso. Que momento incrível… Épico!
 
 
-## O Que Eu Deveria Ter Feito
+## O que eu deveria ter feito
 
 1. **Desligar o computador**
 2. **Ir dormir**
 3. **Descansar**
-4. **Fazer isso em um dia melhor, se realmente fosse necessário**
+4. **Fazer isso num dia melhor, se realmente fosse necessário**
 
 
-Mas não. Eu fiz o script. Agora ele está aqui. E estou escrevendo sobre ele como se fosse uma conquista.
+Mas não. Eu fiz o script. Agora ele está aqui. E estou escrevendo sobre ele como se fosse conquista.
 
 
-## A Lição Se É Que Existe Alguma
+## A lição, se é que existe alguma
+
+**Sim, descansar é importante.** Às vezes ficamos acordados achando que vamos ganhar mais XP assim. Às vezes isso só piora as coisas. Às vezes dormir também dá XP.
 
 
-**Sim, descansar é importante.** Às vezes, ficamos acordados achando que vamos ganhar mais XP assim. Às vezes, isso só piora as coisas. Às vezes, dormir também dá XP.
+Eu deveria ter descansado. Eu não deveria ter feito esse script. Essa é a verdade…
 
 
-Eu deveria ter descansado. Eu não deveria ter feito esse script. Essa é a verdade...
-
-
-E se alguém realmente precisar do script (o que duvido), ele está disponível. Mas por favor, use quando estiver descansado e com a cabeça no lugar certo. Não faça como eu e crie scripts desnecessários em momentos inoportunos quando você deveria estar dormindo.
+E se alguém realmente precisar do script (o que duvido), ele está disponível. Mas por favor, use quando estiver descansado e com a cabeça no lugar. Não faça como eu e crie script desnecessário em momento errado quando você deveria estar dormindo.
 
 
 ---
 
 
-O script está disponível no [GitHub](https://github.com/mateuslacorte/betterstack-for-mikrotik) se você realmente precisar dele. Mas de novo: **você provavelmente não precisa dele.** E se precisar, vá descansar primeiro.
+O script está no [GitHub](https://github.com/mateuslacorte/betterstack-for-mikrotik) se você realmente precisar. Mas de novo: **você provavelmente não precisa.** E se precisar, vai descansar primeiro.

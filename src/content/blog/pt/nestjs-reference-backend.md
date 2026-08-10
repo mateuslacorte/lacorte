@@ -1,5 +1,5 @@
 ---
-title: Backend de Referência NestJS
+title: Backend de referência NestJS
 date: '2026-01-06'
 tags:
   - portfólio
@@ -9,174 +9,173 @@ tags:
   - graphql
   - referência
 description: >-
-  Um template de backend NestJS completo com tudo que você poderia
-  possivelmente precisar. E provavelmente muita coisa que você não precisa. É
-  um projeto de referência que você pode usar como ponto de partida para
-  qualquer coisa.
+  Um template de backend NestJS completo com tudo que você poderia precisar —
+  e provavelmente um monte de coisa que você não precisa. É um projeto de
+  referência pra usar como ponto de partida.
 ---
 
 
-Construí esse backend NestJS como um projeto de referência e template inicial para aplicações backend modernas. Depois de configurar as mesmas funcionalidades repetidamente em projetos diferentes, decidi criar uma base abrangente que inclui todos os padrões e integrações comuns que você normalmente precisaria.
+Montei esse backend NestJS como projeto de referência e template inicial pra aplicações backend modernas. Depois de configurar as mesmas coisas de novo e de novo em projetos diferentes, decidi juntar numa base só os padrões e integrações comuns que você normalmente precisa.
 
 
-## O Projeto
+## O projeto
 
 
-Este é um template de backend NestJS pronto para produção que fornece uma base sólida para construir aplicações escaláveis. Ele inclui autenticação, integrações de banco de dados, cache, upload de arquivos, comunicação em tempo real, e mais — tudo devidamente estruturado e pronto para usar.
+É um template NestJS pronto pra produção, com base sólida pra montar aplicação escalável. Tem autenticação, integração com banco, cache, upload de arquivo, comunicação em tempo real e mais — tudo estruturado e pronto pra usar.
 
 
-O objetivo era criar algo que os desenvolvedores pudessem clonar e começar imediatamente a construir sua lógica de negócio em cima, sem precisar gastar tempo configurando código boilerplate para funcionalidades comuns.
+A ideia era algo que o desenvolvedor clonasse e começasse a lógica de negócio na hora, sem gastar dias montando boilerplate de feature comum.
 
 
-## A Stack de Tecnologia
+## A stack
 
 
-**Framework Principal:**
-- **NestJS** - Framework Node.js de nível empresarial
-- **TypeScript** - Para type safety e melhor experiência de desenvolvimento
-- **GraphQL (Apollo)** - Linguagem de consulta de API moderna
-- **APIs REST** - Endpoints HTTP tradicionais
+**Framework principal:**
+- **NestJS** — framework Node.js pra aplicação séria
+- **TypeScript** — type safety e DX melhor
+- **GraphQL (Apollo)** — query language moderna pra API
+- **APIs REST** — endpoint HTTP clássico
 
 
-**Bancos de Dados:**
-- **MongoDB** (Mongoose/Typegoose) - Banco de dados de documentos para schemas flexíveis
-- **PostgreSQL** (TypeORM) - Banco de dados relacional para dados estruturados
-- **Redis** - Camada de cache em memória
+**Bancos de dados:**
+- **MongoDB** (Mongoose/Typegoose) — documento, schema flexível
+- **PostgreSQL** (TypeORM) — relacional, dado estruturado
+- **Redis** — cache em memória
 
 
-**Autenticação & Segurança:**
-- **JWT** - Autenticação baseada em token
-- **Passport** - Estratégias de autenticação
-- **bcrypt** - Hashing de senhas
-- **Rate limiting** - Proteção contra abuso
+**Autenticação & segurança:**
+- **JWT** — auth baseada em token
+- **Passport** — strategies de autenticação
+- **bcrypt** — hash de senha
+- **Rate limiting** — proteção contra abuso
 
 
-**Tempo Real & Comunicação:**
-- **WebSockets** (Socket.io) - Comunicação bidirecional em tempo real
-- **E-mail** (Nodemailer) - Serviço de e-mail SMTP
-- **WhatsApp** - Integração de mensagens
-- **Kafka** - Fila de mensagens para arquitetura orientada a eventos
+**Tempo real & comunicação:**
+- **WebSockets** (Socket.io) — comunicação bidirecional em tempo real
+- **E-mail** (Nodemailer) — SMTP
+- **WhatsApp** — integração de mensagem
+- **Kafka** — fila de mensagem pra arquitetura orientada a evento
 
 
-**Armazenamento & Arquivos:**
-- **MinIO** - Armazenamento de objetos compatível com S3
-- **Serviço de upload de arquivos** - Lida com uploads multipart
+**Armazenamento & arquivos:**
+- **MinIO** — object storage compatível com S3
+- **Serviço de upload** — lida com upload multipart
 
 
-**Logging & Monitoramento:**
-- **Logtail** - Agregação centralizada de logs
+**Logging & monitoramento:**
+- **Logtail** — agregação centralizada de log
 
 
 **Documentação:**
-- **Swagger** - Documentação interativa de API
-- **Wiki** - Sistema de documentação embutido
+- **Swagger** — documentação interativa da API
+- **Wiki** — documentação embutida
 
 
-**Outras Funcionalidades:**
-- **Tarefas agendadas** - Suporte a cron jobs
-- **Processamento de imagens** - Integração com Canvas/Jimp
-- **Leitura de QR code** - Capacidades de leitura de código de barras
+**Outras funcionalidades:**
+- **Tarefas agendadas** — suporte a cron job
+- **Processamento de imagem** — Canvas/Jimp
+- **Leitura de QR code** — leitura de código de barras
 
 
-## Funcionalidades Principais
+## Funcionalidades principais
 
 
-### Autenticação & Autorização
+### Autenticação & autorização
 
 
-Sistema completo de autenticação baseado em JWT com controle de acesso baseado em papéis (RBAC). Inclui login, cadastro, redefinição de senha e funcionalidade de refresh token.
+Sistema completo de auth com JWT e controle de acesso por papel (RBAC). Inclui login, cadastro, redefinição de senha e refresh token.
 
 
-### Suporte Multi-Banco de Dados
+### Suporte multi-banco
 
 
-Arquitetura de banco de dados flexível suportando tanto MongoDB (para armazenamento de documentos) quanto PostgreSQL (para dados relacionais), permitindo que você escolha a ferramenta certa para cada caso de uso.
+Arquitetura flexível com MongoDB (documento) e PostgreSQL (relacional), pra você escolher a ferramenta certa pra cada caso.
 
 
-### Sistema de Cache
+### Sistema de cache
 
 
-Cache baseado em Redis com decorators para cache fácil no nível de método. Inclui interceptors tanto para Mongoose quanto para TypeORM para cachear automaticamente resultados de consultas.
+Cache com Redis e decorators pra cachear no nível do método. Tem interceptors pro Mongoose e pro TypeORM pra cachear resultado de query automaticamente.
 
 
-### Serviço de Upload de Arquivos
+### Upload de arquivo
 
 
-Manuseio robusto de upload de arquivos com integração MinIO para armazenamento de objetos. Suporta validação, processamento e disponibilização segura de arquivos.
+Upload robusto com MinIO pra object storage. Validação, processamento e servir arquivo com segurança.
 
 
 ### Gateway WebSocket
 
 
-Gateway WebSocket abstrato que facilita adicionar funcionalidades em tempo real à sua aplicação. Inclui validação de mensagens e padrões de handler.
+Gateway WebSocket abstrato pra facilitar meter tempo real na aplicação. Inclui validação de mensagem e padrões de handler.
 
 
 ### GraphQL & REST
 
 
-Tanto APIs GraphQL quanto REST estão disponíveis, então você pode escolher a abordagem certa para seu frontend ou usar ambas simultaneamente.
+As duas estão disponíveis — você escolhe o que faz sentido pro frontend, ou usa as duas ao mesmo tempo.
 
 
-### Funcionalidades de Segurança
+### Segurança
 
 
-Módulo de segurança embutido com bloqueio de IP, rate limiting e validação abrangente de requisições. Guard global de JWT protege todas as rotas por padrão.
+Módulo de segurança embutido com bloqueio de IP, rate limiting e validação ampla de request. Guard global de JWT protege todas as rotas por padrão.
 
 
 ### Documentação
 
 
-Swagger UI para documentação de API e um sistema de wiki embutido para documentação do projeto, facilitando o onboarding de novos desenvolvedores.
+Swagger UI pra API e uma wiki embutida pro projeto, pra facilitar a vida de quem chega no time.
 
 
 ## Arquitetura
 
 
-O projeto segue as melhores práticas do NestJS com uma arquitetura modular:
-- **Modules** - Módulos baseados em funcionalidades (auth, users, email, etc.)
-- **Common** - Utilitários e serviços compartilhados (cache, upload de arquivos, WebSocket, segurança)
-- **Config** - Gerenciamento centralizado de configuração
-- **DTOs** - Objetos de transferência de dados com validação
-- **Guards** - Guards de autenticação e autorização
-- **Interceptors** - Preocupações transversais (logging, cache)
-- **Decorators** - Decorators customizados para padrões comuns
+O projeto segue as boas práticas do NestJS com arquitetura modular:
+- **Modules** — módulos por funcionalidade (auth, users, email, etc.)
+- **Common** — utilitários e serviços compartilhados (cache, upload, WebSocket, segurança)
+- **Config** — configuração centralizada
+- **DTOs** — objetos de transferência com validação
+- **Guards** — autenticação e autorização
+- **Interceptors** — logging, cache e afins
+- **Decorators** — decorators customizados pra padrões comuns
 
 
-Cada módulo é autocontido e pode ser facilmente estendido ou removido de acordo com as necessidades do seu projeto.
+Cada módulo é autocontido e dá pra estender ou remover conforme o projeto.
 
 
-## O Que o Torna Útil
+## Por que isso é útil
 
 
-Esse projeto de referência economiza um tempo significativo de desenvolvimento ao fornecer:
-1. **Integrações pré-configuradas** - Todos os serviços comuns já estão configurados e funcionando
-2. **Boas práticas** - O código segue as convenções do NestJS e as melhores práticas de TypeScript
-3. **Type safety** - Suporte completo a TypeScript com tipagem adequada em todo o código
-4. **Documentação** - Código bem documentado com exemplos
-5. **Flexibilidade** - Design modular permite usar apenas o que você precisa
-6. **Padrões prontos para produção** - Tratamento de erros, validação, logging e segurança já estão incluídos
+Esse projeto de referência economiza tempo de desenvolvimento de verdade:
+1. **Integrações já configuradas** — os serviços comuns já estão de pé
+2. **Boas práticas** — código segue as convenções do NestJS e do TypeScript
+3. **Tipagem** — TypeScript de ponta a ponta, tipado direito
+4. **Documentação** — código documentado, com exemplos
+5. **Flexibilidade** — design modular: use só o que precisa
+6. **Padrões de produção** — tratamento de erro, validação, logging e segurança já inclusos
 
 
-Em vez de passar dias ou semanas configurando autenticação, conexões de banco de dados, upload de arquivos e outras funcionalidades comuns, você pode clonar esse projeto e começar a construir sua lógica de negócio imediatamente.
+Em vez de gastar dias ou semanas montando auth, conexão de banco, upload e outras features comuns, você clona e vai direto pra lógica de negócio.
 
 
-## Casos de Uso
+## Casos de uso
 
 
-Esse template é ideal para:
-- **Iniciar novos projetos** - Ganhe vantagem com todas as funcionalidades comuns
-- **Aprender NestJS** - Veja como estruturar uma aplicação NestJS do mundo real
-- **Implementação de referência** - Use como guia para seus próprios projetos
-- **Prototipagem rápida** - Construa MVPs rapidamente com todas as funcionalidades já prontas
+Esse template serve bem pra:
+- **Começar projeto novo** — já sai com as features comuns
+- **Aprender NestJS** — ver como estruturar uma aplicação Nest de verdade
+- **Implementação de referência** — usar de guia nos seus próprios projetos
+- **Prototipar rápido** — MVP com as peças já no lugar
 
 
-Seja construindo uma aplicação SaaS, um backend de API, ou uma aplicação em tempo real, esse template fornece uma base sólida para construir em cima.
+Seja SaaS, backend de API ou app em tempo real, o template dá uma base sólida pra construir em cima.
 
 
-Esse backend de referência NestJS é um ponto de partida abrangente para o desenvolvimento backend moderno. Ele inclui todos os padrões e integrações comuns que você vai precisar, devidamente estruturados e prontos para usar. Em vez de reinventar a roda a cada projeto, você pode focar no que torna sua aplicação única.
+Esse backend NestJS de referência é um ponto de partida completo pro desenvolvimento backend moderno. Tem os padrões e integrações comuns que você vai precisar, estruturados e prontos pra usar. Em vez de reinventar a roda em todo projeto, você foca no que torna a aplicação sua.
 
 
-O projeto demonstra padrões reais do NestJS e serve tanto como template quanto como recurso de aprendizado para construir aplicações backend escaláveis.
+O projeto mostra padrões NestJS do mundo real e serve tanto de template quanto de material de estudo pra montar backend escalável.
 
 
-Se você quiser usar, [aqui está um link para o GitHub](https://github.com/mateuslacorte/nestjs-backend).
+Se quiser usar, [aqui está o link do GitHub](https://github.com/mateuslacorte/nestjs-backend).

@@ -9,7 +9,7 @@ export const ocppNodeLibraryProject = {
   } satisfies Localized,
   metaDescription: {
     en: 'fastify-ocpp — Node.js OCPP-J library for CSMS backends. Subprotocol negotiation, CALL framing, OCA schemas, onAction/call API for 1.6, 2.0.1, and 2.1.',
-    pt: 'fastify-ocpp — biblioteca OCPP-J em Node.js para backends CSMS. Negociação de subprotocolo, framing CALL, schemas OCA e API onAction/call para 1.6, 2.0.1 e 2.1.',
+    pt: 'fastify-ocpp — biblioteca OCPP-J em Node.js pra backends CSMS. Negociação de subprotocolo, framing de CALL, schemas OCA e API onAction/call pra 1.6, 2.0.1 e 2.1.',
   } satisfies Localized,
   breadcrumbHome: { en: 'Home', pt: 'Início' } satisfies Localized,
   breadcrumbProjects: { en: 'Projects', pt: 'Projetos' } satisfies Localized,
@@ -20,7 +20,7 @@ export const ocppNodeLibraryProject = {
   } satisfies Localized,
   pitchExtra: {
     en: 'Install `fastify-ocpp`, register once, then own BootNotification, Authorize, transactions, and outbound Reset / remote start in your code — not in a fork of the wire protocol.',
-    pt: 'Instale `fastify-ocpp`, registre uma vez e cuide de BootNotification, Authorize, transações e Reset / start remoto no seu código — não num fork do protocolo.',
+    pt: 'Instale `fastify-ocpp`, registre uma vez e trate BootNotification, Authorize, transações e Reset / start remoto no seu código — não num fork do protocolo.',
   } satisfies Localized,
   badges: {
     package: { en: 'fastify-ocpp', pt: 'fastify-ocpp' } satisfies Localized,
@@ -58,20 +58,20 @@ export const ocppNodeLibraryProject = {
   ctaNpm: { en: 'Install on npm', pt: 'Instalar no npm' } satisfies Localized,
   ctaGithub: { en: 'View on GitHub', pt: 'Ver no GitHub' } satisfies Localized,
   ctaTutorial: { en: 'Read the tutorial', pt: 'Ler o tutorial' } satisfies Localized,
-  featuresEyebrow: { en: 'Package surface', pt: 'Superfície do pacote' } satisfies Localized,
+  featuresEyebrow: { en: 'Package surface', pt: 'O que o pacote oferece' } satisfies Localized,
   featuresHeading: {
     en: 'What you get when you install',
-    pt: 'O que você ganha ao instalar',
+    pt: 'O que vem na instalação',
   } satisfies Localized,
   features: [
     {
       title: {
         en: 'versions + shared path',
-        pt: 'versions + path compartilhado',
+        pt: 'versions + rota compartilhada',
       },
       description: {
         en: 'Configure `versions: [\'2.1\',\'2.0.1\',\'1.6\']` and `path: \'/ocpp\'`. Stations hit one route; Sec-WebSocket-Protocol picks the match.',
-        pt: 'Configure `versions: [\'2.1\',\'2.0.1\',\'1.6\']` e `path: \'/ocpp\'`. As estações usam uma rota; o Sec-WebSocket-Protocol escolhe o match.',
+        pt: 'Configure `versions: [\'2.1\',\'2.0.1\',\'1.6\']` e `path: \'/ocpp\'`. As estações usam uma rota só; o Sec-WebSocket-Protocol escolhe a versão compatível.',
       },
     },
     {
@@ -81,7 +81,7 @@ export const ocppNodeLibraryProject = {
       },
       description: {
         en: 'Register handlers per action (optionally per version). Return a plain object — the package wraps CALLRESULT and validates it.',
-        pt: 'Registre handlers por ação (opcionalmente por versão). Devolva um objeto simples — o pacote monta o CALLRESULT e valida.',
+        pt: 'Registre handlers por ação (opcionalmente por versão). Retorne um objeto simples — o pacote monta o CALLRESULT e valida.',
       },
     },
     {
@@ -91,7 +91,7 @@ export const ocppNodeLibraryProject = {
       },
       description: {
         en: 'Outbound CSMS→station CALLs with timeout. Inspect `conn.version` before choosing RemoteStart vs RequestStartTransaction.',
-        pt: 'CALLs de saída CSMS→estação com timeout. Veja `conn.version` antes de escolher RemoteStart ou RequestStartTransaction.',
+        pt: 'CALLs de saída CSMS→estação com timeout. Consulte `conn.version` antes de escolher RemoteStart ou RequestStartTransaction.',
       },
     },
     {
@@ -101,7 +101,7 @@ export const ocppNodeLibraryProject = {
       },
       description: {
         en: '`validateIncoming` / `validateOutgoing` default on. Official Open Charge Alliance JSON schemas ship inside the package.',
-        pt: '`validateIncoming` / `validateOutgoing` ligados por padrão. Os schemas JSON oficiais da Open Charge Alliance vêm no pacote.',
+        pt: '`validateIncoming` / `validateOutgoing` ativos por padrão. Os schemas JSON oficiais da Open Charge Alliance já vêm no pacote.',
       },
     },
     {
@@ -111,45 +111,45 @@ export const ocppNodeLibraryProject = {
       },
       description: {
         en: 'Live map of chargePointId → connection. Filter by negotiated version and gate operator commands on real presence.',
-        pt: 'Mapa vivo chargePointId → conexão. Filtre pela versão negociada e só dispare comando de operação com presença real.',
+        pt: 'Mapa em tempo real de chargePointId → conexão. Filtre pela versão negociada e só envie comandos de operação quando a estação estiver online.',
       },
     },
     {
       title: {
         en: 'Ops knobs built in',
-        pt: 'Knobs de ops embutidos',
+        pt: 'Ajustes de operação embutidos',
       },
       description: {
         en: '`callTimeoutMs`, `rejectDuplicateConnections`, `onConnect` / `onDisconnect` — production defaults without reinventing the session layer.',
-        pt: '`callTimeoutMs`, `rejectDuplicateConnections`, `onConnect` / `onDisconnect` — defaults de produção sem reinventar a camada de sessão.',
+        pt: '`callTimeoutMs`, `rejectDuplicateConnections`, `onConnect` / `onDisconnect` — padrões de produção sem reinventar a camada de sessão.',
       },
     },
   ],
   workflowEyebrow: { en: 'How it works', pt: 'Como funciona' } satisfies Localized,
   workflowHeading: {
     en: 'Install, register, wire handlers',
-    pt: 'Instale, registre, ligue os handlers',
+    pt: 'Instale, registre e conecte os handlers',
   } satisfies Localized,
   workflow: [
     {
       title: { en: 'Install the package', pt: 'Instale o pacote' },
       description: {
         en: '`npm i fastify-ocpp` (Node 18+). The package ships `dist/`, TypeScript types, and the OCA `schemas/` tree.',
-        pt: '`npm i fastify-ocpp` (Node 18+). O pacote traz `dist/`, types TypeScript e a árvore `schemas/` da OCA.',
+        pt: '`npm i fastify-ocpp` (Node 18+). O pacote traz `dist/`, tipos TypeScript e a árvore `schemas/` da OCA.',
       },
     },
     {
       title: { en: 'Register once', pt: 'Registre uma vez' },
       description: {
         en: 'Pass `versions` (allow-list + preference) and `path`. You get `app.ocpp` — handlers, outbound call, and the registry.',
-        pt: 'Passe `versions` (allow-list + preferência) e `path`. Você ganha `app.ocpp` — handlers, call de saída e o registry.',
+        pt: 'Passe `versions` (allow-list + preferência) e `path`. Você recebe `app.ocpp` — handlers, call de saída e o registry.',
       },
     },
     {
-      title: { en: 'Own the domain', pt: 'Cuide do domínio' },
+      title: { en: 'Own the domain', pt: 'Implemente o domínio' },
       description: {
         en: 'Implement BootNotification, Heartbeat, Authorize, transactions. Use `ocpp.call` from your operator API for Reset and remote start.',
-        pt: 'Implemente BootNotification, Heartbeat, Authorize, transações. Use `ocpp.call` na sua API de operação para Reset e start remoto.',
+        pt: 'Implemente BootNotification, Heartbeat, Authorize e transações. Use `ocpp.call` na sua API de operação pra Reset e start remoto.',
       },
     },
   ],
@@ -169,7 +169,7 @@ export const ocppNodeLibraryProject = {
     },
     {
       en: 'Add `onAction(\'BootNotification\')` and `onAction(\'Heartbeat\')`, then point a simulator at `/ocpp/CP_001`.',
-      pt: 'Adicione `onAction(\'BootNotification\')` e `onAction(\'Heartbeat\')` e aponte um simulador para `/ocpp/CP_001`.',
+      pt: 'Adicione `onAction(\'BootNotification\')` e `onAction(\'Heartbeat\')` e aponte um simulador pra `/ocpp/CP_001`.',
     },
     {
       en: 'Read the protocol tutorial when you are ready for Authorize and full sessions.',
@@ -178,18 +178,18 @@ export const ocppNodeLibraryProject = {
   ],
   tryAsideTitle: {
     en: 'Library boundary',
-    pt: 'Limite da biblioteca',
+    pt: 'Escopo da biblioteca',
   } satisfies Localized,
   tryAsideBody: {
     en: 'fastify-ocpp owns transport, negotiation, CALL framing, and schemas. Your app owns auth, billing, tariffs, and operator UX in handlers.',
-    pt: 'O fastify-ocpp cuida de transporte, negociação, framing CALL e schemas. Seu app cuida de auth, billing, tarifas e UX de operação nos handlers.',
+    pt: 'O fastify-ocpp cuida de transporte, negociação, framing de CALL e schemas. Seu app cuida de auth, faturamento, tarifas e UX de operação nos handlers.',
   } satisfies Localized,
   tryAsideNote: {
     en: 'OCPP-J only. SOAP 1.6 is out of scope. License: GPL-3.0-only.',
     pt: 'Somente OCPP-J. SOAP 1.6 fica de fora. Licença: GPL-3.0-only.',
   } satisfies Localized,
-  stackEyebrow: { en: 'Package facts', pt: 'Fatos do pacote' } satisfies Localized,
-  stackHeading: { en: 'What ships on npm', pt: 'O que sobe no npm' } satisfies Localized,
+  stackEyebrow: { en: 'Package facts', pt: 'Dados do pacote' } satisfies Localized,
+  stackHeading: { en: 'What ships on npm', pt: 'O que o pacote inclui' } satisfies Localized,
   stack: [
     {
       label: { en: 'Name', pt: 'Nome' },
@@ -200,7 +200,7 @@ export const ocppNodeLibraryProject = {
       value: { en: 'OCPP-J 1.6, 2.0.1, 2.1', pt: 'OCPP-J 1.6, 2.0.1, 2.1' },
     },
     {
-      label: { en: 'Surface', pt: 'Superfície' },
+      label: { en: 'Surface', pt: 'API' },
       value: { en: 'onAction, call, registry, schemas', pt: 'onAction, call, registry, schemas' },
     },
     {
@@ -225,7 +225,7 @@ export const ocppNodeLibraryProject = {
     },
   ],
   faqEyebrow: { en: 'FAQ', pt: 'FAQ' } satisfies Localized,
-  faqHeading: { en: 'Common questions', pt: 'Perguntas comuns' } satisfies Localized,
+  faqHeading: { en: 'Common questions', pt: 'Perguntas frequentes' } satisfies Localized,
   faqs: [
     {
       question: {
@@ -234,17 +234,17 @@ export const ocppNodeLibraryProject = {
       },
       answer: {
         en: 'An npm library that adds an OCPP-J CSMS WebSocket endpoint to a Node app: subprotocol negotiation, CALL framing, OCA schema validation, handlers, and outbound call().',
-        pt: 'Uma biblioteca npm que adiciona um endpoint WebSocket CSMS OCPP-J a um app Node: negociação de subprotocolo, framing CALL, validação OCA, handlers e call() de saída.',
+        pt: 'Uma biblioteca npm que adiciona um endpoint WebSocket CSMS OCPP-J a um app Node: negociação de subprotocolo, framing de CALL, validação OCA, handlers e call() de saída.',
       },
     },
     {
       question: {
         en: 'Does it include billing or roaming?',
-        pt: 'Vem com billing ou roaming?',
+        pt: 'Vem com faturamento ou roaming?',
       },
       answer: {
         en: 'No. Those live in your handlers and services. The package stops at a correct, validated OCPP conversation.',
-        pt: 'Não. Isso mora nos seus handlers e serviços. O pacote para numa conversa OCPP correta e validada.',
+        pt: 'Não. Isso fica nos seus handlers e serviços. O pacote cobre só a conversa OCPP correta e validada.',
       },
     },
     {
@@ -254,7 +254,7 @@ export const ocppNodeLibraryProject = {
       },
       answer: {
         en: 'OCPP-J 1.6, 2.0.1, and 2.1 on one shared path. SOAP (OCPP-S) is not supported.',
-        pt: 'OCPP-J 1.6, 2.0.1 e 2.1 num path compartilhado. SOAP (OCPP-S) não é suportado.',
+        pt: 'OCPP-J 1.6, 2.0.1 e 2.1 numa rota compartilhada. SOAP (OCPP-S) não é suportado.',
       },
     },
     {
@@ -264,17 +264,17 @@ export const ocppNodeLibraryProject = {
       },
       answer: {
         en: 'In onAction handlers and application services that call ocpp.call. Do not fork the library to change tariffs or auth rules.',
-        pt: 'Nos handlers onAction e nos serviços que chamam ocpp.call. Não faça fork da biblioteca para mudar tarifa ou regra de auth.',
+        pt: 'Nos handlers onAction e nos serviços que chamam ocpp.call. Não faça fork da biblioteca pra mudar tarifa ou regra de auth.',
       },
     },
   ],
   bottomCtaTitle: {
     en: 'npm i fastify-ocpp — then wire your first handler.',
-    pt: 'npm i fastify-ocpp — e ligue o primeiro handler.',
+    pt: 'npm i fastify-ocpp — e registre o primeiro handler.',
   } satisfies Localized,
   bottomCtaBody: {
     en: 'Grab the package on npm, clone the repo, or read the CSMS tutorial when you want the full protocol walkthrough.',
-    pt: 'Pegue o pacote no npm, clone o repo ou leia o tutorial de CSMS quando quiser o passeio completo pelo protocolo.',
+    pt: 'Instale o pacote no npm, clone o repo ou leia o tutorial de CSMS quando quiser o guia completo do protocolo.',
   } satisfies Localized,
 } as const;
 

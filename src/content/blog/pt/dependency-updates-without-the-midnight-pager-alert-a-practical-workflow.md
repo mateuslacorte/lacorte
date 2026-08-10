@@ -1,5 +1,5 @@
 ---
-title: 'Atualizações de dependências sem alerta de pager de madrugada: um fluxo prático'
+title: 'Atualizações de dependências sem pager de madrugada: um fluxo prático'
 date: '2026-07-28'
 tags:
   - docker
@@ -9,29 +9,31 @@ tags:
   - github-actions
   - renovate
 description: >-
-  Pare de temer atualizações de dependências. Monte um fluxo com gates de teste automatizados, scripts de reprodução local e políticas de merge que pegam breaking changes antes de chegarem à produção.
+  Pare de ter medo de atualizar dependência. Monte um fluxo com checagens de teste
+  automatizadas, script de reprodução local e política de merge que pega
+  breaking change antes de chegar em produção.
 ---
 
-Você conhece a rotina. Segunda de manhã. Café mal esfriado. O Slack acende: "Testes falhando na main — alguém mexeu em dependências?" Três horas depois você está fazendo bisect num bump de versão minor numa dependência transitiva que mudou um default que você nem sabia que existia. O PR do Dependabot fica lá, com checkmarks verdes enganando você, porque ninguém escreveu o teste de integração que teria pegado isso.
+Você conhece a rotina. Segunda de manhã. Café mal esfriado. O Slack acende: "Testes falhando na main — alguém mexeu em dependências?" Três horas depois você está fazendo bisect num bump minor de uma dependência transitiva que mudou um default que você nem sabia que existia. O PR do Dependabot fica lá, com check verde mentindo na sua cara, porque ninguém escreveu o teste de integração que teria pegado isso.
 
-Aqui vai a verdade desconfortável: atualizações de dependências são a fonte mais previsível de incidentes em produção, e mesmo assim a maioria dos times trata elas como clima — algo que simplesmente acontece com você. O blog do GitHub recentemente comemorou o novo cooldown de três dias do Dependabot como se esperar mais antes de abrir um PR resolvesse alguma coisa. Spoiler: não resolve. O problema não é timing. É que seu pipeline de updates não tem dentes.
+Aqui vai a verdade inconveniente: atualização de dependência é a fonte mais previsível de incidente em produção — e mesmo assim a maioria dos times trata isso como chuva. Acontece com você. O blog do GitHub recentemente festejou o novo cooldown de três dias do Dependabot como se esperar mais pra abrir o PR resolvesse alguma coisa. Spoiler: não resolve. O problema não é timing. É que seu pipeline de updates não freia nada.
 
-Este post percorre um fluxo completo de atualização de dependências que realmente pega quebras antes do deploy. Vamos configurar o Renovate (ou o Dependabot, se você estiver preso a ele) com regras que fazem sentido, montar gates de CI que rodam os testes certos na hora certa, escrever um script de reprodução local para debugar falhas em segundos e não em horas, e estabelecer uma política de merge que faz com que "quem aprovou isso?" seja uma pergunta que você nunca precise fazer. Sem agentes de IA. Sem vendor lock-in. Só arquivos de config, shell scripts e a satisfação silenciosa de um pipeline verde que significa alguma coisa.
+Este post percorre um fluxo completo de atualização de dependências que de fato pega quebra antes do deploy. Vamos configurar o Renovate (ou o Dependabot, se você estiver preso nele) com regras que fazem sentido, montar checagens de CI que rodam o teste certo na hora certa, escrever um script de reprodução local pra debugar falha em segundos — não em horas — e cravar uma política de merge que faz "quem aprovou isso?" virar pergunta que você nunca precisa fazer. Sem agente de IA. Sem vendor lock-in. Só arquivo de config, shell script e a satisfação quieta de um pipeline verde que significa alguma coisa.
 
-## Por Que Seu Setup Atual Está Enganando Você
+## Por que seu setup atual está mentindo pra você
 
-Sua CI está verde. O PR do Dependabot mostra todos os checks passando. Você faz merge. Vinte minutos depois, o pager dispara porque o handler de webhook de pagamento passou a retornar 500. O culpado? Um bump minor no `axios` de 1.6.2 para 1.6.3 que mudou como o `transformResponse` trata strings vazias — uma mudança de comportamento que os maintainers consideraram bug fix, não breaking change. Seus testes unitários mockavam a camada HTTP. Seus testes de integração não existiam. O versionamento semântico acabou de te trair.
+Sua CI está verde. O PR do Dependabot mostra todos os checks passando. Você faz merge. Vinte minutos depois o pager dispara porque o handler de webhook de pagamento começou a devolver 500. O culpado? Um bump minor do `axios` de 1.6.2 pra 1.6.3 que mudou como o `transformResponse` trata string vazia — mudança de comportamento que os maintainers acharam bugfix, não breaking change. Seus testes unitários mockavam a camada HTTP. Seus testes de integração não existiam. O versionamento semântico acabou de te trair.
 
-SemVer é um contrato social, não uma garantia matemática. Maintainers erram. Eles classificam breaking changes como patches. Eles corrigem bugs nos quais outros pacotes dependiam como comportamento não documentado. O `^` no seu `package.json` significa "confie no julgamento do maintainer", e essa confiança está equivocada em cerca de 12% das vezes, segundo o estudo do ecossistema npm de 2023. Sua CI verde só prova que seus testes passam com a nova versão — não que sua aplicação funciona.
+SemVer é contrato social, não garantia matemática. Maintainer erra. Classifica breaking change como patch. "Corrige" bug que outro pacote usava como comportamento não documentado. O `^` no seu `package.json` significa "confie no julgamento do maintainer", e essa confiança falha em cerca de 12% das vezes, segundo o estudo do ecossistema npm de 2023. CI verde só prova que seus testes passam com a versão nova — não que a aplicação funciona.
 
-Testes unitários são os piores culpados aqui. Eles testam unidades isoladas, o que significa que explicitamente *não* testam os pontos de integração onde mudanças de dependência realmente mordem. Aquele exemplo do `axios`? O teste unitário do seu serviço de pagamento passa porque mocka `axios.post` e asserta o formato do payload. Nunca exercita o response transformer. O teste de integração que você *não escreveu* teria pegado — mas testes de integração são lentos, instáveis e ninguém mantém.
+Teste unitário é o pior vilão aqui. Ele testa unidade isolada, o que significa que *explicitamente* não exercita os pontos de integração onde mudança de dependência realmente dói. Aquele exemplo do `axios`? O unitário do serviço de pagamento passa porque mocka `axios.post` e asserta o formato do payload. Nunca passa pelo response transformer. O teste de integração que você *não escreveu* teria pegado — mas integração é lenta, instável e ninguém mantém.
 
 ```bash
 # This passes. It tells you nothing about production behaviour.
 npm test -- --testPathPattern=payment.service.test.ts
 ```
 
-O cooldown de três dias que o GitHub anunciou? Teatro. Atrasa a abertura do PR. Não adiciona testes. Não roda seu ambiente de staging contra a nova versão. Não te dá um script de reprodução. Só significa que você descobre a quebra na quinta em vez de segunda — ainda em produção, ainda às 2 da manhã.
+O cooldown de três dias que o GitHub anunciou? Teatro. Atrasa a abertura do PR. Não adiciona teste. Não roda staging contra a versão nova. Não te dá script de reprodução. Só faz você descobrir a quebra na quinta em vez de segunda — ainda em produção, ainda às duas da manhã.
 
 É assim que um pipeline mentiroso se parece na prática:
 
@@ -50,15 +52,15 @@ jobs:
       - run: npm run lint
 ```
 
-Sem testes de integração. Sem contract tests. Sem smoke test contra uma dependência real. Só testes unitários e lint — o mínimo para parecer responsável enquanto você shipa risco.
+Sem teste de integração. Sem contract test. Sem smoke test contra dependência de verdade. Só unitário e lint — o mínimo pra parecer responsável enquanto você manda risco pra produção.
 
-A correção não é mais testes unitários. É um pipeline que admite que testes unitários não bastam e constrói gates que realmente validam a superfície de integração. Próxima seção: configurar o Renovate para agrupar, agendar e gatear updates para você não revisar cinco PRs da mesma dependência transitiva.
+A correção não é "mais teste unitário". É um pipeline que admite que unitário não basta e monta checagens que de fato validam a integração. Próxima seção: configurar o Renovate pra agrupar, agendar e filtrar updates — assim você não revisa cinco PRs da mesma dependência transitiva.
 
-## Configure o Bot Como Se Você Falasse Sério
+## Configure o bot como se você levasse a sério
 
-A maioria dos times configura o bot uma vez, esquece que ele existe e depois se pergunta por que está afogada em PRs de pacote único às 18h de sexta. Pare com isso. Aqui vai uma config do Renovate que realmente funciona, mais o equivalente no Dependabot para quem está refém do GitHub.
+A maioria dos times configura o bot uma vez, esquece que ele existe e depois se pergunta por que está afogada em PR de pacote único às 18h de sexta. Para com isso. Aqui vai uma config do Renovate que realmente funciona — e o equivalente no Dependabot pra quem está refém do GitHub.
 
-### Renovate: A Config Madura
+### Renovate: a config madura
 
 Crie `renovate.json` na raiz do repo:
 
@@ -110,9 +112,9 @@ Crie `renovate.json` na raiz do repo:
 }
 ```
 
-Decisões-chave: patches fazem auto-merge depois que unit + lint + typecheck passam. Minors esperam testes de integração. Majors exigem a suíte completa incluindo e2e. Pacotes que historicamente te mordem (AWS SDK, drivers de DB) nunca fazem auto-merge — ganham label e reviewer do time de platform. O `ignoreDeps` para TypeScript e `@types/node` não é preguiça; é reconhecer que bumps minor de TS quebram builds de formas que nenhuma suíte de testes pega até você estar três horas atolado em erros de `--strict`.
+Decisões-chave: patch faz auto-merge depois que unit + lint + typecheck passam. Minor espera teste de integração. Major exige a suíte completa, incluindo e2e. Pacote que historicamente te morde (AWS SDK, driver de DB) nunca faz auto-merge — ganha label e reviewer do time de platform. O `ignoreDeps` pra TypeScript e `@types/node` não é preguiça; é reconhecer que bump minor de TS quebra build de um jeito que nenhuma suíte de testes pega até você estar três horas atolado em erro de `--strict`.
 
-### Dependabot: A Config "Estou Preso ao GitHub"
+### Dependabot: a config "tô preso no GitHub"
 
 `.github/dependabot.yml`:
 
@@ -152,23 +154,23 @@ updates:
       - dependency-type: "indirect"
 ```
 
-O agrupamento do Dependabot é mais fraco — você ganha um PR por grupo, não por pacote — mas funciona. O prefixo de `commit-message` impõe conventional commits para sua ferramenta de changelog (`auto-changelog`, `standard-version`, o que for) produzir saída legível em vez de "Update dependency axios to 1.6.3".
+O agrupamento do Dependabot é mais fraco — você ganha um PR por grupo, não por pacote — mas funciona. O prefixo de `commit-message` impõe conventional commits pra sua ferramenta de changelog (`auto-changelog`, `standard-version`, o que for) gerar saída legível em vez de "Update dependency axios to 1.6.3".
 
-### A Janela de Schedule Que Salva Seus Fins de Semana
+### A janela de schedule que salva seu fim de semana
 
-Ambas as configs rodam às 4h UTC em dias úteis. Isso significa que PRs chegam enquanto a Europa dorme, a CI roda antes do standup matinal nos EUA, e você tem o dia todo para revisar minors/majors antes da janela de deploy. Sem merges na sexta. Sem "vou aprovar rapidinho" às 17h30. O bot respeita sua agenda porque você mandou.
+As duas configs rodam às 4h UTC em dia útil. Isso significa que os PRs chegam enquanto a Europa dorme, a CI roda antes do standup da manhã nos EUA, e você tem o dia inteiro pra revisar minor/major antes da janela de deploy. Sem merge na sexta. Sem "vou aprovar rapidinho" às 17h30. O bot respeita sua agenda porque você mandou.
 
-### Mais Uma Coisa: Exigir Status Checks
+### Mais uma coisa: exigir status checks
 
-Branch protection rules — faça agora. No GitHub: Settings → Branches → Add rule for `main` → Require status checks to pass → selecione `ci/test`, `ci/lint`, `ci/typecheck`, `ci/integration`, `ci/e2e`. Exija branches atualizadas. Exija reviews de PR (1 para patches, 2 para minors/majors). O bot não consegue fazer merge do que a branch protection não permitir.
+Branch protection rules — faz agora. No GitHub: Settings → Branches → Add rule for `main` → Require status checks to pass → selecione `ci/test`, `ci/lint`, `ci/typecheck`, `ci/integration`, `ci/e2e`. Exija branch atualizada. Exija review de PR (1 pra patch, 2 pra minor/major). O bot não consegue fazer merge do que a branch protection não deixar.
 
-## Gates de CI Que Realmente Gateiam
+## Checagens de CI que de fato barram
 
-Seu pipeline de CI deveria parecer um segurança de clube exclusivo: rápido para rejeitar os candidatos óbvios, minucioso com os VIPs, e absolutamente ninguém entra sem identificação. A maioria dos pipelines é ou uma porta giratória (só testes unitários) ou um muro de tijolos (integração completa em todo typo fix). Os dois estão errados.
+Seu pipeline de CI deveria parecer porteiro de festa chique: rápido pra barrar o óbvio, minucioso com VIP, e absolutamente ninguém entra sem identificação. A maioria dos pipelines é ou catraca liberada (só unitário) ou muro de concreto (integração completa em todo typo fix). Os dois estão errados.
 
-### Estágio 1: O Velocity Gate (Todo PR, < 3 minutos)
+### Estágio 1: o Velocity Gate (todo PR, < 3 minutos)
 
-Testes unitários, lint, type-check, audit de dependências. Cache agressivo. Fail fast.
+Teste unitário, lint, type-check, audit de dependência. Cache agressivo. Fail fast.
 
 ```yaml
 # .github/workflows/velocity.yml
@@ -251,11 +253,11 @@ jobs:
           fi
 ```
 
-Falhas do gate vêm dos exit codes reais de lint/teste/audit. Pule ecossistemas que você não usa com `hashFiles` na instalação + checagem de arquivo nos steps; pule CLIs opcionais com `command -v` — nunca `|| true` no toolchain que *está* presente.
+A falha da checagem vem do exit code de verdade do lint/teste/audit. Pule ecossistema que você não usa com `hashFiles` na instalação + checagem de arquivo nos steps; pule CLI opcional com `command -v` — nunca `|| true` no toolchain que *está* presente.
 
-### Estágio 2: O Integration Gate (Só Updates Agrupados, < 15 minutos)
+### Estágio 2: o Integration Gate (só updates agrupados, < 15 minutos)
 
-Roda **somente** nos PRs agrupados do Renovate (veja a Seção 2). Bancos reais, filas reais, chamadas HTTP reais. Sem mocks. Mocks mentem.
+Roda **somente** nos PRs agrupados do Renovate (veja a seção 2). Banco de verdade, fila de verdade, chamada HTTP de verdade. Sem mock. Mock mente.
 
 ```yaml
 # .github/workflows/integration.yml
@@ -310,9 +312,9 @@ jobs:
           REDIS_URL: redis://localhost:6379/0
 ```
 
-### Estágio 3: Contract Gate (Clientes de API, < 5 minutos)
+### Estágio 3: Contract Gate (clientes de API, < 5 minutos)
 
-Se você publica ou consome schemas OpenAPI/GraphQL, rode contract tests. Pact para consumer-driven, Schemathesis para provider-driven. Pegue o `nullable: false` que virou `nullable: true` antes do frontend explodir.
+Se você publica ou consome schema OpenAPI/GraphQL, rode contract test. Pact pra consumer-driven, Schemathesis pra provider-driven. Pegue o `nullable: false` que virou `nullable: true` antes do frontend explodir.
 
 ```yaml
 # .github/workflows/contract.yml
@@ -337,7 +339,7 @@ jobs:
             openapi.yaml 2>/dev/null || true
 ```
 
-### Estágio 4: Smoke Gate (Full Stack, < 10 minutos)
+### Estágio 4: Smoke Gate (full stack, < 10 minutos)
 
 Docker Compose sobe os artefatos reais de deploy. Mesmas imagens, mesmas configs, mesma rede. Se isso passar, você pode fazer deploy com confiança.
 
@@ -374,7 +376,6 @@ jobs:
         if: always()
         run: docker compose -f docker-compose.yml -f docker-compose.ci.yml down -v
 ```
-
 ```yaml
 # docker-compose.ci.yml (committed to repo)
 services:
@@ -419,7 +420,7 @@ services:
       retries: 10
 ```
 
-### A Política de Merge (Impulsionada por Branch Protection)
+### A política de merge (empurrada por branch protection)
 
 ```yaml
 # .github/branch-protection.yml (apply via gh api or UI)
@@ -436,7 +437,7 @@ required_pull_request_reviews:
   require_code_owner_reviews: true
 ```
 
-O `strict: true` significa que **todo** check precisa passar — inclusive novos adicionados depois. `dismiss_stale_reviews` força re-review quando o PR de dependência atualiza (Renovate faz rebase). `require_code_owner_reviews` significa que seu arquivo `CODEOWNERS` decide quem precisa aprovar. O meu diz:
+O `strict: true` significa que **todo** check precisa passar — inclusive os novos que forem adicionados depois. `dismiss_stale_reviews` força re-review quando o PR de dependência atualiza (Renovate faz rebase). `require_code_owner_reviews` significa que seu arquivo `CODEOWNERS` decide quem precisa aprovar. O meu diz:
 
 ```
 # .github/CODEOWNERS
@@ -446,13 +447,13 @@ O `strict: true` significa que **todo** check precisa passar — inclusive novos
 /docker-compose*.yml @team-infra
 ```
 
-Time de platform cuida de decisões de dependência. Infra cuida do compose. Ninguém faz merge num PR agrupado de dependências sem review de platform. O bot abre o PR, roda os gates, atribui os reviewers. Você acorda na terça com pipeline verde e uma mensagem no Slack: "Renovate PR #247 pronto para review — todos os gates passaram." Você dá uma olhada no diff, aprova, faz merge. Café ainda morno.
+Time de platform cuida de decisão de dependência. Infra cuida do compose. Ninguém faz merge num PR agrupado de dependências sem review de platform. O bot abre o PR, roda as checagens, atribui os reviewers. Você acorda na terça com pipeline verde e uma mensagem no Slack: "Renovate PR #247 pronto pra review — todas as checagens passaram." Você olha o diff, aprova, faz merge. Café ainda morno.
 
-## O Script de Reprodução Local: Debug em Segundos
+## O script de reprodução local: debug em segundos
 
-Pare de ler logs de CI como folhas de chá. Quando um PR de dependência falha, você precisa do ambiente exato que quebrou — localmente, em segundos, não numa nova run de CI enfileirada atrás do typo fix de alguém.
+Para de ler log de CI como se fosse borra de café. Quando um PR de dependência falha, você precisa do ambiente exato que quebrou — localmente, em segundos, não numa nova run de CI enfileirada atrás do typo fix de alguém.
 
-Aqui está o `repro.sh`. Jogue na raiz do repo, `chmod +x`, e nunca mais adivinhe.
+Aqui está o `repro.sh`. Joga na raiz do repo, `chmod +x`, e nunca mais fica no escuro.
 
 ```bash
 #!/usr/bin/env bash
@@ -518,7 +519,7 @@ echo "✅ Reproduction complete. Worktree at: ${WORKTREE_DIR}"
 echo "   Clean up with: git worktree remove ${WORKTREE_DIR}"
 ```
 
-Agora o bisect. Digamos que `axios@1.6.3` quebra seu handler de webhook mas `1.6.2` passa. Você não precisa adivinhar qual commit no `axios` fez isso — precisa do commit no histórico do *seu* lockfile onde o bump entrou.
+Agora o bisect. Digamos que `axios@1.6.3` quebra seu handler de webhook, mas `1.6.2` passa. Você não precisa adivinhar qual commit no `axios` fez isso — precisa do commit no histórico do *seu* lockfile onde o bump entrou.
 
 ```bash
 #!/usr/bin/env bash
@@ -565,17 +566,17 @@ git bisect run bash -c 'npm ci --prefer-offline --no-audit && exec "$@"' _ "${TE
 git bisect reset
 ```
 
-Rode: `./bisect-dep.sh axios 1.6.2 1.6.3 -- npm test -- --testNamePattern="webhook"`. Versões viram commits do lockfile; cada passo do bisect instala a partir do lockfile daquele commit e roda seu teste. O commit culpado na *sua* árvore aparece. Você corrige seu código, não o deles.
+Rode: `./bisect-dep.sh axios 1.6.2 1.6.3 -- npm test -- --testNamePattern="webhook"`. Versões viram commits do lockfile; cada passo do bisect instala a partir do lockfile daquele commit e roda seu teste. O commit culpado na *sua* árvore aparece. Você corrige o seu código, não o deles.
 
-Um script. Zero caça a logs de CI. Sua segunda de manhã ficou chata de novo.
+Um script. Zero caça a log de CI. Sua segunda de manhã voltou a ser chata.
 
-## Lidando com a Breaking Change Inevitável
+## Lidando com a breaking change inevitável
 
-Uma breaking change vai escapar. A pergunta não é se — é se você tem um playbook ou um espiral de pânico.
+Uma breaking change vai escapar. A pergunta não é se — é se você tem playbook ou só entra em pânico.
 
-### Fixe Com Prazo, Não Com Esperança
+### Fixe com prazo, não com esperança
 
-Pins temporários pertencem ao `package.json` com data de expiração que sua CI impõe. Eu uso um arquivo `pinned-dependencies.json` que o Renovate lê via `packageRules`:
+Pin temporário mora no `package.json` com data de expiração que a sua CI cobra. Eu uso um arquivo `pinned-dependencies.json` que o Renovate lê via `packageRules`:
 
 ```json
 {
@@ -592,7 +593,7 @@ Pins temporários pertencem ao `package.json` com data de expiração que sua CI
 }
 ```
 
-`schedule` diz ao Renovate quando reabrir o PR do bump. `expires` é a data ISO que a *sua* CI cobra — mantenha as duas alinhadas. O gate falha se algum pin passou de `expires`:
+`schedule` diz ao Renovate quando reabrir o PR do bump. `expires` é a data ISO que a *sua* CI cobra — mantenha as duas alinhadas. O check falha se algum pin passou de `expires`:
 
 ```bash
 #!/usr/bin/env bash
@@ -627,11 +628,11 @@ done < <(jq -r '.packageRules[] | select(.expires != null) | "\(.matchPackageNam
 exit "$failed"
 ```
 
-Adicione ao job `pre-merge`. Chega de pins esquecidos apodrecendo por anos.
+Adicione ao job `pre-merge`. Chega de pin esquecido apodrecendo por anos.
 
-### Escreva o Teste de Regressão Primeiro
+### Escreva o teste de regressão primeiro
 
-Antes de corrigir o código, escreva o teste que teria pegado. Para a mudança de `transformResponse` no `axios`, isso é um contract test:
+Antes de corrigir o código, escreva o teste que teria pegado. Pra mudança de `transformResponse` no `axios`, isso é um contract test:
 
 ```typescript
 // tests/contract/axios-transform-response.test.ts
@@ -657,11 +658,11 @@ describe('axios transformResponse contract', () => {
 });
 ```
 
-Isso falha no 1.6.3, passa no 1.6.2. Commit *antes* de tocar no código da aplicação. Agora a correção está verificada, e o teste fica para sempre.
+Isso falha no 1.6.3, passa no 1.6.2. Commit *antes* de mexer no código da aplicação. Agora a correção está verificada, e o teste fica pra sempre.
 
-### Template de Issue Upstream — Pronto para Copiar e Colar
+### Template de issue upstream — pronto pra copiar e colar
 
-Não escreva um romance. Maintainers querem reprodução, não sua biografia. Salve isso como `.github/ISSUE_TEMPLATE/dependency-regression.yml`:
+Não escreva romance. Maintainer quer reprodução, não a sua biografia. Salve isso como `.github/ISSUE_TEMPLATE/dependency-regression.yml`:
 
 ```yaml
 name: Dependency Regression Report
@@ -711,15 +712,15 @@ body:
       required: true
 ```
 
-Linke o PR à issue. Maintainers fecham "works for me" em minutos quando você entrega um script de cinco linhas.
+Linke o PR à issue. Maintainer fecha "works for me" em minutos quando você entrega um script de cinco linhas.
 
-### Monorepo: Alinhe ou Isole
+### Monorepo: alinhe ou isole
 
-Num monorepo, uma breaking change numa biblioteca interna compartilhada (`@myorg/api-client`) bloqueia todo consumidor. Duas estratégias:
+Num monorepo, uma breaking change numa biblioteca interna compartilhada (`@myorg/api-client`) trava todo consumidor. Duas estratégias:
 
-**Estratégia A: Updates alinhados** — Use o `groupName` do Renovate com `matchPackagePatterns: ["@myorg/*"]` e `automergeType: "pr"`. Todos os pacotes internos atualizam num PR só. A CI roda a matriz completa. Merge uma vez, pronto.
+**Estratégia A: updates alinhados** — Use o `groupName` do Renovate com `matchPackagePatterns: ["@myorg/*"]` e `automergeType: "pr"`. Todos os pacotes internos atualizam num PR só. A CI roda a matriz completa. Merge uma vez, pronto.
 
-**Estratégia B: Contratos consumer-driven** — Cada consumidor declara seu contrato no `package.json`:
+**Estratégia B: contratos consumer-driven** — Cada consumidor declara seu contrato no `package.json`:
 
 ```json
 {
@@ -736,13 +737,13 @@ Num monorepo, uma breaking change numa biblioteca interna compartilhada (`@myorg
 }
 ```
 
-Um job de CI lê `contract`, instala o range, roda o teste especificado. Se `@myorg/api-client@2.2.0` quebra billing mas não notifications, só billing bloqueia. Notifications fazem merge livremente.
+Um job de CI lê `contract`, instala o range, roda o teste especificado. Se `@myorg/api-client@2.2.0` quebra billing mas não notifications, só billing bloqueia. Notifications fazem merge à vontade.
 
 Eu prefiro a Estratégia B. Escala melhor. A Estratégia A transforma toda mudança interna numa reunião de coordenação company-wide.
 
-### Agende a Correção, Não Trave o Mundo
+### Agende a correção, não trave o mundo
 
-Crie uma label `dependency-fix`. Sua config do Renovate exclui PRs rotulados do schedule principal:
+Crie uma label `dependency-fix`. Sua config do Renovate tira PRs rotulados do schedule principal:
 
 ```json
 {
@@ -757,15 +758,15 @@ Crie uma label `dependency-fix`. Sua config do Renovate exclui PRs rotulados do 
 }
 ```
 
-O PR de breaking change ganha label, pula a fila, faz merge rápido. Outros updates seguem no cadastro normal. Sem pilhas de sexta às 18h.
+O PR de breaking change ganha label, fura a fila, faz merge rápido. Outros updates seguem no cadastro normal. Sem pilha de sexta às 18h.
 
-## Política de Merge: O Contrato Social
+## Política de merge: o contrato social
 
-Seu bot abre PRs. Seus gates de CI rodam. Seu script de repro funciona. Agora você precisa da camada humana — uma política de merge codificada em config, não conhecimento tribal. Porque "LGTM" do estagiário que entrou semana passada não é um gate. É esperança.
+Seu bot abre PRs. Suas checagens de CI rodam. Seu script de repro funciona. Agora falta a camada humana — uma política de merge codificada em config, não em "fulano sabe como a gente faz". Porque "LGTM" do estagiário que entrou semana passada não é barreira. É esperança.
 
-### Reviewers Obrigatórios por Tipo de Pacote
+### Reviewers obrigatórios por tipo de pacote
 
-Nem toda dependência nasce igual. Um patch de `lodash`? Auto-merge se verde. Um bump major de `react`? Dois engenheiros sênior e revisão obrigatória. Codifique isso no `.github/CODEOWNERS`:
+Nem toda dependência nasce igual. Patch de `lodash`? Auto-merge se estiver verde. Bump major de `react`? Dois engenheiros sênior e review obrigatório. Codifique isso no `.github/CODEOWNERS`:
 
 ```text
 # Core runtime — senior review mandatory
@@ -782,11 +783,11 @@ pnpm-lock.yaml                  @team/senior-backend @team/senior-frontend
 **/*.md                         @team/any-engineer
 ```
 
-Combine com uma branch protection rule que exige **2 aprovações** para mudanças em `package.json`, **1 para dev deps**, **0 para docs**. GitHub UI: Settings → Branches → Branch protection rules → Require a pull request before merging → Required approvals.
+Combine com uma branch protection rule que exige **2 aprovações** pra mudança em `package.json`, **1 pra dev deps**, **0 pra docs**. GitHub UI: Settings → Branches → Branch protection rules → Require a pull request before merging → Required approvals.
 
-### Condições de Auto-Merge: Verde Significa Go
+### Condições de auto-merge: verde significa pode ir
 
-Configure o Renovate para auto-merge quando *todas* estas forem verdadeiras:
+Configure o Renovate pra auto-merge quando *todas* estas forem verdade:
 
 ```json
 {
@@ -807,7 +808,7 @@ Configure o Renovate para auto-merge quando *todas* estas forem verdadeiras:
 }
 ```
 
-O check `dependency-health` é um job customizado (veja abaixo). O schedule evita conflitos de merge em horários de pico. Se você está no Dependabot, habilite "Allow auto-merge" nas configurações do repo e adicione este workflow:
+O check `dependency-health` é um job customizado (veja abaixo). O schedule evita conflito de merge em horário de pico. Se você está no Dependabot, habilite "Allow auto-merge" nas configurações do repo e adicione este workflow:
 
 ```yaml
 # .github/workflows/dependabot-auto-merge.yml
@@ -842,15 +843,15 @@ jobs:
             }
 ```
 
-### Bypass de Hotfix de Emergência: Quebre o Vidro, Deixe Registro
+### Bypass de hotfix de emergência: quebre o vidro, deixe rastro
 
-Às vezes você *precisa* fazer merge num update de dependência quebrado — um CVE crítico, shutdown de API de vendor. Crie uma label `hotfix` que bypassa `dependency-health` mas **exige**:
+Às vezes você *precisa* fazer merge num update de dependência quebrado — CVE crítico, shutdown de API de vendor. Crie uma label `hotfix` que bypassa `dependency-health` mas **exige**:
 
 1. Aprovação do time de segurança (imposta pelo CODEOWNERS)
 2. Um ticket de incidente linkado
 3. Um PR de revert pós-merge aberto em até 48 horas
 
-Imponha com um gate de workflow:
+Imponha com um check no workflow:
 
 ```yaml
 # .github/workflows/hotfix-gate.yml
@@ -889,9 +890,9 @@ jobs:
             }
 ```
 
-### Dashboard Mensal de Saúde de Dependências
+### Dashboard mensal de saúde de dependências
 
-Rode esta query GraphQL via `gh api graphql -f query=@query.graphql` num workflow agendado. Gera uma tabela Markdown para o canal do time.
+Rode esta query GraphQL via `gh api graphql -f query=@query.graphql` num workflow agendado. Gera uma tabela Markdown pro canal do time.
 
 ```graphql
 # query.graphql
@@ -943,7 +944,7 @@ jobs:
           echo "Report generated: ${{ steps.query.outputs.result }}"
 ```
 
-### Checklist no Template de PR
+### Checklist no template de PR
 
 Cole isso em `.github/PULL_REQUEST_TEMPLATE/dependency-update.md`:
 
@@ -965,4 +966,4 @@ Cole isso em `.github/PULL_REQUEST_TEMPLATE/dependency-update.md`:
 **Reviewer acknowledgment**: By approving, I confirm I've read the changelog and verified the test coverage for this change.
 ```
 
-Sem ambiguidade. Sem "achei que alguém tinha checado." O checklist vive no PR. A política vive na config. O pager fica em silêncio.
+Sem ambiguidade. Sem "achei que alguém tinha checado." O checklist mora no PR. A política mora na config. O pager fica quieto.

@@ -1,5 +1,5 @@
 ---
-title: Como Selecionar Todos os E-mails na Interface Antiga do Gmail
+title: Como selecionar todos os e-mails na interface antiga do Gmail
 date: '2026-01-13'
 tags:
   - portfólio
@@ -8,143 +8,143 @@ tags:
   - gmail
   - javascript
 description: >-
-  Criei uma extensão para Firefox para adicionar um botão de 'selecionar todos
-  os e-mails' na interface antiga do Gmail. Funcionou. Era simples. E eu acabei
+  Fiz uma extensão pro Firefox pra colocar um botão de 'selecionar todos os
+  e-mails' na interface antiga do Gmail. Funcionou. Era simples. E eu acabei
   de arquivar. Clássico.
 ---
 
 
-Deixa eu te contar sobre uma extensão de Firefox que eu criei. Não porque era revolucionária, não porque resolvia um problema que mudaria o mundo, mas porque... bem, porque eu precisava dela. E aparentemente, eu era o único.
+Deixa eu te contar de uma extensão de Firefox que eu fiz. Não porque era revolucionária, não porque resolvia um problema que ia mudar o mundo, mas porque… bem, porque eu precisava dela. E, aparentemente, eu era o único.
 
 
-## O Problema
+## O problema
 
 
-Então, o Google decidiu atualizar o Gmail. Chocante, eu sei. Criaram uma interface nova com design moderno, UX **pior**, todo esse blá-blá-blá. Mas sabe o que eles esqueceram? A capacidade de selecionar facilmente todos os e-mails na interface antiga quando você precisava fazer ações em massa.
+Então, o Google resolveu atualizar o Gmail. Chocante, eu sei. Interface nova, design moderno, UX **pior**, aquele papo todo. Mas sabe o que eles "esqueceram"? A capacidade de selecionar fácil todos os e-mails na interface antiga quando você precisava fazer ação em massa.
 
 
-Na verdade, espera. Eles não esqueceram. Só moveram para outro lugar. Ou talvez tenham removido completamente. Sinceramente não me lembro. Tudo que sei é que um dia eu estava tentando selecionar todos os meus e-mails na interface antiga do Gmail (porque sou uma criatura de hábitos e me recuso a me adaptar a mudanças), e não conseguia achar o maldito botão.
+Na verdade, espera. Eles não esqueceram. Só moveram pra outro lugar. Ou talvez tenham removido de vez. Sinceramente não lembro. O que sei é que um dia eu tava tentando selecionar todos os e-mails na interface antiga do Gmail (porque sou criatura de hábito e me recuso a me adaptar a mudança), e não achava o maldito botão.
 
 
-Então fiz o que qualquer desenvolvedor razoável faria: criei uma extensão de Firefox para trazer ele de volta. Porque para que se adaptar à mudança quando você pode escrever código para evitá-la? Ainda mais quando a mudança é um lixo...
+Então fiz o que qualquer desenvolvedor razoável faria: montei uma extensão de Firefox pra trazer ele de volta. Porque pra que se adaptar à mudança quando você pode escrever código pra evitá-la? Ainda mais quando a mudança é um lixo…
 
 
-## O Projeto
+## O projeto
 
 
-A extensão é... simples. Quase constrangedoramente simples. É literalmente só um botão que diz "Selecionar Tudo" que você pode clicar para selecionar todos os e-mails na página atual. É isso. Sem mágica. Sem lógica complexa. Só um botão.
+A extensão é… simples. Quase constrangedoramente simples. É literalmente um botão escrito "Selecionar Tudo" que você clica pra marcar todos os e-mails da página atual. É isso. Sem mágica. Sem lógica complexa. Só um botão.
 
 
-Mas aqui está a questão: funcionou. E às vezes, isso já basta.
+Mas aqui vai o ponto: funcionou. E às vezes, isso já basta.
 
 
-### O Que a Extensão Faz
+### O que a extensão faz
 
 
 A extensão basicamente:
 
 1. Injeta um botão na interface antiga do Gmail
-2. Quando você clica nele, seleciona todos os e-mails na página atual
+2. Quando você clica, seleciona todos os e-mails da página atual
 3. É isso. É a coisa toda.
 
 
 Eu sei. Revolucionário, né?
 
 
-A extensão usa um content script que roda nas páginas do Gmail. Ele encontra o container da lista de e-mails, procura por todos os checkboxes, e... marca eles. Porque é assim que você seleciona coisas no Gmail. Você marca os checkboxes. Profundo, eu sei.
+A extensão usa um content script que roda nas páginas do Gmail. Acha o container da lista de e-mails, procura todos os checkboxes e… marca eles. Porque é assim que você seleciona coisa no Gmail. Você marca checkbox. Profundo, eu sei.
 
 
-### Os Detalhes Técnicos
+### Os detalhes técnicos
 
 
-O código é... bem, é JavaScript. JavaScript puro. Sem frameworks. Sem dependências. Só manipulação de DOM pura e sem adulteração. Do jeito que Deus quis.
+O código é… bem, é JavaScript. JavaScript puro. Sem framework. Sem dependência. Só manipulação de DOM crua. Do jeito que Deus quis.
 
 
 Aqui está basicamente o que ele faz:
 
-1. **Espera a página do Gmail carregar** - Porque timing é tudo
-2. **Encontra o container da lista de e-mails** - Usando o bom e velho `querySelector`
-3. **Adiciona um botão à interface** - Porque por que não?
-4. **Escuta cliques** - Porque botões precisam fazer alguma coisa
-5. **Encontra todos os checkboxes** - Os checkboxes que selecionam e-mails individuais
-6. **Marca todos eles** - Porque é esse o objetivo
+1. **Espera a página do Gmail carregar** — porque timing é tudo
+2. **Acha o container da lista de e-mails** — com o bom e velho `querySelector`
+3. **Adiciona um botão na interface** — porque por que não?
+4. **Escuta clique** — porque botão precisa fazer alguma coisa
+5. **Acha todos os checkboxes** — os que selecionam e-mail individual
+6. **Marca todos** — porque esse é o objetivo
 
 
-O código usa manipulação de DOM para injetar o botão na interface do Gmail. Ele procura por classes CSS e IDs específicos que o Gmail usa (o que é sempre arriscado porque podem mudar, mas ei, funcionou quando eu fiz... Spoiler: não funciona mais!).
+O código usa manipulação de DOM pra injetar o botão na interface do Gmail. Procura classes CSS e IDs específicos que o Gmail usa (o que é sempre arriscado porque podem mudar, mas ei, funcionou quando eu fiz… Spoiler: não funciona mais!).
 
 
-O botão é estilizado para parecer que pertence à interface do Gmail. Não é perfeito, mas é bom o suficiente. Porque perfeição é superestimada. Ou pelo menos é isso que eu digo para mim mesmo.
+O botão é estilizado pra parecer que pertence à interface do Gmail. Não é perfeito, mas é bom o bastante. Porque perfeição é superestimada. Ou pelo menos é isso que eu falo pra mim mesmo.
 
 
-### A Extensão de Firefox
+### A extensão de Firefox
 
 
-A extensão é construída usando a WebExtensions API, que é o padrão para extensões de Firefox. Ela tem:
+A extensão é montada com a WebExtensions API, o padrão de extensão do Firefox. Tem:
 
-- Um arquivo `manifest.json` - Porque toda extensão precisa de um
-- Um content script - O JavaScript que roda nas páginas do Gmail
-- Ícones - Porque extensões precisam de ícones (eu acho?)
-- Um README - Porque documentação é importante, mesmo para coisas simples
-
-
-O manifesto especifica que a extensão deve rodar nas páginas do Gmail (`*://mail.google.com/*`). Quando você visita o Gmail, o content script carrega, encontra o lugar certo para injetar o botão, e faz o que tem que fazer.
+- Um arquivo `manifest.json` — porque toda extensão precisa de um
+- Um content script — o JavaScript que roda nas páginas do Gmail
+- Ícones — porque extensão precisa de ícone (eu acho?)
+- Um README — porque documentação importa, mesmo pra coisa simples
 
 
-### Por Que a Interface Antiga do Gmail?
+O manifesto diz que a extensão deve rodar nas páginas do Gmail (`*://mail.google.com/*`). Quando você abre o Gmail, o content script carrega, acha o lugar certo pra injetar o botão, e faz o que tem que fazer.
 
 
-Você deve estar se perguntando: "Por que a interface antiga do Gmail? Por que não a nova?"
+### Por que a interface antiga do Gmail?
 
 
-Boa pergunta. Aqui está a resposta honesta: porque era o que eu estava usando na época. E quando eu não conseguia selecionar facilmente todos os meus e-mails, fiquei frustrado. Então resolvi.
+Você deve estar pensando: "Por que a interface antiga? Por que não a nova?"
 
 
-### O Arquivamento
+Boa pergunta. Resposta honesta: porque era o que eu usava na época. E quando eu não conseguia selecionar fácil todos os e-mails, fiquei puto. Então resolvi.
 
 
-Acabei de arquivar o repositório. 4 de janeiro de 2026. Arquivamento fresquinho, ainda quente do forno.
+### O arquivamento
 
 
-Por quê? Porque o Gmail mudou. De novo. Provavelmente estão descontinuando a interface antiga por completo. Ou talvez tenham corrigido o problema. Ou talvez eu simplesmente tenha parado de usar a interface antiga. Sinceramente acho que é uma combinação de todas essas opções...
+Acabei de arquivar o repositório. 4 de janeiro de 2026. Arquivamento fresquinho, ainda quente.
 
 
-Mas a extensão ainda está lá. Só está... arquivada. Feito um fóssil digital. Um lembrete de uma época em que eu me importava o suficiente com selecionar todos os meus e-mails a ponto de escrever uma extensão de Firefox para isso.
+Por quê? Porque o Gmail mudou. De novo. Provavelmente estão matando a interface antiga de vez. Ou talvez tenham corrigido o problema. Ou talvez eu simplesmente tenha parado de usar a interface antiga. Sinceramente acho que é uma mistura de tudo isso…
 
 
-## O Que Eu Aprendi
-
-1. **Problemas simples precisam de soluções simples** - Às vezes um botão é só um botão
-2. **Extensões de navegador são mais fáceis do que você pensa** - A WebExtensions API é na verdade bem direta
-3. **O Google muda as coisas o tempo todo** - Escrever extensões para serviços do Google é uma batalha perdida
-4. **Às vezes você é o único usuário** - E tudo bem
-5. **Arquivar projetos é catártico** - Às vezes você só precisa deixar as coisas irem
+Mas a extensão ainda tá lá. Só está… arquivada. Feito fóssil digital. Um lembrete de uma época em que eu me importava o bastante com selecionar todos os e-mails a ponto de escrever uma extensão de Firefox pra isso.
 
 
-## O Código
+## O que eu aprendi
+
+1. **Problema simples pede solução simples** — às vezes um botão é só um botão
+2. **Extensão de navegador é mais fácil do que parece** — a WebExtensions API é bem direta
+3. **O Google muda as coisas o tempo todo** — escrever extensão pra serviço do Google é luta perdida
+4. **Às vezes você é o único usuário** — e tudo bem
+5. **Arquivar projeto alivia** — às vezes você só precisa largar a mão
 
 
-Está arquivado, mas ainda está lá. Você pode olhar. Me julgar por causa dele. Instalar se quiser. Não me importo. Está arquivado. Não é mais problema meu.
+## O código
 
 
-O código é simples. É JavaScript. Manipula o DOM. Costumava funcionar... E isso basta.
+Está arquivado, mas ainda tá lá. Pode olhar. Me julgar. Instalar se quiser. Não me importo. Está arquivado. Não é mais problema meu.
 
 
-## O Balanço da Realidade
+O código é simples. É JavaScript. Manipula o DOM. Costumava funcionar… E isso basta.
 
 
-Essa extensão não é impressionante. Não é complexa. Nem sequer é tão útil assim. Mas resolveu um problema que eu tinha, na época em que eu tinha. E às vezes, isso já basta.
+## Pé no chão
 
 
-É um projeto pequeno. Um projeto simples. Um projeto no qual eu provavelmente passei mais tempo pensando do que realmente escrevendo. Mas é meu. E estou escrevendo sobre ele. Então aqui estamos.
+Essa extensão não impressiona. Não é complexa. Nem sequer é tão útil assim. Mas resolveu um problema que eu tinha, na época em que eu tinha. E às vezes, isso já basta.
 
 
-A extensão funcionou. Fez o que era para fazer. E depois eu arquivei porque... bem, por motivos. Comportamento clássico de desenvolvedor.
+É um projeto pequeno. Simples. Um projeto em que eu provavelmente passei mais tempo pensando do que realmente escrevendo. Mas é meu. E estou escrevendo sobre ele. Então aqui estamos.
 
 
-Se você ainda está usando a interface antiga do Gmail e precisa selecionar todos os seus e-mails, essa extensão pode ajudar. Ou pode não ajudar. Está arquivada, então não faço promessas. Mas ei, está lá se você quiser.
+A extensão funcionou. Fez o que era pra fazer. E depois eu arquivei porque… bem, por motivos. Comportamento clássico de desenvolvedor.
+
+
+Se você ainda usa a interface antiga do Gmail e precisa selecionar todos os e-mails, essa extensão pode ajudar. Ou pode não ajudar. Está arquivada, então não faço promessa. Mas ei, está lá se você quiser.
 
 
 ---
 
 
-A extensão está disponível no [GitHub](https://github.com/mateuslacorte/select-all-e-mails-on-old-gmail-interface) se você realmente quiser ver. Está arquivada, então não espere atualizações. Mas se você precisa selecionar todos os seus e-mails na interface antiga do Gmail, e está usando Firefox, e está se sentindo aventureiro... vá em frente. Não vou te impedir.
+A extensão está no [GitHub](https://github.com/mateuslacorte/select-all-e-mails-on-old-gmail-interface) se você realmente quiser ver. Está arquivada, então não espere update. Mas se você precisa selecionar todos os e-mails na interface antiga do Gmail, usa Firefox, e está se sentindo aventureiro… manda ver. Não vou te impedir.

@@ -19,7 +19,7 @@ export const projects: ProjectCard[] = [
     },
     description: {
       en: 'fastify-ocpp on npm — OCPP-J CSMS library with negotiation, framing, schemas, and onAction/call for 1.6–2.1.',
-      pt: 'fastify-ocpp no npm — biblioteca CSMS OCPP-J com negociação, framing, schemas e onAction/call para 1.6–2.1.',
+      pt: 'fastify-ocpp no npm — biblioteca OCPP-J pra CSMS, com negociação, framing, schemas e onAction/call nas versões 1.6–2.1.',
     },
     icon: '/projects/ocpp-node-library-icon.png',
     color: 'from-emerald-500 to-teal-500',
@@ -36,7 +36,7 @@ export const projects: ProjectCard[] = [
     },
     description: {
       en: 'Production-ready NestJS template with REST, GraphQL, auth, and a full Docker stack.',
-      pt: 'Template NestJS pronto para produção com REST, GraphQL, autenticação e stack Docker completa.',
+      pt: 'Template NestJS pronto pra produção, com REST, GraphQL, auth e stack Docker completa.',
     },
     icon: '/projects/nestjs-logo.png',
     color: 'from-primary-500 to-accent-500',

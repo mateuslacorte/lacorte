@@ -5,57 +5,57 @@ tags:
   - introdução
   - sobre
 description: >-
-  Uma introdução rápida sobre quem eu sou, o que eu faço, e a stack de
-  tecnologias que eu amo trabalhar.
+  Uma apresentação rápida: quem eu sou, o que eu faço e a stack com a qual
+  gosto de trabalhar.
 ---
 
 
-E aí! Bem-vindo ao meu blog! Eu sou o Mateus, e estou muito feliz que você esteja aqui. Deixa eu te dar um resumo rápido de quem eu sou e do que eu curto.
+E aí! Bem-vindo ao blog. Eu sou o Mateus, e fico feliz pra caramba que você tenha caído aqui. Vou te dar um resumo rápido de quem eu sou e do que eu curto.
 
 
 ## Quem sou eu?
 
-Sou um **Tech Lead** e **Desenvolvedor Back-End** experiente, que vem construindo coisas legais no mundo da tecnologia. Amo código organizado e bem arquitetado e odeio quando alguém bagunça a base de código. Quando não estou programando, provavelmente você vai me encontrar lendo quadrinhos e romances, assistindo vídeos no YouTube, ou dormindo para recuperar minha energia.
+Sou **Tech Lead** e **Desenvolvedor Back-End**, com uns bons anos construindo coisa útil (e umas bagunças memoráveis) na área. Gosto de código organizado e bem arquitetado — e fico de cabelo em pé quando alguém transforma a base em zona. Quando não estou programando, provavelmente estou lendo quadrinho ou romance, vendo YouTube, ou dormindo pra recuperar a energia.
 
 
 ## Com o que eu trabalho
 
-Sou um desenvolvedor full-stack, mas meu coração pertence mesmo ao back-end. Aqui está a stack de tecnologias com a qual me sinto confortável:
+Sou full-stack na prática, mas o coração é back-end. Essa é a stack com a qual me sinto em casa:
 
 
 ### Frontend & Frameworks
-- **JavaScript** & **TypeScript** - Porque type safety salva vidas
-- **React** & **React Native** - Para construir UIs bonitas e apps mobile
-- **Vite** - Builds rápidos, desenvolvedor feliz 😄
+- **JavaScript** & **TypeScript** — porque type safety salva a pele
+- **React** & **React Native** — UI bonita e app mobile
+- **Vite** — build rápido, desenvolvedor feliz 😄
 
 ### Backend & APIs
-- **Node.js** - Meu runtime de escolha
-- **NestJS** - Para construir APIs escaláveis e fáceis de manter
+- **Node.js** — meu runtime de estimação
+- **NestJS** — APIs escaláveis e fáceis de manter
 
 ### Bancos de Dados
-Já trabalhei com vários bancos de dados diferentes, dependendo do que o projeto precisa:
-- **MySQL** & **MariaDB** - Para dados relacionais
-- **PostgreSQL** - Quando preciso de algo mais poderoso
-- **MongoDB** - Para aqueles momentos NoSQL
-- **Redis** - Porque cache é tudo
+Já mexi com vários, conforme o projeto pedia:
+- **MySQL** & **MariaDB** — dado relacional clássico
+- **PostgreSQL** — quando preciso de mais músculo
+- **MongoDB** — quando NoSQL faz sentido
+- **Redis** — porque cache é tudo
 
 ### Testes
-Acredito em escrever testes sólidos, então uso:
-- **Jest** - Meu framework de testes preferido
-- **Mocha** - Quando o projeto pede
+Acredito em teste de verdade, então uso:
+- **Jest** — meu framework preferido
+- **Mocha** — quando o projeto já veio com ele
 
-## Meu Setup
+## Meu setup
 
-Estou rodando em um **MacBook Pro 16'' Mid 2021** com o chip **Apple M1 Pro**. É uma fera, e dá conta de tudo que eu jogo nele. Uso **macOS** e faço a maior parte da minha navegação no **Safari**.
+Tô num **MacBook Pro 16'' Mid 2021** com chip **Apple M1 Pro**. É uma máquina bruta e engole o que eu jogo nele. Rodo **macOS** e naveguei a maior parte do tempo no **Safari**.
 
 
-## Vamos nos Conectar!
+## Bora conversar!
 
-Fique à vontade para entrar em contato se quiser bater um papo sobre tecnologia, colaborar em um projeto, ou só dar um oi!
+Se quiser papear sobre tech, colaborar em algum projeto ou só mandar um oi, manda ver:
 
 
 - **LinkedIn**: [mateuslacorte](https://www.linkedin.com/in/mateuslacorte/)
 - **Website**: [lacorte.dev](https://www.lacorte.dev)
 - **Telegram**: [lacortedev](https://t.me/lacortedev)
 
-Obrigado por passar por aqui, e espero que você curta o conteúdo que vou compartilhar!
+Valeu por passar aqui — espero que você curta o que eu for soltando por essas bandas!

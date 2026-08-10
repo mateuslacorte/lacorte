@@ -1,5 +1,5 @@
 ---
-title: 'Seu Localhost Merece um Domínio Real: Cloudflare Tunnels, mTLS e Preparação Pós-Quântica'
+title: 'Seu localhost merece um domínio de verdade: Cloudflare Tunnels, mTLS e preparação pós-quântica'
 date: '2026-08-10'
 tags:
   - cloudflare
@@ -9,20 +9,21 @@ tags:
   - tls
   - zero-trust
 description: >-
-  Substitua o ngrok por Cloudflare Tunnels, adicione mTLS para autenticação serviço-a-serviço e prepare suas origens para autenticação pós-quântica — tudo direto do seu laptop.
+  Troque o ngrok por Cloudflare Tunnels, coloque mTLS entre serviços e prepare
+  suas origins pra autenticação pós-quântica — tudo a partir do laptop.
 ---
 
-Você tem três serviços rodando localmente: uma API em Go na porta :8080, um frontend Next.js na :3000, e uma instância Postgres que você jurou que ia containerizar. Precisa testar um webhook do Stripe, mostrar o novo dashboard para um colega, e verificar se o seu handshake mTLS funciona — tudo isso sem commitar código, abrir portas no seu roteador, ou explicar ao seu provedor por que a porta 443 está subitamente ocupada.
+Você tem três serviços rodando local: uma API em Go na :8080, um frontend Next.js na :3000 e um Postgres que você jurou que ia containerizar. Precisa testar um webhook do Stripe, mostrar o dashboard novo pro colega e conferir se o handshake mTLS funciona — sem commitar código, sem abrir porta no roteador e sem explicar pro provedor por que a 443 subitamente ficou ocupada.
 
-Chegou a hora dos Cloudflare Tunnels. Não aquele "teste rápido" que você fez uma vez com `cloudflared tunnel --url localhost:3000` e esqueceu de existir. Estou falando de nível produção: tunnels nomeados com config-as-code, mTLS entre seus serviços locais, certificados reais que os navegadores confiam, e o novo suporte a autenticação pós-quântica que a Cloudflare acabou de lançar para conexões de origem. Tudo isso rodando a partir de um único `docker-compose.yml` que você pode versionar.
+Chegou a hora dos Cloudflare Tunnels. Não aquele "teste rápido" que você fez uma vez com `cloudflared tunnel --url localhost:3000` e esqueceu. Estou falando de nível produção: tunnels nomeados com config-as-code, mTLS entre os serviços locais, certificados de verdade em que o navegador confia, e o suporte novo a autenticação pós-quântica que a Cloudflare acabou de soltar pras conexões de origin. Tudo a partir de um único `docker-compose.yml` que você versiona.
 
-Ao final deste post, você terá um ambiente de desenvolvimento local que expõe qualquer serviço num hostname real com TLS válido, impõe TLS mútuo entre serviços, registra cada requisição para debug, e está pronto para o futuro pós-quântico — sem nunca precisar tocar na página de port forwarding do seu roteador.
+No fim deste post você tem um ambiente de dev local que expõe qualquer serviço num hostname real com TLS válido, impõe TLS mútuo entre serviços, registra cada request pra debug e já está pronto pro futuro pós-quântico — sem nunca abrir a página de port forwarding do roteador.
 
-## Por Que Seu Setup Atual de Localhost Está Te Travando
+## Por que o localhost atual te trava
 
-Você conhece a rotina. `ngrok http 3000` te dá `https://a1b2c3d4.ngrok-free.app` — válido por duas horas, subdomínio aleatório a cada restart. Webhooks do Stripe? Boa sorte configurando um endpoint de webhook que muda todos os dias. Você poderia pagar por um domínio reservado, mas isso custa $5/mês pelo privilégio de fazer tunnel através da infraestrutura de outra pessoa quando você já tem um domínio parado na Cloudflare.
+Você conhece a rotina. `ngrok http 3000` te dá `https://a1b2c3d4.ngrok-free.app` — válido por duas horas, subdomínio aleatório a cada restart. Webhook do Stripe? Boa sorte configurando um endpoint que muda todo dia. Dá pra pagar domínio reservado, mas são US$ 5/mês pelo privilégio de fazer tunnel na infra de outra pessoa quando você já tem domínio parado na Cloudflare.
 
-Certificados autoassinados são piores. `mkcert -install` funciona até não funcionar mais — seu navegador confia nele, mas o `fetch()` no seu app Next.js não confia, seu cliente HTTP em Go rejeita, e o verificador de webhook do Stripe recusa terminantemente. Você acaba com `NODE_TLS_REJECT_UNAUTHORIZED=0` no seu `.env.local`, uma armadilha que você vai esquecer de remover antes de ir para produção.
+Certificado autoassinado é pior. `mkcert -install` funciona até não funcionar — o navegador confia, o `fetch()` do Next.js não, o cliente HTTP em Go rejeita, e o verificador de webhook do Stripe recusa de cara. Você acaba com `NODE_TLS_REJECT_UNAUTHORIZED=0` no `.env.local`, uma armadilha que vai esquecer de tirar antes de ir pra produção.
 
 ```bash
 # The "it works on my machine" certificate dance
@@ -32,7 +33,7 @@ mkcert localhost 127.0.0.1 ::1
 export SSL_CERT_FILE="$(mkcert -CAROOT)/rootCA.pem"
 ```
 
-Depois vem a malabarismo do `/etc/hosts`. `api.localhost`, `app.localhost`, `db.localhost` — todos apontando para `127.0.0.1`. Só que o Docker no macOS/Windows não vê `127.0.0.1` do mesmo jeito que o seu host vê. Você troca para `host.docker.internal`, então seu serviço Go não consegue alcançar o Postgres porque ele está numa rede Docker customizada, então você adiciona `network_mode: host` e agora conflitos de porta comem a sua tarde.
+Aí vem o malabarismo do `/etc/hosts`. `api.localhost`, `app.localhost`, `db.localhost` — todos apontando pra `127.0.0.1`. Só que o Docker no macOS/Windows não vê `127.0.0.1` do mesmo jeito que o host. Você troca pra `host.docker.internal`, aí o serviço Go não alcança o Postgres porque ele está numa rede Docker customizada, aí você coloca `network_mode: host` e conflitos de porta comem a tarde.
 
 ```yaml
 # docker-compose.yml — the "works until it doesn't" approach
@@ -43,11 +44,11 @@ services:
     network_mode: host  # Hope nothing else uses 5432
 ```
 
-TLS de verdade sendo terminado? Esquece. Seu proxy reverso (Caddy, Traefik, Nginx) termina o TLS localmente, mas os certificados não são os mesmos que a produção usa. O encaminhamento de headers fica confuso — `X-Forwarded-For`, `X-Forwarded-Proto`, `Forwarded` — e a lógica da sua aplicação se comporta diferente atrás de um proxy do que se comportaria em bare metal.
+Terminar TLS de verdade? Esquece. Seu proxy reverso (Caddy, Traefik, Nginx) termina TLS local, mas os certificados não são os mesmos da produção. Encaminhamento de header vira bagunça — `X-Forwarded-For`, `X-Forwarded-Proto`, `Forwarded` — e a lógica da aplicação se comporta diferente atrás de proxy do que em bare metal.
 
-TLS mútuo? Você já leu a documentação. Já gerou certificados de cliente com `openssl req -newkey rsa:2048 -nodes -keyout client.key -x509 -days 365 -out client.crt`. Já configurou o seu servidor Go para `RequireAndVerifyClientCert`. Já passou três horas debugando `x509: certificate signed by unknown authority` porque a cadeia de CA está com um arquivo errado.
+mTLS? Você já leu a doc. Já gerou cert de cliente com `openssl req -newkey rsa:2048 -nodes -keyout client.key -x509 -days 365 -out client.crt`. Já configurou o servidor Go com `RequireAndVerifyClientCert`. Já passou três horas debugando `x509: certificate signed by unknown authority` porque a cadeia de CA estava um arquivo errado.
 
-Aqui está a falha de webhook do Stripe que arruína a sua sexta-feira:
+Aqui a falha de webhook do Stripe que estraga a sexta:
 
 ```bash
 # Terminal 1: Your Go API
@@ -68,30 +69,30 @@ $ stripe trigger payment_intent.succeeded
 > x509: certificate signed by unknown authority
 ```
 
-O cliente de webhooks de saída do Stripe não confia na cadeia de certificados do ngrok no plano gratuito. Você poderia fazer upgrade, ou poderia parar de brigar com as suas ferramentas e dar ao seu localhost um domínio real com certificados reais que todo mundo confia — incluindo o Stripe, o seu navegador, e as suas próprias chamadas serviço-a-serviço.
+O cliente de webhook de saída do Stripe não confia na cadeia de certificados do ngrok no plano gratuito. Dá pra fazer upgrade — ou parar de brigar com as ferramentas e dar ao localhost um domínio de verdade, com certificados em que todo mundo confia: Stripe, navegador e as suas próprias chamadas serviço-a-serviço.
 
-## Cloudflare Tunnels: O Modelo Mental Que Você Realmente Precisa
+## Cloudflare Tunnels: o modelo mental que você precisa de fato
 
-Pare de pensar no `cloudflared` como um proxy reverso. Ele não é. É um **cliente QUIC somente de saída** que mantém uma conexão persistente e multiplexada com a borda da Cloudflare. O seu laptop inicia a conexão. O seu roteador não vê nada além de UDP/443 de saída. Sem port forwarding, sem regras de firewall, sem crises existenciais do tipo "espera, meu provedor bloqueia a porta 80?".
+Pare de pensar no `cloudflared` como proxy reverso. Não é. É um **cliente QUIC só de saída** que mantém uma conexão persistente e multiplexada com a borda da Cloudflare. Seu laptop inicia a conexão. O roteador só vê UDP/443 de saída. Sem port forwarding, sem regra de firewall, sem crise existencial do tipo "será que meu provedor bloqueia a porta 80?".
 
 ```
 Browser → Cloudflare Edge (TLS termination) → QUIC tunnel → cloudflared (local) → HTTP service
 ```
 
-Essa é a arquitetura inteira. A Cloudflare termina o TLS na borda usando o seu certificado real (emitido via ACME, gerenciado por eles). O tunnel carrega HTTP puro até o seu serviço local. A sua API Go na `:8080` nunca vê um certificado. Ela só vê `Host: api.dev.lacorte.dev` e processa a requisição.
+Essa é a arquitetura inteira. A Cloudflare termina o TLS na borda com o seu certificado de verdade (emitido via ACME, gerenciado por eles). O tunnel carrega HTTP puro até o serviço local. A API Go na `:8080` nunca vê certificado. Só vê `Host: api.dev.lacorte.dev` e processa a request.
 
-### Tunnels Nomeados vs. Efêmeros: Cresça
+### Tunnels nomeados vs. efêmeros: cresça
 
-`cloudflared tunnel --url localhost:3000` cria um **tunnel efêmero**. Subdomínio aleatório, sem persistência de configuração, morre quando você aperta `Ctrl+C`. Bom para um "ei, olha isso rapidinho." Inútil para webhooks, teste de mTLS, ou qualquer coisa que precise sobreviver a um laptop hibernando.
+`cloudflared tunnel --url localhost:3000` cria um **tunnel efêmero**. Subdomínio aleatório, config sem persistência, morre no `Ctrl+C`. Serve pra um "ei, olha isso rapidinho." Inútil pra webhook, teste de mTLS ou qualquer coisa que precise sobreviver ao laptop hibernar.
 
-**Tunnels nomeados** são a versão adulta. Você os cria uma vez:
+**Tunnels nomeados** são a versão adulta. Você cria uma vez:
 
 ```bash
 cloudflared tunnel create dev-env
 # Output: Created tunnel dev-env with id 123e4567-e89b-12d3-a456-426614174000
 ```
 
-Isso te dá um UUID estável. Você então configura o DNS uma vez:
+Isso te dá um UUID estável. Aí você configura o DNS uma vez:
 
 ```bash
 cloudflared tunnel route dns dev-env api.dev.lacorte.dev
@@ -99,9 +100,9 @@ cloudflared tunnel route dns dev-env app.dev.lacorte.dev
 cloudflared tunnel route dns dev-env db.dev.lacorte.dev  # yes, really
 ```
 
-### O `config.yml` Que Você Vai Realmente Versionar
+### O `config.yml` que você de fato vai versionar
 
-Esqueça as flags. Coloque isto em `~/.cloudflared/config.yml` (ou `./cloudflared/config.yml` para o setup Docker que vem a seguir):
+Esqueça as flags. Coloque isto em `~/.cloudflared/config.yml` (ou `./cloudflared/config.yml` pro setup Docker que vem a seguir):
 
 ```yaml
 tunnel: 123e4567-e89b-12d3-a456-426614174000
@@ -118,17 +119,17 @@ ingress:
     service: http_status:404
 ```
 
-**As regras de ingress casam de cima para baixo.** O primeiro match vence. O catch-all wildcard no final impede que erros de "tunnel not found" revelem a sua estrutura interna. `host.docker.internal` funciona porque estamos rodando o `cloudflared` dentro do Docker — mais sobre isso na próxima seção.
+**As regras de ingress casam de cima pra baixo.** O primeiro match vence. O catch-all wildcard no final impede que erros de "tunnel not found" vazem a estrutura interna. `host.docker.internal` funciona porque estamos rodando o `cloudflared` dentro do Docker — mais sobre isso na próxima seção.
 
-### Terminação de TLS: A Borda Faz o Trabalho Pesado
+### Terminação de TLS: a borda faz o trabalho pesado
 
-A Cloudflare provisiona um certificado válido e publicamente confiável para `*.dev.lacorte.dev` via Let's Encrypt (ou a CA própria deles). O seu navegador vê um cadeado verde. O seu serviço local vê `X-Forwarded-Proto: https` e HTTP puro. Esse é o padrão correto. Você **não** quer gerenciar certificados no localhost. Você **não** quer o `mkcert` no seu Dockerfile.
+A Cloudflare provisiona um certificado válido e publicamente confiável pra `*.dev.lacorte.dev` via Let's Encrypt (ou a CA própria deles). O navegador vê o cadeado. O serviço local vê `X-Forwarded-Proto: https` e HTTP puro. Esse é o default certo. Você **não** quer gerenciar certificado no localhost. Você **não** quer `mkcert` no Dockerfile.
 
-O tunnel criptografa o tráfego entre a borda e a origem via QUIC. É isso. O seu serviço continua burro e feliz.
+O tunnel cifra o tráfego entre borda e origin via QUIC. É isso. Seu serviço continua burro e feliz.
 
-## Docker Compose: Um Arquivo Para Governar a Todos
+## Docker Compose: um arquivo pra governar todos
 
-Aqui está a stack inteira — tunnel, API, frontend e banco de dados — em um único arquivo que você pode `git commit` e rodar com `docker compose up -d` em qualquer máquina com Docker instalado. Sem binário `cloudflared` no host, sem units do systemd, sem desculpas de "funciona na minha máquina".
+Aqui está a stack inteira — tunnel, API, frontend e banco — num único arquivo que você `git commit` e sobe com `docker compose up -d` em qualquer máquina com Docker. Sem binário `cloudflared` no host, sem unit do systemd, sem desculpa de "funciona na minha máquina".
 
 ```yaml
 # docker-compose.yml
@@ -203,9 +204,9 @@ volumes:
   pgdata:
 ```
 
-Note o `NEXT_PUBLIC_API_URL`: ele é embutido no bundle do frontend e roda no *navegador*, que não tem a menor ideia do que `api` resolve na rede Docker — esse nome só existe dentro da `appnet`. Aponte as variáveis de ambiente voltadas para o navegador para o hostname público do tunnel (`https://api.localhost.dev`). Se o seu frontend também faz chamadas do lado do servidor (SSR, route handlers), essas executam dentro da rede Docker e podem usar `http://api:8080` com segurança.
+Note o `NEXT_PUBLIC_API_URL`: ele entra no bundle do frontend e roda no *navegador*, que não faz a menor ideia do que `api` resolve na rede Docker — esse nome só existe dentro da `appnet`. Aponte as variáveis voltadas pro browser pro hostname público do tunnel (`https://api.localhost.dev`). Se o frontend também faz chamada server-side (SSR, route handlers), essas rodam dentro da rede Docker e podem usar `http://api:8080` sem drama.
 
-O serviço `cloudflared` monta dois arquivos: a *configuração de ingress* que mapeia hostnames para serviços internos, e as *credenciais do tunnel* que provam à borda da Cloudflare qual tunnel é esse. Crie o `cloudflared/config.yml`:
+O serviço `cloudflared` monta dois arquivos: a *config de ingress* que mapeia hostnames pra serviços internos, e as *credenciais do tunnel* que provam à borda da Cloudflare qual tunnel é esse. Crie o `cloudflared/config.yml`:
 
 ```yaml
 # cloudflared/config.yml
@@ -224,17 +225,17 @@ ingress:
   - service: http_status:404
 ```
 
-Note os nomes DNS do Docker nos campos `service:`: `api:8080` e `frontend:3000` — isso é o `cloudflared`, rodando na rede `appnet`, alcançando os seus containers pelos nomes DNS do Docker. O tráfego externo chega em `api.localhost.dev` e `app.localhost.dev` (apontados para o tunnel via DNS da Cloudflare), termina o TLS na borda, e roteia através da conexão QUIC até o container certo.
+Note os nomes DNS do Docker nos campos `service:`: `api:8080` e `frontend:3000` — isso é o `cloudflared`, na rede `appnet`, alcançando os containers pelos nomes DNS do Docker. Tráfego externo chega em `api.localhost.dev` e `app.localhost.dev` (apontados pro tunnel via DNS da Cloudflare), termina TLS na borda e roteia pela conexão QUIC até o container certo.
 
-O campo `tunnel:` é o UUID gerado por `cloudflared tunnel create dev-env`, não um token — um ID e um token são credenciais diferentes, e uma não substitui a outra. Criar o tunnel escreve um arquivo de credenciais em `~/.cloudflared/<uuid>.json`; copie-o para o diretório (ignorado pelo git) que você está montando:
+O campo `tunnel:` é o UUID gerado por `cloudflared tunnel create dev-env`, não um token — ID e token são credenciais diferentes, e uma não substitui a outra. Criar o tunnel grava um arquivo de credenciais em `~/.cloudflared/<uuid>.json`; copie pro diretório (ignorado pelo git) que você está montando:
 
 ```bash
 cp ~/.cloudflared/123e4567-e89b-12d3-a456-426614174000.json ./cloudflared/credentials.json
 ```
 
-Esse arquivo, montado como somente leitura acima, é o segredo de fato — nunca o commite.
+Esse arquivo, montado como somente leitura acima, é o segredo de fato — nunca commit.
 
-**Prefere pular o gerenciamento de um arquivo de credenciais?** Use o modo token: remova `credentials-file` e o UUID de `tunnel:` do `config.yml`, e rode o `cloudflared` com um token obtido via `cloudflared tunnel token dev-env`:
+**Prefere pular o gerenciamento de arquivo de credenciais?** Use o modo token: tire `credentials-file` e o UUID de `tunnel:` do `config.yml`, e rode o `cloudflared` com um token obtido via `cloudflared tunnel token dev-env`:
 
 ```yaml
 # docker-compose.yml (cloudflared service, token mode alternative)
@@ -250,22 +251,22 @@ cloudflared:
   restart: unless-stopped
 ```
 
-O token codifica a identidade do tunnel, então não há montagem de `credentials-file` — mais simples para CI ou ambientes descartáveis, ao custo de um segredo de longa duração parado no `.env`:
+O token codifica a identidade do tunnel, então não precisa montar `credentials-file` — mais simples pra CI ou ambiente descartável, ao custo de um segredo de longa duração parado no `.env`:
 
 ```bash
 # .env (token mode only — keep out of version control)
 TUNNEL_TOKEN=eyJhIjoi...your-token-from-cloudflare-dashboard...
 ```
 
-O resto deste post assume o caminho de credenciais locais acima; troque para o modo token onde você vir `credentials-file` se preferir esse caminho.
+O resto deste post assume o caminho de credenciais locais acima; troque pro modo token onde aparecer `credentials-file` se preferir esse caminho.
 
-Rode `docker compose up -d`. Observe `docker compose logs -f cloudflared` até ver a linha "Connection established". É isso. O seu localhost agora tem hostnames reais, certificados válidos, e uma topologia que sobrevive a reboots, mudanças de rede, e aquele colega que "só precisa ver rapidinho".
+Rode `docker compose up -d`. Acompanhe `docker compose logs -f cloudflared` até ver a linha "Connection established". Pronto. Seu localhost agora tem hostnames de verdade, certificados válidos e uma topologia que sobrevive a reboot, mudança de rede e aquele colega que "só precisa ver rapidinho".
 
-## TLS Mútuo Entre Serviços Locais Sem Dor de Cabeça
+## TLS mútuo entre serviços locais sem dor de cabeça
 
-Você já tem TLS válido da Cloudflare até o seu laptop para qualquer coisa que um navegador acesse. Agora faça os seus *serviços* verificarem *um ao outro* — sem mais headers de "confia em mim", validação de certificado real com uma CA que você controla. Isso é mTLS serviço-a-serviço: o listener `:8443` da sua API Go exige um certificado de cliente antes de responder qualquer coisa, e qualquer chamador — outro serviço, um script, o `curl` — precisa apresentar um certificado assinado pela sua CA para passar.
+Você já tem TLS válido da Cloudflare até o laptop pra tudo que o navegador acessa. Agora faça os *serviços* verificarem *uns aos outros* — sem header de "confia em mim", validação de certificado de verdade com uma CA que você controla. Isso é mTLS serviço-a-serviço: o listener `:8443` da API Go exige certificado de cliente antes de responder qualquer coisa, e qualquer chamador — outro serviço, um script, o `curl` — precisa apresentar um certificado assinado pela sua CA pra passar.
 
-Primeiro, instale o `mkcert` e crie uma CA local que o seu sistema operacional e containers vão realmente confiar:
+Primeiro, instale o `mkcert` e crie uma CA local em que o SO e os containers de fato confiem:
 
 ```bash
 # macOS
@@ -278,9 +279,9 @@ choco install mkcert
 mkcert -install
 ```
 
-A flag `-install` adiciona a CA raiz ao trust store do seu sistema. O Firefox precisa do `libnss3-tools` no Linux — o mkcert avisa isso, mas você vai ignorar e depois vai ficar se perguntando por que o `curl` funciona mas o Firefox não.
+A flag `-install` adiciona a CA raiz ao trust store do sistema. No Linux, o Firefox precisa do `libnss3-tools` — o mkcert avisa, você ignora, e depois fica se perguntando por que o `curl` funciona e o Firefox não.
 
-Gere certificados para cada serviço. Use nomes DNS que combinem com a sua configuração de tunnel, não `localhost`:
+Gere certificados pra cada serviço. Use nomes DNS que casem com a config do tunnel, não `localhost`:
 
 ```bash
 mkdir -p certs
@@ -292,15 +293,15 @@ mkcert -key-file certs/client-key.pem -cert-file certs/client.pem \
   "client.localhost"
 ```
 
-O `client.pem` é o que qualquer chamador — outro serviço, um sidecar, um script — apresenta ao chamar a sua API diretamente.
+O `client.pem` é o que qualquer chamador — outro serviço, um sidecar, um script — apresenta ao chamar a API direto.
 
-O seu servidor precisa confiar na mesma raiz que assinou o `client.pem`. Copie a CA raiz do mkcert para dentro do seu projeto para que a aplicação não dependa do trust store do sistema:
+O servidor precisa confiar na mesma raiz que assinou o `client.pem`. Copie a CA raiz do mkcert pro projeto pra a aplicação não depender do trust store do sistema:
 
 ```bash
 cp "$(mkcert -CAROOT)/rootCA.pem" certs/rootCA.pem
 ```
 
-Agora configure a sua API Go para exigir e verificar certificados de cliente. Isso não é opcional — `ClientAuth: tls.RequireAndVerifyClientCert` significa sem certificado, sem tráfego:
+Agora configure a API Go pra exigir e verificar certificados de cliente. Isso não é opcional — `ClientAuth: tls.RequireAndVerifyClientCert` significa sem cert, sem tráfego:
 
 ```go
 // main.go
@@ -372,14 +373,14 @@ const server = https.createServer({
 server.listen(8443);
 ```
 
-Isso resolve o mTLS serviço-a-serviço: qualquer chamador local que apresente o `client.pem` passa, qualquer outro é rejeitado na camada TLS. Vale a pena ser preciso sobre duas questões relacionadas, mas diferentes, que isso *não* cobre:
+Isso resolve o mTLS serviço-a-serviço: qualquer chamador local que apresente o `client.pem` passa; qualquer outro é rejeitado na camada TLS. Vale ser preciso sobre duas questões relacionadas, mas diferentes, que isso *não* cobre:
 
-- **Navegador → borda** continua exatamente como descrito antes — HTTPS público puro, terminado pela Cloudflare com um certificado em que o seu navegador confia. O mTLS interno entre os seus serviços não muda isso.
-- **Autenticação de cliente borda → origem** — provar que uma requisição que chega na sua origem realmente veio da borda da Cloudflare, e não de qualquer um que descobriu o seu IP — é uma funcionalidade separada chamada **Authenticated Origin Pulls**. Você a ativa por zona no dashboard (SSL/TLS → Origin Server → Authenticated Origin Pulls) ou via API; a Cloudflare então apresenta um certificado de cliente assinado pela CA própria dela em cada requisição borda-para-origem, e a stack TLS da sua origem o verifica. Não existe um campo `originRequest.mTLS` na configuração do `cloudflared` — essa chave não existe. Se você quiser que o seu servidor Go/Node imponha isso também, adicione o certificado da CA de origin-pull da Cloudflare como outra entrada confiável em `ClientCAs` junto com a sua raiz do mkcert, e a sua lógica existente de `RequireAndVerifyClientCert` cobre os dois casos.
+- **Navegador → borda** continua exatamente como antes — HTTPS público puro, terminado pela Cloudflare com um certificado em que o navegador confia. O mTLS interno entre os seus serviços não muda isso.
+- **Autenticação de cliente borda → origin** — provar que uma request que chega na origin de fato veio da borda da Cloudflare, e não de alguém que achou o seu IP — é uma feature separada chamada **Authenticated Origin Pulls**. Você ativa por zona no dashboard (SSL/TLS → Origin Server → Authenticated Origin Pulls) ou via API; a Cloudflare então apresenta um certificado de cliente assinado pela CA própria dela em cada request borda-pra-origin, e a stack TLS da origin verifica. Não existe campo `originRequest.mTLS` na config do `cloudflared` — essa chave não existe. Se quiser que o servidor Go/Node imponha isso também, adicione o certificado da CA de origin-pull da Cloudflare como outra entrada confiável em `ClientCAs` junto com a raiz do mkcert, e a lógica existente de `RequireAndVerifyClientCert` cobre os dois casos.
 
-Para o setup deste post — um tunnel fazendo proxy para um container na sua própria rede Docker confiável — `http://` puro para o serviço (como configurado no `cloudflared/config.yml` anteriormente) é suficiente, e o Authenticated Origin Pulls não é necessário. Recorra a ele quando a sua origem está diretamente acessível pela internet pública e você precisa provar que uma requisição se originou na borda.
+Pro setup deste post — um tunnel fazendo proxy pra um container na sua própria rede Docker confiável — `http://` puro pro serviço (como no `cloudflared/config.yml` acima) basta, e Authenticated Origin Pulls não é necessário. Recorra a ele quando a origin estiver diretamente acessível na internet pública e você precisar provar que a request veio da borda.
 
-Teste o handshake mTLS serviço-a-serviço diretamente contra o seu servidor Go/Node:
+Teste o handshake mTLS serviço-a-serviço direto contra o servidor Go/Node:
 
 ```bash
 # Present a valid client cert — should succeed
@@ -390,13 +391,13 @@ curl -v --cert certs/client.pem --key certs/client-key.pem \
 curl -v --cacert certs/rootCA.pem https://api.localhost:8443/health
 ```
 
-Observe os logs. Você vai ver `TLS handshake complete` com `peer certificates: 1` do lado do servidor. É isso — autenticação mútua com zero segredos de longa duração no seu código. A CA nunca sai da sua máquina. Rotacione os certificados anualmente com um cron job se você estiver se sentindo responsável.
+Olhe os logs. Você vai ver `TLS handshake complete` com `peer certificates: 1` do lado do servidor. Pronto — autenticação mútua com zero segredo de longa duração no código. A CA nunca sai da sua máquina. Rotacione os certificados todo ano com um cron se estiver se sentindo responsável.
 
-## Autenticação Pós-Quântica: O Que Você Pode Ativar Hoje
+## Autenticação pós-quântica: o que dá pra ligar hoje
 
-A Cloudflare lançou silenciosamente a autenticação pós-quântica de origem no trimestre passado. Não é enfeite de marketing — é um handshake KEM híbrido (X25519+Kyber768) entre a borda deles e a sua origem. O modelo de ameaça é harvest-now-decrypt-later: alguém grava o seu tráfego TLS hoje, espera por um CRQC (computador quântico criptograficamente relevante), e retroativamente decifra as suas API keys, tokens de sessão, e aquela mensagem de commit vergonhosa que você deu push para produção. A autenticação PQ torna essa gravação inútil sem quebrar as trocas de chave clássica e pós-quântica simultaneamente.
+A Cloudflare soltou em silêncio a autenticação pós-quântica de origin no trimestre passado. Não é enfeite de marketing — é um handshake KEM híbrido (X25519+Kyber768) entre a borda deles e a sua origin. O modelo de ameaça é harvest-now-decrypt-later: alguém grava o tráfego TLS hoje, espera um CRQC (computador quântico criptograficamente relevante) e decifra depois as API keys, tokens de sessão e aquela mensagem de commit vergonhosa que você deu push pra produção. Auth PQ torna essa gravação inútil sem quebrar as trocas de chave clássica e pós-quântica ao mesmo tempo.
 
-Ativá-la exige duas coisas: HTTP/2 até a sua origem (o QUIC ainda não suporta autenticação PQ) e a feature flag. Pós-quântico é uma configuração **de tunnel inteiro**, não algo que você alterna por regra de ingress — ela vive no nível superior do `config.yml`, junto de `tunnel:` e `credentials-file:`:
+Ativar exige duas coisas: HTTP/2 até a origin (o QUIC ainda não suporta auth PQ) e a feature flag. Pós-quântico é configuração **do tunnel inteiro**, não algo que você liga por regra de ingress — mora no nível superior do `config.yml`, junto de `tunnel:` e `credentials-file:`:
 
 ```yaml
 # cloudflared/config.yml (tunnel-wide post-quantum flag)
@@ -416,14 +417,14 @@ ingress:
   - service: http_status:404
 ```
 
-Sem um arquivo de config por perto? A mesma flag existe como a flag de CLI `cloudflared tunnel run --post-quantum`, ou a variável de ambiente `TUNNEL_POST_QUANTUM=true` — útil se você estiver rodando o modo token da seção de compose anterior.
+Sem arquivo de config por perto? A mesma flag existe como CLI `cloudflared tunnel run --post-quantum`, ou a variável `TUNNEL_POST_QUANTUM=true` — útil se você estiver no modo token da seção de compose.
 
-Reinicie o container do tunnel: `docker compose restart cloudflared`. A borda da Cloudflare agora tenta uma troca de chave híbrida `X25519MLKEM768` com o seu `cloudflared` local, que fala HTTP/2 com os seus serviços.
+Reinicie o container do tunnel: `docker compose restart cloudflared`. A borda da Cloudflare agora tenta uma troca de chave híbrida `X25519MLKEM768` com o seu `cloudflared` local, que fala HTTP/2 com os serviços.
 
-A verificação não vem dos headers de resposta — o `cf-ray` não ganha um sufixo `-pq`. Os caracteres depois do ray ID sempre são o código de aeroporto do datacenter (`-ORD` para Chicago, `-GRU` para São Paulo, e assim por diante), pós-quântico ou não. Verifique estes, em vez disso:
+A verificação não vem dos headers de resposta — o `cf-ray` não ganha sufixo `-pq`. Os caracteres depois do ray ID sempre são o código de aeroporto do datacenter (`-ORD` pra Chicago, `-GRU` pra São Paulo, e assim por diante), pós-quântico ou não. Confira estes em vez disso:
 
-1. **Logs do `cloudflared`** com `--loglevel debug` — as linhas de log de conexão informam o grupo de troca de chaves negociado.
-2. **`cdn-cgi/trace`**, acessado através do próprio hostname do seu tunnel:
+1. **Logs do `cloudflared`** com `--loglevel debug` — as linhas de conexão informam o grupo de troca de chaves negociado.
+2. **`cdn-cgi/trace`**, acessado pelo hostname do próprio tunnel:
 
 ```bash
 curl -s https://api.lab.lacorte.dev/cdn-cgi/trace
@@ -432,21 +433,21 @@ curl -s https://api.lab.lacorte.dev/cdn-cgi/trace
 # kex=X25519MLKEM768
 ```
 
-Um valor de `kex` igual a `X25519MLKEM768` (o grupo híbrido ML-KEM padronizado, antes lançado sob o nome de rascunho `X25519Kyber768Draft00`) confirma um handshake pós-quântico para essa conexão. Para o trecho específico borda-para-origem, cruze a informação com o dashboard da Cloudflare → Zero Trust → Networks → Tunnels → o seu tunnel, e consulte a documentação atual de pós-quântico da Cloudflare para os campos exatos de verificação — essa é uma área que ainda está evoluindo.
+Um valor de `kex` igual a `X25519MLKEM768` (o grupo híbrido ML-KEM padronizado, antes lançado sob o nome de rascunho `X25519Kyber768Draft00`) confirma handshake pós-quântico nessa conexão. Pro trecho específico borda-pra-origin, cruze com o dashboard da Cloudflare → Zero Trust → Networks → Tunnels → o seu tunnel, e consulte a doc atual de pós-quântico da Cloudflare pelos campos exatos de verificação — essa área ainda está evoluindo.
 
-Suporte de navegadores: Chrome 116+, Firefox 118+, e builds recentes do Safari suportam troca de chaves híbrida ML-KEM no TLS 1.3. A Cloudflare termina PQ na borda — o seu navegador negocia o grupo híbrido diretamente com a Cloudflare; a configuração PQ do tunnel governa o trecho borda-para-origem. O fallback é automático: se a sua origem (ou a versão do `cloudflared`) não suportar PQ, a Cloudflare silenciosamente cai para o X25519 clássico. Sem erros, sem requisições quebradas — você só vai ver um valor de `kex` clássico em vez disso.
+Suporte de navegadores: Chrome 116+, Firefox 118+ e builds recentes do Safari suportam troca de chaves híbrida ML-KEM no TLS 1.3. A Cloudflare termina PQ na borda — o navegador negocia o grupo híbrido direto com a Cloudflare; a config PQ do tunnel governa o trecho borda-pra-origin. O fallback é automático: se a origin (ou a versão do `cloudflared`) não suportar PQ, a Cloudflare cai em silêncio pro X25519 clássico. Sem erro, sem request quebrada — você só vê um `kex` clássico.
 
-Uma pegadinha: `http2Origin: true` exige que os seus serviços locais aceitem h2c (HTTP/2 em texto puro) ou TLS com um certificado em que o `cloudflared` confia. Já que estamos usando o mkcert na seção anterior, monte o seu diretório `certs/` dentro do container `cloudflared` (`- ./certs:/etc/cloudflared/certs:ro`) e adicione `caPool: /etc/cloudflared/certs/rootCA.pem` ao `originRequest` daquela regra se os seus serviços servirem HTTPS. Para backends de HTTP puro — como `api` e `frontend` no compose file deste post — o h2c funciona sem configuração adicional, e você pode pular o `caPool` completamente.
+Uma pegadinha: `http2Origin: true` exige que os serviços locais aceitem h2c (HTTP/2 em texto puro) ou TLS com um certificado em que o `cloudflared` confia. Como usamos mkcert na seção anterior, monte o diretório `certs/` dentro do container `cloudflared` (`- ./certs:/etc/cloudflared/certs:ro`) e adicione `caPool: /etc/cloudflared/certs/rootCA.pem` ao `originRequest` daquela regra se os serviços servirem HTTPS. Pra backends de HTTP puro — como `api` e `frontend` no compose deste post — o h2c funciona sem config extra, e você pode pular o `caPool` por completo.
 
-Isso não é teatro de future-proofing. A flag existe, o hardware existe, e a configuração é uma linha só. Ative agora para que a saída do seu `cdn-cgi/trace` e os logs do `cloudflared` mostrem `X25519MLKEM768`, e você possa honestamente dizer que a sua stack de dev local está preparada para o pós-quântico.
+Isso não é teatro de future-proofing. A flag existe, o hardware existe, e a config é uma linha. Ligue agora pra a saída do `cdn-cgi/trace` e os logs do `cloudflared` mostrarem `X25519MLKEM768`, e você poder dizer de boa que a stack de dev local está preparada pro pós-quântico.
 
-## Debug, Observabilidade, e a Estratégia de Saída do "Funciona na Minha Máquina"
+## Debug, observabilidade e a saída do "funciona na minha máquina"
 
-O tunnel está rodando. Os certificados validam. O handshake mTLS completa. Aí algo quebra — um webhook retorna 502, um header é removido, um colega vê um erro diferente do seu. Hora de parar de adivinhar e começar a olhar dados estruturados.
+O tunnel está rodando. Os certificados validam. O handshake mTLS completa. Aí algo quebra — webhook devolve 502, um header some, o colega vê um erro diferente do seu. Hora de parar de chutar e olhar dado estruturado.
 
-### Logging Estruturado Que Não é Uma Porcaria
+### Logging estruturado que não é uma porcaria
 
-O `cloudflared` fala JSON quando você pede educadamente. Atualize o seu serviço no compose:
+O `cloudflared` fala JSON quando você pede educado. Atualize o serviço no compose:
 
 ```yaml
 # docker-compose.yml (cloudflared service, with logging/metrics flags)
@@ -467,13 +468,13 @@ services:
       - "2000:2000"  # Prometheus metrics
 ```
 
-A flag `--logfile` escreve linhas JSON num volume que você pode acompanhar com tail, enviar para o Loki, ou processar com `jq`:
+A flag `--logfile` escreve linhas JSON num volume que você pode acompanhar com tail, mandar pro Loki ou processar com `jq`:
 
 ```bash
 docker compose exec cloudflared tail -f /var/log/cloudflared/access.log | jq '.'
 ```
 
-Saída de exemplo quando uma requisição chega na sua API Go:
+Saída de exemplo quando uma request chega na API Go:
 
 ```json
 {
@@ -494,32 +495,32 @@ Saída de exemplo quando uma requisição chega na sua API Go:
 }
 ```
 
-Notou o `pq_kem`? Essa é a confirmação do seu handshake pós-quântico, espelhando o valor de `kex` do `cdn-cgi/trace` visto acima. Se estiver ausente da sua saída de log real, a configuração da sua origem não está negociando o KEM híbrido — verifique de novo a flag `post-quantum: true` de tunnel inteiro da seção anterior, e confirme quais campos a sua versão do `cloudflared` realmente emite, já que os esquemas de log estruturado evoluem entre releases.
+Notou o `pq_kem`? Essa é a confirmação do handshake pós-quântico, espelhando o `kex` do `cdn-cgi/trace` acima. Se estiver ausente na saída de log real, a config da origin não está negociando o KEM híbrido — confira de novo a flag `post-quantum: true` de tunnel inteiro da seção anterior, e veja quais campos a sua versão do `cloudflared` de fato emite, já que esquemas de log estruturado mudam entre releases.
 
-### Dashboard Zero Trust: A Fonte da Verdade
+### Dashboard Zero Trust: a fonte da verdade
 
-O dashboard Zero Trust da Cloudflare (Dash → Zero Trust → Logs → HTTP) mostra cada requisição que atravessou o seu tunnel, completo com:
+O dashboard Zero Trust da Cloudflare (Dash → Zero Trust → Logs → HTTP) mostra cada request que atravessou o tunnel, completo com:
 
-- Headers de requisição/resposta (sanitizados)
+- Headers de request/resposta (sanitizados)
 - Detalhes da negociação TLS
 - Resultado da validação do certificado de cliente mTLS
 - Matches de regras do WAF
 - Origem geográfica
 
-Filtre pelo header `cf-ray` para correlacionar com os seus logs locais. O dashboard retém 72 horas no plano gratuito — suficiente para debugar aquele incidente de "funcionava ontem".
+Filtre pelo header `cf-ray` pra correlacionar com os logs locais. O dashboard retém 72 horas no plano gratuito — o bastante pra debugar aquele incidente de "funcionava ontem".
 
-### Expondo Serviços Não-HTTP: `cloudflared tunnel route ip`
+### Expondo serviços não-HTTP: `cloudflared tunnel route ip`
 
-O seu container Postgres vive na rede do compose. O cliente `psql` do seu colega vive no laptop dele. Não faça tunnel SSH. Roteie a subnet:
+Seu container Postgres vive na rede do compose. O `psql` do colega vive no laptop dele. Não faça tunnel SSH. Roteie a subnet:
 
 ```bash
 # Run once per tunnel (persists in Cloudflare's config)
 cloudflared tunnel route ip add 172.20.0.0/16 <TUNNEL_NAME> --config /etc/cloudflared/config.yml
 ```
 
-Agora qualquer dispositivo no tunnel (incluindo o `cloudflared access tcp --hostname db.lacorte.dev --url tcp://localhost:5432` do seu colega) alcança `172.20.0.5:5432` diretamente. Funciona para impressoras, APIs internas, aquele servidor de dongle de licença USB esquisito — qualquer coisa com um IP.
+Agora qualquer device no tunnel (incluindo o `cloudflared access tcp --hostname db.lacorte.dev --url tcp://localhost:5432` do colega) alcança `172.20.0.5:5432` direto. Funciona pra impressora, API interna, aquele servidor esquisito de dongle USB de licença — qualquer coisa com IP.
 
-Atualize o `config.yml` para anunciar a rota:
+Atualize o `config.yml` pra anunciar a rota:
 
 ```yaml
 # cloudflared/config.yml
@@ -537,11 +538,11 @@ warp-routing:
   enabled: true
 ```
 
-O bloco `warp-routing` habilita as rotas de IP que você adicionou via CLI. Sem portas extras, sem gambiarras com `socat`.
+O bloco `warp-routing` habilita as rotas de IP que você adicionou via CLI. Sem porta extra, sem gambiarra com `socat`.
 
-### Fluxo de Time: Commit, Compartilhe, Rode
+### Fluxo de time: commit, compartilhe, rode
 
-O seu repositório agora contém:
+Seu repositório agora contém:
 
 ```
 .
@@ -569,7 +570,7 @@ certs/*.key
 TUNNEL_TOKEN=eyJhIjoi...  # from `cloudflared tunnel token <NAME>`
 ```
 
-Integre um novo dev em três passos:
+Integre um dev novo em três passos:
 
 ```bash
 git clone git@github.com:you/local-stack.git
@@ -578,13 +579,13 @@ cp .env.example .env
 docker compose up -d
 ```
 
-Todos recebem hostnames idênticos, certificados idênticos, imposição de mTLS idêntica, logging idêntico. Sem "funciona na minha máquina" porque a máquina *é* o compose file.
+Todo mundo recebe hostname idêntico, certificado idêntico, imposição de mTLS idêntica, logging idêntico. Sem "funciona na minha máquina" porque a máquina *é* o compose file.
 
-### Checklist de Promoção Para Staging
+### Checklist de promoção pra staging
 
-Antes de copiar esse padrão para staging, verifique:
+Antes de copiar esse padrão pra staging, confira:
 
-- [ ] Token do tunnel armazenado num gerenciador de segredos (não no `.env`), injetado no momento do deploy
+- [ ] Token do tunnel num gerenciador de segredos (não no `.env`), injetado na hora do deploy
 - [ ] `cloudflared` roda como usuário não-root (`user: "1000:1000"` no compose, ou ServiceAccount dedicada no K8s)
 - [ ] Endpoint de métricas (`:2000`) coletado pelo Prometheus com `job="cloudflared-tunnel"`
 - [ ] Volume de log montado em armazenamento persistente ou enviado ao Loki/Vector
@@ -595,4 +596,4 @@ Antes de copiar esse padrão para staging, verifique:
 - [ ] Versão do `cloudflared` fixada no compose (`2024.12.0`, não `latest`)
 - [ ] Runbook inclui: procedimento de limpeza `cloudflared tunnel route ip delete`
 
-Você substituiu um hábito frágil de `ngrok` por infraestrutura que você pode versionar, revisar e debugar. O tunnel agora é código. Trate-o como código.
+Você trocou um hábito frágil de `ngrok` por infra que dá pra versionar, revisar e debugar. O tunnel agora é código. Trate como código.

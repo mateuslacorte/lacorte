@@ -43,18 +43,18 @@ export const commonTranslations = {
   // Home page
   home: {
     welcome: { en: 'Welcome', pt: 'Bem-vindo' },
-    subtitle: { en: 'Developer Blog & Projects', pt: 'Blog e projetos de desenvolvimento' },
+    subtitle: { en: 'Developer Blog & Projects', pt: 'Blog e projetos de dev' },
     latestPosts: { en: 'Latest Posts', pt: 'Posts recentes' },
     viewAll: { en: 'View All', pt: 'Ver todos' },
     featuredProjects: { en: 'Featured Projects', pt: 'Projetos em destaque' },
-    tryTools: { en: 'Try Our Tools', pt: 'Experimente nossas ferramentas' },
+    tryTools: { en: 'Try Our Tools', pt: 'Experimente as ferramentas' },
     playGames: { en: 'Play Games', pt: 'Jogar' },
   },
 
   // Projects page
   projects: {
     title: { en: 'Projects', pt: 'Projetos' },
-    description: { en: 'Various projects and experiments', pt: 'Diversos projetos e experimentos' },
+    description: { en: 'Various projects and experiments', pt: 'Projetos e experimentos variados' },
     viewProject: { en: 'View Project', pt: 'Ver projeto' },
     allProjects: { en: 'All Projects', pt: 'Todos os projetos' },
     newProject: { en: 'New Project', pt: 'Novo projeto' },
@@ -86,6 +86,33 @@ export const commonTranslations = {
     tags: { en: 'Tags', pt: 'Tags' },
     noPosts: { en: 'No posts yet', pt: 'Nenhum post ainda' },
     minuteRead: { en: 'min read', pt: 'min de leitura' },
+    comments: { en: 'Comments', pt: 'Comentários' },
+    commentsIntro: {
+      en: 'Keep it useful — questions, corrections, and war stories welcome.',
+      pt: 'Vai direto ao ponto — dúvidas, correções e causos de produção são bem-vindos.',
+    },
+    commentName: { en: 'Name', pt: 'Nome' },
+    commentNamePlaceholder: {
+      en: 'How should we credit you?',
+      pt: 'Como você quer aparecer?',
+    },
+    commentLabel: { en: 'Comment', pt: 'Comentário' },
+    commentPlaceholder: { en: 'Add your take…', pt: 'Escreva seu comentário…' },
+    commentSubmit: { en: 'Post comment', pt: 'Publicar comentário' },
+    commentSubmitting: { en: 'Posting…', pt: 'Publicando…' },
+    commentsLoading: { en: 'Loading comments…', pt: 'Carregando comentários…' },
+    commentsEmpty: {
+      en: 'No comments yet. Start the thread.',
+      pt: 'Ainda não há comentários. Seja o primeiro.',
+    },
+    commentsLoadError: {
+      en: 'Failed to load comments',
+      pt: 'Não foi possível carregar os comentários',
+    },
+    commentPostError: {
+      en: 'Failed to post comment',
+      pt: 'Não foi possível publicar o comentário',
+    },
   },
 
   // 404 Page
@@ -99,7 +126,7 @@ export const commonTranslations = {
   index: {
     welcome: { en: 'Welcome to my blog', pt: 'Bem-vindo ao meu blog' },
     greeting: { en: "Hi, I'm", pt: 'Olá, eu sou' },
-    heroDescription: { en: 'A space where I document what I learn while developing and create small projects.', pt: 'Um espaço onde documento o que aprendo enquanto desenvolvo e crio projetos pequenos.' },
+    heroDescription: { en: 'A space where I document what I learn while developing and create small projects.', pt: 'Aqui eu documento o que aprendo enquanto desenvolvo e publico uns projetos pequenos.' },
     readBlog: { en: 'Read Blog', pt: 'Ler o blog' },
     latestPosts: { en: 'Latest Posts', pt: 'Posts recentes' },
     recentPosts: { en: 'Recent Posts', pt: 'Posts recentes' },
@@ -119,7 +146,7 @@ export const commonTranslations = {
     rouletteDesc: { en: 'Custom random roulette wheel', pt: 'Roleta aleatória personalizada' },
     seeMore: { en: 'See More', pt: 'Ver mais' },
     noProjectsYet: { en: 'No projects right now', pt: 'Nenhum projeto no momento' },
-    noProjectsHint: { en: 'Check back later — new work will show up when it is ready to share.', pt: 'Volte mais tarde — novos trabalhos aparecem quando estiverem prontos para compartilhar.' },
+    noProjectsHint: { en: 'Check back later — new work will show up when it is ready to share.', pt: 'Volte mais tarde — novos trabalhos aparecem quando estiverem prontos pra compartilhar.' },
     browseGames: { en: 'Browse games', pt: 'Explorar jogos' },
     // Tool names
     jsonFormatter: { en: 'JSON Formatter', pt: 'Formatador JSON' },

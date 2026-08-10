@@ -1,5 +1,5 @@
 ---
-title: 'Estratégias de Invalidação de Cache Que Realmente Funcionam: Cache HTTP, Debug, e Não Servir Conteúdo Obsoleto'
+title: 'Estratégias de invalidação de cache que realmente funcionam: HTTP, debug e conteúdo fresco'
 date: '2026-07-27'
 tags:
   - redes
@@ -13,40 +13,40 @@ tags:
   - cache
   - otimização
 description: >-
-  Domine os headers de cache HTTP, depure cache misses com curl, e construa
-  estratégias de invalidação que funcionam — sem vendor lock-in ou mágica.
+  Domine headers de cache HTTP, debugue cache miss com curl e monte estratégias
+  de invalidação que funcionam — sem vendor lock-in nem mágica.
 ---
 
-Invalidação de cache é uma das duas coisas difíceis em ciência da computação, principalmente porque a outra — nomear coisas — é como você estraga a primeira. Você já viu isso: um `Set-Cookie` perdido num endpoint JSON destrói a taxa de acerto do seu CDN. Um `Vary: Accept-Encoding` faltando serve conteúdo gzipado quebrado para um cliente que não consegue decodificar. Seu `max-age=31536000` em assets versionados funciona muito bem até você precisar rotacionar uma chave de assinatura ontem.
+Invalidação de cache é uma das duas coisas difíceis em ciência da computação — em parte porque a outra (nomear coisas) é exatamente o que estraga a primeira. Você já viu o filme: um `Set-Cookie` perdido num endpoint JSON zera a taxa de acerto do CDN. Um `Vary: Accept-Encoding` faltando serve gzip quebrado pra cliente que não consegue decodificar. Seu `max-age=31536000` em assets versionados funciona lindamente… até você precisar rotacionar uma chave de assinatura ontem.
 
-Esse não é um post teórico. É a checklist que eu sigo toda vez que um bug de cache cai no meu colo — headers que realmente importam, invocações de `curl` que revelam o que o CDN está vendo, padrões de invalidação que não exigem um doutorado em sistemas distribuídos, e uma stack Docker Compose que você pode subir para ver os headers fluírem em tempo real. No final você vai saber exatamente quais diretivas `Cache-Control` merecem seu lugar, como projetar chaves de cache que sobrevivem a deploys, e o truque com `stale-while-revalidate` que te deixa dormir tranquilo durante um purge de cache.
+Este post não é teoria. É a checklist que eu percorro toda vez que um bug de cache cai na minha mesa — headers que realmente importam, comandos `curl` que mostram o que o CDN está vendo, padrões de invalidação que não pedem doutorado em sistemas distribuídos, e uma stack Docker Compose que você sobe pra ver os headers fluírem ao vivo. No fim você sabe quais diretivas `Cache-Control` merecem existir, como desenhar chaves de cache que sobrevivem a deploy, e o truque com `stale-while-revalidate` que te deixa dormir em paz durante um purge.
 
-## A Taxonomia dos Headers: O Que Realmente Importa
+## Taxonomia dos headers: o que realmente importa
 
-A maioria dos desenvolvedores trata o `Cache-Control` como um horóscopo — copia uma string do Stack Overflow, torce para as estrelas se alinharem, e fica se perguntando por que o CDN está servindo o CSS da semana passada. Vamos parar de chutar. Aqui está cada diretiva que merece seu lugar, o que ela realmente faz, e quando usar.
+Muita gente trata `Cache-Control` como horóscopo — copia uma string do Stack Overflow, torce pro astro alinhar e fica se perguntando por que o CDN ainda serve o CSS da semana passada. Chega de chute. Aqui vai cada diretiva que paga o aluguel, o que ela faz de verdade e quando usar.
 
 | Diretiva | Quem obedece | Quando usar |
 |-----------|--------------|----------------|
 | `public` | Todo mundo (navegador, CDN, proxy) | Assets estáticos, respostas de API públicas, qualquer coisa sem autenticação |
-| `private` | Só o navegador | JSON específico do usuário, HTML com tokens CSRF, qualquer coisa atrás de uma sessão |
+| `private` | Só o navegador | JSON específico do usuário, HTML com tokens CSRF, qualquer coisa atrás de sessão |
 | `no-store` | Todo mundo — **não grave em disco** | Segredos, PII, `/auth/me`, respostas de pagamento |
-| `no-cache` | Todo mundo — **revalide sempre** | Endpoints de mutação, resultados de busca, "atualidade importa mais que velocidade" |
-| `must-revalidate` | Todo mundo — velho = morto | Dados financeiros, contagens de estoque, qualquer coisa onde dado velho está errado |
-| `max-age=N` | Navegador + caches compartilhados | Seu TTL base; `31536000` para assets versionados, `300` para API |
-| `s-maxage=N` | **Só caches compartilhados** (CDN, proxies) | Sobrescreve o `max-age` na borda sem tocar no cache do navegador |
+| `no-cache` | Todo mundo — **revalide sempre** | Endpoints de mutação, resultados de busca, "frescor importa mais que velocidade" |
+| `must-revalidate` | Todo mundo — velho = morto | Dados financeiros, contagem de estoque, qualquer coisa em que dado velho está errado |
+| `max-age=N` | Navegador + caches compartilhados | Seu TTL base; `31536000` pra assets versionados, `300` pra API |
+| `s-maxage=N` | **Só caches compartilhados** (CDN, proxies) | Sobrescreve o `max-age` na borda sem mexer no cache do navegador |
 | `stale-while-revalidate=N` | Todo mundo | Serve dado velho por até N segundos enquanto a revalidação assíncrona roda — **a diretiva que te deixa dormir durante um purge** |
-| `stale-if-error=N` | Todo mundo | Serve dado velho por até N segundos quando a origem retorna 5xx — seu buffer de incidente |
+| `stale-if-error=N` | Todo mundo | Serve dado velho por até N segundos quando a origem devolve 5xx — seu colchão de incidente |
 | `immutable` | Navegador | Assets versionados (`/app.a1b2c3.js`) — diz ao navegador "nunca revalide, jamais" |
 
-**As jogadas combinadas:**
+**Combinações que funcionam:**
 - Assets versionados: `Cache-Control: public, max-age=31536000, immutable`
 - Ponto de entrada HTML: `Cache-Control: no-cache, must-revalidate` (ou `max-age=0, must-revalidate`)
 - API privada: `Cache-Control: private, max-age=60, stale-while-revalidate=300`
 - API pública: `Cache-Control: public, max-age=60, s-maxage=300, stale-while-revalidate=600`
 
-### A Armadilha do `Vary`
+### A armadilha do `Vary`
 
-O `Vary` diz aos caches: "essa resposta muda de acordo com esses headers de requisição." Erre nele e você fragmenta o cache em pedaços inúteis. `Vary: Accept-Encoding` é o **único** valor que você provavelmente precisa — ele permite que o CDN armazene variantes gzip e brotli separadamente. `Vary: Accept` para negociação de conteúdo? Beleza. `Vary: User-Agent`? Você acabou de criar uma entrada de cache por versão de navegador. `Vary: Cookie`? Parabéns, você acabou de desabilitar o cache para todo usuário logado.
+O `Vary` avisa os caches: "essa resposta muda conforme estes headers de requisição." Erre nele e você fragmenta o cache em pedaços inúteis. `Vary: Accept-Encoding` é o **único** valor que você provavelmente precisa — deixa o CDN guardar variantes gzip e brotli separadas. `Vary: Accept` pra negociação de conteúdo? Beleza. `Vary: User-Agent`? Você acabou de criar uma entrada por versão de navegador. `Vary: Cookie`? Parabéns: acabou de desligar o cache pra todo usuário logado.
 
 ```python
 # header_echo.py — run: pip install flask && python header_echo.py
@@ -78,13 +78,13 @@ if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080)
 ```
 
-Suba ele, chame `curl -H "Accept-Encoding: gzip" localhost:8080/echo`, e veja a lógica do `Vary` em ação em tempo real. Próxima seção: vamos conectar isso a uma stack Docker Compose com um CDN de verdade na frente para você ver os headers mudando a cada salto.
+Sobe, chama `curl -H "Accept-Encoding: gzip" localhost:8080/echo` e vê a lógica do `Vary` ao vivo. Na próxima seção a gente pluga isso numa stack Docker Compose com um CDN de verdade na frente pra você ver os headers mudarem a cada salto.
 
-## Debugando com curl: Veja O Que o CDN Vê
+## Debug com curl: veja o que o CDN vê
 
-As DevTools do seu navegador mentem. Elas mostram o que o navegador *recebeu* depois que o service worker, o cache do navegador, e três extensões mexeram nos headers. O `curl` mostra o que realmente trafega no fio — desde que você pare de usar ele como um apelido do `wget`.
+As DevTools do navegador mentem. Elas mostram o que o navegador *recebeu* depois que service worker, cache do browser e três extensões mexeram nos headers. O `curl` mostra o que realmente passa no fio — desde que você pare de usar ele como apelido do `wget`.
 
-Comece pelas flags que importam. `-v` (ou `-i` para só os headers) imprime a resposta completa. `--compressed` pede gzip/br e *descomprime automaticamente* — crítico porque CDNs frequentemente servem valores de `ETag` diferentes para respostas comprimidas versus identity. `-H 'Accept-Encoding: gzip, br'` sem `--compressed` deixa você inspecionar o `Content-Encoding` e o `Vary` crus. `--resolve example.com:443:1.2.3.4` força o SNI e o host header para a sua máquina de staging sem tocar em `/etc/hosts`. E o impressor de veredito:
+Comece pelas flags que importam. `-v` (ou `-i` só pros headers) imprime a resposta completa. `--compressed` pede gzip/br e *descomprime sozinho* — crítico porque CDNs costumam servir `ETag` diferente pra resposta comprimida versus identity. `-H 'Accept-Encoding: gzip, br'` sem `--compressed` deixa você inspecionar `Content-Encoding` e `Vary` crus. `--resolve example.com:443:1.2.3.4` força SNI e host header pra sua máquina de staging sem tocar em `/etc/hosts`. E o impressor de veredito:
 
 ```bash
 -o /dev/null -D - | awk 'BEGIN{IGNORECASE=1}
@@ -98,9 +98,9 @@ Comece pelas flags que importam. `-v` (ou `-i` para só os headers) imprime a re
   END{printf "http=%s age=%s cache=%s cf=%s etag=%s vary=%s\n", code, age, cache, cf, etag, vary}'
 ```
 
-`Age` te diz quantos segundos o objeto ficou num cache compartilhado. `X-Cache` (ou `CF-Cache-Status`, `X-Served-By`, `Via`) revela *qual* camada serviu a resposta. `Vary` expõe se a chave de cache fragmenta em `Accept-Encoding`, `Accept`, ou o seu `X-Device-Type` customizado.
+`Age` diz há quantos segundos o objeto ficou num cache compartilhado. `X-Cache` (ou `CF-Cache-Status`, `X-Served-By`, `Via`) revela *qual* camada serviu a resposta. `Vary` expõe se a chave de cache fragmenta em `Accept-Encoding`, `Accept` ou no seu `X-Device-Type` customizado.
 
-Empacote isso numa função de shell que você pode carregar no `.bashrc`:
+Empacote numa função de shell pra carregar no `.bashrc`:
 
 ```bash
 cache-debug() {
@@ -121,7 +121,7 @@ cache-debug() {
 }
 ```
 
-Agora suba um laboratório local que espelha origem → borda → cliente. Salve esse `docker-compose.yml`:
+Agora sobe um laboratório local que espelha origem → borda → cliente. Salve esse `docker-compose.yml`:
 
 ```yaml
 services:
@@ -140,7 +140,7 @@ services:
     depends_on: [origin]
 ```
 
-`app.py` — um endpoint Flask com corpo estável (para o `proxy_cache` poder dar HIT) e `ETag` a partir do mtime. `POST /mutate` reescreve o arquivo quando você quiser um miss de propósito:
+`app.py` — endpoint Flask com corpo estável (pra o `proxy_cache` poder dar HIT) e `ETag` a partir do mtime. `POST /mutate` reescreve o arquivo quando você quiser forçar um miss:
 
 ```python
 from flask import Flask, make_response
@@ -174,7 +174,7 @@ if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080)
 ```
 
-`nginx.conf` — um reverse proxy mínimo que adiciona `X-Cache` e respeita o `stale-while-revalidate`:
+`nginx.conf` — reverse proxy mínimo que adiciona `X-Cache` e respeita `stale-while-revalidate`:
 
 ```nginx
 events { worker_connections 1024; }
@@ -194,38 +194,38 @@ http {
 }
 ```
 
-Construa e rode:
+Build e sobe:
 
 ```bash
 docker compose up --build -d
 ```
 
-Chame a origem diretamente:
+Chama a origem direto:
 
 ```bash
 cache-debug http://localhost:8080/asset
 # http=200 age= cache= etag=W/"1723456789123456789-17" vary=Accept-Encoding
 ```
 
-Chame a borda (nginx):
+Chama a borda (nginx):
 
 ```bash
 cache-debug http://localhost:8081/asset
 # http=200 age=0 cache=MISS etag=W/"1723456789123456789-17" vary=Accept-Encoding
 ```
 
-Chame de novo — `HIT`, `age` incrementa:
+Chama de novo — `HIT`, `age` sobe:
 
 ```bash
 cache-debug http://localhost:8081/asset
 # http=200 age=2 cache=HIT etag=W/"1723456789123456789-17" vary=Accept-Encoding
 ```
 
-Agora você vê exatamente o que o CDN vê. Sem cache do navegador, sem service worker, sem mentiras.
+Agora você vê exatamente o que o CDN vê. Sem cache do navegador, sem service worker, sem mentira.
 
-## A Armadilha do Set-Cookie e Outros Assassinos Silenciosos
+## A armadilha do Set-Cookie e outros assassinos silenciosos
 
-Você lançou uma API JSON. O CDN mostra 0% de taxa de acerto. Você checa os headers de resposta e lá está: `Set-Cookie: session=abc123; Path=/; HttpOnly` em toda chamada de `/api/users`. Parabéns — você acabou de tirar toda requisição autenticada do cache porque a maioria dos CDNs trata `Set-Cookie` como "essa resposta é pessoal, não guarde." A correção não é remover cookies do seu app; é removê-los na borda para endpoints públicos.
+Você lançou uma API JSON. O CDN mostra 0% de hit rate. Olha os headers de resposta e lá está: `Set-Cookie: session=abc123; Path=/; HttpOnly` em toda chamada de `/api/users`. Parabéns — você tirou toda requisição autenticada do cache, porque a maioria dos CDNs trata `Set-Cookie` como "essa resposta é pessoal, não guarda." A correção não é remover cookies do app; é stripá-los na borda em endpoints públicos.
 
 ```nginx
 # nginx.conf — strip cookies on API routes that shouldn't set them
@@ -256,7 +256,7 @@ curl -I -H "Accept: application/json" https://api.example.com/api/public/status
 
 ---
 
-**A falta do `Vary: Accept-Encoding`** é o bug silencioso de corrupção de dados. Sua origem serve JSON gzipado. O CDN guarda em cache. Um cliente sem suporte a gzip (dispositivo IoT antigo, proxy mal configurado) recebe o stream gzip cacheado e engasga.
+**Falta de `Vary: Accept-Encoding`** é o bug silencioso de corrupção de dado. Sua origem serve JSON gzipado. O CDN guarda. Um cliente sem gzip (IoT antigo, proxy mal configurado) recebe o stream gzip cacheado e engasga.
 
 ```bash
 curl -I -H "Accept-Encoding: gzip" https://api.example.com/data
@@ -266,7 +266,7 @@ curl -I -H "Accept-Encoding: identity" https://api.example.com/data
 # Response: Content-Encoding: gzip, Vary: Accept-Encoding  ✗ (served gzip to non-gzip client)
 ```
 
-Correção: garanta que sua origem *sempre* envie `Vary: Accept-Encoding` quando a compressão estiver habilitada. No nginx:
+Correção: garanta que a origem *sempre* mande `Vary: Accept-Encoding` quando compressão estiver ligada. No nginx:
 
 ```nginx
 gzip on;
@@ -275,7 +275,7 @@ gzip_vary on;  # adds Vary: Accept-Encoding automatically
 
 ---
 
-**O cargo-culting do `Pragma: no-cache`** — é legado do HTTP/1.0 que não faz nada no HTTP/1.1+. Se você ver isso, apague. Não é um fallback; é ruído.
+**Culto ao `Pragma: no-cache`** — é legado do HTTP/1.0 que não faz nada no HTTP/1.1+. Se aparecer, apague. Não é fallback; é ruído.
 
 ```bash
 curl -I https://example.com/asset.js | grep -i pragma
@@ -284,7 +284,7 @@ curl -I https://example.com/asset.js | grep -i pragma
 
 ---
 
-**`Cache-Control: no-store` em assets públicos** — geralmente um copy-paste de um endpoint de autenticação. Sua logo, seu CSS, seus bundles JS versionados: eles querem `public, max-age=31536000, immutable`. `no-store` força todo cliente a revalidar a cada carregamento de página.
+**`Cache-Control: no-store` em assets públicos** — geralmente copy-paste de um endpoint de auth. Logo, CSS, bundles JS versionados: eles querem `public, max-age=31536000, immutable`. `no-store` força todo cliente a revalidar a cada page load.
 
 ```bash
 curl -I https://cdn.example.com/app.abc123.js
@@ -294,7 +294,7 @@ curl -I https://cdn.example.com/app.abc123.js
 
 ---
 
-**Divergências de ETag entre restarts de container** — seu app gera `ETag: W/"abc123"` baseado em estado em memória ou inode do filesystem. O deploy reinicia os pods, o inode muda, o ETag muda, todo cliente revalida e dá cache miss.
+**ETag que muda entre restart de container** — o app gera `ETag: W/"abc123"` com base em estado em memória ou inode do filesystem. Deploy reinicia os pods, inode muda, ETag muda, todo cliente revalida e toma cache miss.
 
 ```bash
 # Before deploy
@@ -306,7 +306,7 @@ curl -I https://api.example.com/data | grep etag
 # ETag: W/"inode-87-size-1024"  ← cache miss storm
 ```
 
-Correção: derive os ETags do hash do conteúdo, não de metadados. No seu app:
+Correção: derive ETags do hash do conteúdo, não de metadado. No app:
 
 ```python
 import hashlib
@@ -314,21 +314,21 @@ def etag_for(body: bytes) -> str:
     return f'W/"{hashlib.sha256(body).hexdigest()[:16]}"'
 ```
 
-Ou deixe o nginx cuidar disso para arquivos estáticos:
+Ou deixe o nginx cuidar disso em arquivo estático:
 
 ```nginx
 etag on;  # uses Last-Modified + content hash for static files
 ```
 
-Cinco assassinos silenciosos. Cinco correções de uma linha. Sua taxa de acerto acabou de dobrar.
+Cinco armadilhas silenciosas. Cinco correções de uma linha. Sua taxa de acerto acabou de dobrar.
 
-## Design de Chave de Cache: Versionamento, Fingerprints, e a Flag Immutable
+## Design de chave de cache: versionamento, fingerprint e a flag immutable
 
-Versionamento por query string (`/app.js?v=1.2.3`) é o equivalente em cache de escrever sua senha num post-it — funciona até não funcionar mais. A maioria dos CDNs e navegadores trata query strings como componentes da chave de cache, mas alguns as removem completamente (tô olhando pra você, configurações antigas do Cloudflare e certos proxies corporativos). Pior, `?v=123` não diz nada sobre o *conteúdo* — você pode incrementar a versão sem mudar um único byte, ou esquecer de incrementar depois de uma mudança real. De qualquer jeito você perde: cache misses ou assets velhos.
+Versionar por query string (`/app.js?v=1.2.3`) é o equivalente em cache de anotar a senha num post-it — funciona até não funcionar. A maioria dos CDNs e navegadores trata query string como parte da chave, mas alguns cortam ela por completo (tô olhando pra você, configs antigas do Cloudflare e certos proxies corporativos). Pior: `?v=123` não diz nada sobre o *conteúdo* — dá pra incrementar a versão sem mudar um byte, ou esquecer de incrementar depois de mudança real. Nos dois casos você perde: cache miss ou asset velho.
 
-Nomes de arquivo com hash de conteúdo (`app.a1b2c3.js`) são a única estratégia que sobrevive ao contato com a realidade. O hash *é* a impressão digital do conteúdo. Mude um byte, o nome do arquivo muda, a chave de cache muda, o arquivo antigo expira naturalmente. Sem chamadas de API de purge, sem ansiedade de "será que eu lembrei de incrementar a versão?".
+Nome de arquivo com hash de conteúdo (`app.a1b2c3.js`) é a única estratégia que sobrevive ao contato com a realidade. O hash *é* a impressão digital do conteúdo. Muda um byte, muda o nome do arquivo, muda a chave de cache, o arquivo antigo expira sozinho. Sem chamada de API de purge, sem ansiedade de "será que eu lembrei de bumpar a versão?".
 
-Gere hashes no momento do build com um one-liner que funciona em qualquer pipeline de CI:
+Gere hashes no build com um one-liner que roda em qualquer pipeline de CI:
 
 ```bash
 # Bash + coreutils — no Node required
@@ -338,7 +338,7 @@ find dist -type f -name '*.js' -o -name '*.css' | while read f; do
 done
 ```
 
-Prefere Node? Mesmo resultado, zero dependências:
+Prefere Node? Mesmo resultado, zero dependência:
 
 ```bash
 node -e "
@@ -351,29 +351,29 @@ fs.readdirSync('dist').forEach(f => {
 "
 ```
 
-Agora o header `Cache-Control` para esses assets com fingerprint:
+Agora o header `Cache-Control` pra esses assets com fingerprint:
 
 ```
 Cache-Control: max-age=31536000, immutable
 ```
 
-É isso. Um ano, `immutable` diz ao navegador "essa sequência de bytes nunca vai mudar, nem mande uma requisição condicional." A RFC 8246 tornou isso padrão; todo navegador moderno respeita. Tire o `must-revalidate`, tire o `public` — `immutable` já implica os dois. Se você ainda está enviando `max-age=31536000` sem `immutable`, está desperdiçando idas e voltas em checagens de `If-None-Match` que sempre vão retornar 304.
+É isso. Um ano; `immutable` diz ao navegador "essa sequência de bytes nunca muda, nem manda requisição condicional." A RFC 8246 padronizou; todo browser moderno respeita. Tire o `must-revalidate`, tire o `public` — `immutable` já implica os dois. Se você ainda manda `max-age=31536000` sem `immutable`, está queimando round-trip em checagens de `If-None-Match` que sempre voltam 304.
 
-HTML é a exceção. Você *quer* que o HTML revalide porque ele referencia esses assets com fingerprint. Dê a ele um `max-age` curto com uma janela de stale generosa:
+HTML é a exceção. Você *quer* que o HTML revalide porque ele referencia esses assets com fingerprint. Dê um `max-age` curto com janela de stale generosa:
 
 ```
 Cache-Control: max-age=600, stale-while-revalidate=86400
 ```
 
-Dez minutos fresco, 24 horas de stale-while-revalidate. O navegador serve o HTML em cache instantaneamente enquanto busca uma cópia fresca em background. Fez deploy de um build quebrado? Os usuários veem o HTML antigo (com suas referências de assets antigas) por até um dia enquanto você faz o rollback. Sem necessidade de purge de cache, sem 404s em assets com hash faltando. Essa é a rede de segurança que te deixa dormir tranquilo durante um deploy de sexta-feira.
+Dez minutos fresco, 24 horas de stale-while-revalidate. O navegador serve o HTML em cache na hora enquanto busca uma cópia fresca em background. Deployou build quebrado? Usuário vê o HTML antigo (com referências de asset antigas) por até um dia enquanto você faz rollback. Sem purge obrigatório, sem 404 em asset com hash faltando. Essa é a rede de segurança que te deixa dormir tranquilo num deploy de sexta.
 
-## Invalidação Sem Lágrimas: Purge, Bypass, e Soft Purge
+## Invalidação sem drama: purge, bypass e soft purge
 
-Três formas de limpar um cache, cada uma com um limiar de dor diferente. O **hard purge** bate na API do CDN — instantâneo, autoritativo, e rate-limited até a exaustão se você não tomar cuidado. O **cache-busting via mudança de chave** (nomes de arquivo com fingerprint, `max-age` immutable) é a resposta "correta" até você precisar rotacionar uma chave de assinatura *agora* e não puder esperar os clientes buscarem de novo. O **soft purge** via `stale-while-revalidate` é a opção civilizada: serve conteúdo velho imediatamente enquanto revalida em background. Seus usuários não veem picos de latência; sua origem vê uma única requisição de revalidação em vez de uma estampida.
+Três jeitos de limpar um cache, cada um com um limiar de dor diferente. O **hard purge** bate na API do CDN — instantâneo, autoritativo, e rate-limited até a exaustão se você não tomar cuidado. O **cache-busting por mudança de chave** (nome de arquivo com fingerprint, `max-age` immutable) é a resposta "certa"… até você precisar rotacionar uma chave de assinatura *agora* e não puder esperar o cliente refetchar. O **soft purge** via `stale-while-revalidate` é a opção civilizada: serve conteúdo velho na hora enquanto revalida em background. Usuário não vê pico de latência; origem vê uma única requisição de revalidação em vez de uma estampida.
 
-Eu recorro ao soft purge por padrão. O hard purge é para emergências do tipo "vazamos PII numa resposta cacheada". A rotação de chave é para deploys.
+Eu parto pro soft purge por padrão. Hard purge é pra emergência do tipo "vazamos PII numa resposta cacheada". Rotação de chave é pra deploy.
 
-Aqui está um purgador portátil que fala Cloudflare, Fastly, e nginx sem um único SDK de fornecedor. Salve como `purge.py`:
+Aqui vai um purgador portátil que fala Cloudflare, Fastly e nginx sem um SDK de fornecedor sequer. Salve como `purge.py`:
 
 ```python
 #!/usr/bin/env python3
@@ -421,7 +421,7 @@ if __name__ == "__main__":
     print(f"Purged {len(URLS)} URLs")
 ```
 
-Conecte isso ao GitHub Actions para que só os assets alterados sejam purgados:
+Pluga no GitHub Actions pra purgar só os assets que mudaram:
 
 ```yaml
 # .github/workflows/deploy.yml
@@ -446,21 +446,21 @@ Conecte isso ao GitHub Actions para que só os assets alterados sejam purgados:
   run: python3 purge.py
 ```
 
-O filtro `grep` é o molho secreto — purga só os assets com fingerprint que realmente mudaram. Entradas HTML com `max-age=0, must-revalidate` não precisam de purge; elas revalidam a cada navegação.
+O filtro `grep` é o pulo do gato — purga só assets com fingerprint que de fato mudaram. Entrada HTML com `max-age=0, must-revalidate` não precisa de purge; ela revalida a cada navegação.
 
-## Observatório de Cache Local-First: Laboratório Docker Compose
+## Observatório de cache local-first: laboratório Docker Compose
 
-Ler sobre headers num post de blog é bom. Ver `X-Cache: MISS` virar `HIT` no seu terminal enquanto você alterna uma diretiva `Cache-Control` é como o conhecimento gruda de verdade. Suba essa stack, cutuque ela, quebre ela, e você nunca mais vai ter que chutar o comportamento de cache.
+Ler header num post de blog é bom. Ver `X-Cache: MISS` virar `HIT` no terminal enquanto você troca uma diretiva `Cache-Control` é como o conhecimento gruda de verdade. Sobe essa stack, cutuca, quebra — e nunca mais precisa chutar comportamento de cache.
 
-### A Stack
+### A stack
 
-Três containers, zero dependências externas:
+Três containers, zero dependência externa:
 
-- **nginx** — reverse proxy com `proxy_cache` habilitado, emite `X-Cache` para você ver HIT/MISS/BYPASS sem escavar logs
-- **flask-origin** — app Python que retorna headers configuráveis via query params; muda o comportamento sem rebuild
-- **cache-debug** — `curl` numa caixa com um Makefile para que seus comandos de teste sejam documentados e repetíveis
+- **nginx** — reverse proxy com `proxy_cache` ligado, emite `X-Cache` pra você ver HIT/MISS/BYPASS sem escavar log
+- **flask-origin** — app Python que devolve headers configuráveis via query param; muda o comportamento sem rebuild
+- **cache-debug** — `curl` numa caixa com Makefile pra os comandos de teste ficarem documentados e repetíveis
 
-Crie um diretório e coloque esses arquivos dentro:
+Crie um diretório e jogue esses arquivos dentro:
 
 **docker-compose.yml**
 ```yaml
@@ -489,7 +489,7 @@ volumes:
   nginx_cache:
 ```
 
-**nginx.conf** — a lógica de cache vive aqui, não num serviço gerenciado que você não consegue inspecionar:
+**nginx.conf** — a lógica de cache mora aqui, não num serviço gerenciado que você não consegue inspecionar:
 ```nginx
 events { worker_connections 1024; }
 http {
@@ -521,7 +521,7 @@ EXPOSE 5000
 CMD ["gunicorn", "-b", "0.0.0.0:5000", "app:app"]
 ```
 
-**flask-origin/app.py** — headers controlados pela query string para você testar cenários sem editar código:
+**flask-origin/app.py** — headers controlados pela query string pra testar cenário sem editar código:
 ```python
 import os
 from flask import Flask, request, Response
@@ -596,4 +596,4 @@ docker compose run --rm cache-debug test-vary
 docker compose run --rm cache-debug test-cookie-footgun
 ```
 
-Observe o `X-Cache` mudando de `MISS` para `HIT` para `STALE` para `BYPASS`. Ajuste o `nginx.conf`, recarregue com `docker compose exec nginx nginx -s reload`, rode os alvos do Make de novo. Esse é o loop. Sem dashboard, sem CLI de fornecedor, sem chute. Quando seu cache de produção se comportar de forma estranha, você vai ter um modelo mental que bate com o que realmente acontece no fio — porque você viu acontecer no seu laptop.
+Observe o `X-Cache` mudando de `MISS` pra `HIT` pra `STALE` pra `BYPASS`. Ajuste o `nginx.conf`, recarregue com `docker compose exec nginx nginx -s reload`, rode os alvos do Make de novo. Esse é o loop. Sem dashboard, sem CLI de fornecedor, sem chute. Quando o cache de produção se comportar estranho, você vai ter um modelo mental que bate com o que realmente acontece no fio — porque você viu acontecer no laptop.

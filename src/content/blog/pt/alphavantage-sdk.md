@@ -8,125 +8,125 @@ tags:
   - api
   - retro
 description: >-
-  Um pacote NPM de 7 anos que criei para encapsular a API da Alpha Vantage. É
-  simples, é velho, e ainda está no NPM. Não me julgue.
+  Um pacote NPM de 7 anos que eu montei pra encapsular a API da Alpha Vantage.
+  É simples, é velho, e ainda tá no NPM. Não me julgue.
 ---
 
 
-Deixa eu te contar sobre a época em que eu achei que era um desenvolvedor de verdade. Foi há 7 anos. Eu era jovem, ingênuo, e cheio de... bem, principalmente cafeína e decisões de vida questionáveis.
+Deixa eu te contar da época em que eu achava que era desenvolvedor de verdade. Foi há 7 anos. Eu era jovem, ingênuo, e cheio de… bem, principalmente cafeína e decisão de vida questionável.
 
 
-Criei um pacote NPM. Um de verdade. Publiquei e tudo. Se chama `alphavantage-sdk`, e ainda está por aí, assombrando o registro do NPM feito um fantasma digital do meu passado.
+Criei um pacote NPM. De verdade. Publiquei e tudo. Se chama `alphavantage-sdk`, e ainda tá por aí, assombrando o registro do NPM feito fantasma digital do meu passado.
 
 
-## O Projeto
+## O projeto
 
 
-Eu queria usar a API da Alpha Vantage (que fornece dados de mercado de ações de graça, porque quem não ama uma API gratuita?). Mas fazer requisições HTTP era difícil, aparentemente. Então fiz o que qualquer desenvolvedor razoável faria: encapsulei numa biblioteca e publiquei no NPM.
+Eu queria usar a API da Alpha Vantage (dados de mercado de ações de graça — porque quem não ama API gratuita?). Mas fazer request HTTP era difícil, aparentemente. Então fiz o que qualquer desenvolvedor razoável faria: encapsulei numa lib e publiquei no NPM.
 
 
-Porque por que usar `fetch` ou `axios` diretamente quando você pode adicionar uma camada extra de abstração? É isso que os bons desenvolvedores fazem, né? Né?
+Porque por que usar `fetch` ou `axios` direto quando você pode meter uma camada a mais de abstração? É isso que os bons fazem, né? Né?
 
 
-O pacote é simples. Quase constrangedoramente simples. É basicamente um wrapper em cima do módulo `https` nativo do Node.js. Mas ei, funcionou. E as pessoas realmente usaram. Algumas ainda usam, provavelmente. Deus as ajude.
+O pacote é simples. Quase constrangedoramente simples. Basicamente um wrapper em cima do módulo `https` nativo do Node.js. Mas ei, funcionou. E as pessoas realmente usaram. Algumas ainda usam, provavelmente. Deus as ajude.
 
 
-## O Código
+## O código
 
 
-O SDK inteiro tem... espera só... umas 50 linhas de código. Só isso. 50 linhas. Para um pacote NPM inteiro. Não tenho orgulho, mas também não tenho vergonha. É um meio-termo esquisito.
+O SDK inteiro tem… espera só… umas 50 linhas. Só isso. 50 linhas. Pra um pacote NPM inteiro. Não tenho orgulho, mas também não tenho vergonha. É um meio-termo esquisito.
 
 
-O código faz exatamente o que você esperaria:
+O código faz exatamente o que você espera:
 1. Recebe uma chave de API
-2. Faz requisições HTTP para a Alpha Vantage
-3. Retorna JSON já parseado
+2. Faz request HTTP pra Alpha Vantage
+3. Devolve JSON já parseado
 4. É isso. É a coisa toda.
 
 
-Usei o módulo `https` nativo do Node.js porque eu era preguiçoso demais para adicionar uma dependência. O que, olhando para trás, foi na verdade uma jogada inteligente. Menos dependências = menos problemas. Quem diria?
+Usei o módulo `https` nativo do Node.js porque eu era preguiçoso demais pra adicionar dependência. O que, olhando pra trás, foi na verdade uma jogada inteligente. Menos dependência = menos dor de cabeça. Quem diria?
 
 
-O código usa Promises (porque async/await ainda não era moda em 2018, ou eu simplesmente não sabia da existência). Ele concatena manualmente os pedaços de resposta porque... bem, porque era assim que se fazia naquela época, eu acho?
+O código usa Promise (porque async/await ainda não era moda em 2018, ou eu simplesmente não sabia que existia). Ele concatena na mão os pedaços da resposta porque… bem, porque era assim que se fazia naquela época, eu acho?
 
 
-## O Que Ele Faz
+## O que ele faz
 
 
-O SDK fornece funções para buscar dados de mercado de ações:
+O SDK expõe funções pra buscar dado de mercado:
 - Séries temporais diárias, semanais e mensais
 - Versões ajustadas e não ajustadas
-- Conjuntos de dados completos (porque às vezes você precisa de TODOS os dados)
+- Conjuntos completos (porque às vezes você precisa de TODOS os dados)
 
 
 É basicamente um wrapper fininho que:
-1. Recebe um símbolo de ação (tipo 'MSFT' para a Microsoft)
+1. Recebe um símbolo de ação (tipo `'MSFT'` pra Microsoft)
 2. Chama a API da Alpha Vantage
-3. Retorna os dados
+3. Devolve os dados
 
 
-É isso. Sem mágica. Sem lógica complexa. Só requisições HTTP encapsuladas em funções. E sabe de uma coisa? Às vezes isso já basta.
+É isso. Sem mágica. Sem lógica complexa. Só request HTTP embrulhada em função. E sabe de uma coisa? Às vezes isso já basta.
 
 
-## O Pacote NPM
+## O pacote NPM
 
 
 Eu publiquei no NPM. As pessoas instalaram. Algumas talvez ainda estejam usando. Sinto muito, futuros desenvolvedores que precisam manter código que depende disso.
 
 
-O nome do pacote é `alphavantage-sdk`. Ainda está lá. Você pode instalar agora mesmo com `npm install alphavantage-sdk`. Por favor, não instale. Mas você poderia.
+O nome do pacote é `alphavantage-sdk`. Ainda tá lá. Você pode instalar agora mesmo com `npm install alphavantage-sdk`. Por favor, não instale. Mas você poderia.
 
 
-Ele tem um README. Tem exemplos. Até tem um arquivo CONTRIBUTING.md (porque eu era chique). É licenciado sob MPL 2.0, porque eu achei que era uma boa ideia na época. Ainda acho que é, na verdade.
+Tem README. Tem exemplo. Até tem um `CONTRIBUTING.md` (porque eu era chique). Licença MPL 2.0, porque eu achei que era boa ideia na época. Ainda acho que é, na verdade.
 
 
-## Os Detalhes Técnicos
+## Os detalhes técnicos
 
 
-Sejamos honestos: esse código não é impressionante. É um wrapper HTTP simples. Qualquer um conseguiria escrever isso em 10 minutos. Eu provavelmente escrevi em 10 minutos. Mas eu publiquei, e é isso que conta, né?
+Sejamos honestos: esse código não impressiona. É um wrapper HTTP simples. Qualquer um escreve isso em 10 minutos. Eu provavelmente escrevi em 10 minutos. Mas eu publiquei, e é isso que conta, né?
 
 
 O código usa:
-- **Módulo `https` do Node.js** - Porque dependências são para os fracos
-- **Promises** - Porque async/await era coisa nova demais
-- **Concatenação manual de chunks** - Porque eu não conhecia formas melhores
-- **Chave de API global** - Porque configuração é difícil
+- **Módulo `https` do Node.js** — porque dependência é pra fraco
+- **Promises** — porque async/await era novidade demais
+- **Concatenação manual de chunks** — porque eu não conhecia jeito melhor
+- **Chave de API global** — porque configuração é difícil
 
 
-Não é um código bom. Mas é um código funcional. E às vezes, isso já basta para um pacote NPM.
+Não é código bom. Mas é código que funciona. E às vezes, pra um pacote NPM, isso já basta.
 
 
-## O Que Eu Aprendi
+## O que eu aprendi
 
 
-1. **Publicar no NPM é fácil** - Talvez fácil demais
-2. **Soluções simples funcionam** - Mesmo que não sejam elegantes
-3. **As pessoas vão usar seu código** - Mesmo que seja terrível
-4. **Documentação importa** - Mesmo para pacotes de 50 linhas
-5. **Código antigo é constrangedor** - Mas também meio nostálgico
+1. **Publicar no NPM é fácil** — talvez fácil demais
+2. **Solução simples funciona** — mesmo sem elegância
+3. **As pessoas vão usar seu código** — mesmo que seja uma porcaria
+4. **Documentação importa** — mesmo pra pacote de 50 linhas
+5. **Código antigo é constrangedor** — mas também meio nostálgico
 
 
-Olhando para esse código agora, vejo todas as coisas que eu faria diferente:
+Olhando esse código agora, vejo tudo que eu faria diferente:
 - Usar async/await
-- Adicionar tratamento de erro de verdade
-- Usar uma biblioteca HTTP de verdade
+- Meter tratamento de erro de verdade
+- Usar uma lib HTTP de verdade
 - Adicionar tipos TypeScript
-- Realmente testar o código
+- De fato testar o código
 
 
-Mas sabe de uma coisa? Funcionou. As pessoas usaram. E isso é mais do que posso dizer sobre alguns dos meus projetos mais "polidos" que nunca viram a luz do dia.
+Mas sabe de uma coisa? Funcionou. As pessoas usaram. E isso é mais do que posso dizer de alguns projetos mais "polidos" que nunca viram a luz do dia.
 
 
-## O Balanço da Realidade
+## Pé no chão
 
 
-Esse pacote é velho. Realmente velho. 7 anos. Em anos de JavaScript, isso é basicamente história antiga. O código é simples. A abordagem é ultrapassada. A implementação é... bem, é uma implementação.
+Esse pacote é velho. Velho de verdade. 7 anos. Em anos de JavaScript, isso é pré-história. O código é simples. A abordagem é ultrapassada. A implementação é… bem, é uma implementação.
 
 
-Mas aqui está a questão: eu entreguei. Eu publiquei. As pessoas usaram. E isso já é alguma coisa. Nem todo mundo pode dizer que publicou um pacote NPM, mesmo que seja só um wrapper simples.
+Mas aqui vai o ponto: eu entreguei. Eu publiquei. As pessoas usaram. E isso já é alguma coisa. Nem todo mundo pode dizer que publicou um pacote NPM, mesmo que seja só um wrapper simples.
 
 
-Não é impressionante. Não é complexo. Nem sequer é tão bom assim. Mas é meu, e eu tenho um orgulho esquisito dele. Mesmo que também esteja um pouco constrangido por causa dele.
+Não impressiona. Não é complexo. Nem sequer é tão bom assim. Mas é meu, e eu tenho um orgulho esquisito dele. Mesmo que também fique um pouco constrangido por causa dele.
 
 
-Se você quiser ver o código de verdade (e me julgar por causa dele), pode conferir no [GitHub](https://github.com/mmendescortes/alphavantage-node-sdk). Ou instalar pelo NPM se estiver se sentindo aventureiro. Só não me conte se você fizer isso. Não quero saber.
+Se quiser ver o código de verdade (e me julgar por causa dele), confere no [GitHub](https://github.com/mmendescortes/alphavantage-node-sdk). Ou instala pelo NPM se estiver se sentindo aventureiro. Só não me conta se fizer isso. Eu não quero saber.
