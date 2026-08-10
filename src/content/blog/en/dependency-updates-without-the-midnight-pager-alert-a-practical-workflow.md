@@ -210,27 +210,48 @@ jobs:
 
       - name: Lint & Typecheck
         run: |
-          npm run lint 2>/dev/null || true
-          npm run typecheck 2>/dev/null || true
-          python -m ruff check . 2>/dev/null || true
-          python -m mypy . 2>/dev/null || true
-          go vet ./... 2>/dev/null || true
-          golangci-lint run ./... 2>/dev/null || true
+          set -euo pipefail
+          if [[ -f package-lock.json || -f package.json ]]; then
+            npm run lint
+            npm run typecheck
+          fi
+          if [[ -f requirements.txt || -f pyproject.toml ]]; then
+            if command -v ruff >/dev/null 2>&1; then python -m ruff check .; fi
+            if command -v mypy >/dev/null 2>&1; then python -m mypy .; fi
+          fi
+          if [[ -f go.sum ]]; then
+            go vet ./...
+            if command -v golangci-lint >/dev/null 2>&1; then golangci-lint run ./...; fi
+          fi
 
       - name: Unit Tests
         run: |
-          npm test -- --passWithNoTests 2>/dev/null || true
-          python -m pytest --tb=short -q 2>/dev/null || true
-          go test ./... -short 2>/dev/null || true
+          set -euo pipefail
+          if [[ -f package-lock.json || -f package.json ]]; then
+            npm test -- --passWithNoTests
+          fi
+          if [[ -f requirements.txt || -f pyproject.toml ]]; then
+            python -m pytest --tb=short -q
+          fi
+          if [[ -f go.sum ]]; then
+            go test ./... -short
+          fi
 
       - name: Dependency Audit
         run: |
-          npm audit --audit-level=high 2>/dev/null || true
-          pip-audit -r requirements.txt 2>/dev/null || true
-          govulncheck ./... 2>/dev/null || true
+          set -euo pipefail
+          if [[ -f package-lock.json ]]; then
+            npm audit --audit-level=high
+          fi
+          if [[ -f requirements.txt ]]; then
+            pip-audit -r requirements.txt
+          fi
+          if [[ -f go.sum ]] && command -v govulncheck >/dev/null 2>&1; then
+            govulncheck ./...
+          fi
 ```
 
-The `2>/dev/null || true` pattern isn't laziness — it's polyglot pragmatism. Your repo might not have Go. Don't fail the Node PR because `go vet` doesn't exist.
+Gate failures come from real lint/test/audit exit codes. Skip ecosystems you don't ship via `hashFiles` on install + file checks in the run steps; skip optional CLIs with `command -v` — never `|| true` on the toolchain that *is* present.
 
 ### Stage 2: The Integration Gate (Grouped Updates Only, < 15 minutes)
 
@@ -449,8 +470,10 @@ REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 WORKTREE_DIR="${REPO_ROOT}/.repro/pr-${PR_NUMBER}"
 
 echo "🔧 Setting up worktree for PR #${PR_NUMBER}..."
-git worktree add -f "${WORKTREE_DIR}" "pr/${PR_NUMBER}" 2>/dev/null || \
-  git worktree add -f "${WORKTREE_DIR}" "$(gh pr checkout ${PR_NUMBER} --json headRefName -q .headRefName)"
+BRANCH="$(gh pr view "${PR_NUMBER}" --json headRefName -q .headRefName)"
+echo "📌 Head branch: ${BRANCH}"
+git fetch origin "pull/${PR_NUMBER}/head:refs/repro/pr-${PR_NUMBER}"
+git worktree add -f "${WORKTREE_DIR}" "refs/repro/pr-${PR_NUMBER}"
 
 cd "${WORKTREE_DIR}"
 
@@ -495,27 +518,54 @@ echo "✅ Reproduction complete. Worktree at: ${WORKTREE_DIR}"
 echo "   Clean up with: git worktree remove ${WORKTREE_DIR}"
 ```
 
-Now the bisect. Say `axios@1.6.3` breaks your webhook handler but `1.6.2` passes. You don't need to guess which commit in `axios` did it — you need to know *your* code's breaking point.
+Now the bisect. Say `axios@1.6.3` breaks your webhook handler but `1.6.2` passes. You don't need to guess which commit in `axios` did it — you need the commit in *your* lockfile history where the bump landed.
 
 ```bash
 #!/usr/bin/env bash
-# bisect-dep.sh <package> <good-version> <bad-version> <test-command>
+# bisect-dep.sh <package> <good-version> <bad-version> -- <test-command...>
+# Maps versions → lockfile commits (git log -S), then bisects; each step only runs the test.
 set -euo pipefail
 
-PKG="$1"; GOOD="$2"; BAD="$3"; shift 3; TEST_CMD=("$@")
+PKG="$1"; GOOD_VER="$2"; BAD_VER="$3"; shift 3
+if [[ "${1:-}" == "--" ]]; then shift; fi
+TEST_CMD=("$@")
+[[ ${#TEST_CMD[@]} -gt 0 ]] || { echo "Usage: $0 <pkg> <good-ver> <bad-ver> -- <test-command...>"; exit 1; }
 
-git bisect start
-git bisect good "${GOOD}"
-git bisect bad "${BAD}"
+LOCKFILE=""
+for f in package-lock.json yarn.lock pnpm-lock.yaml; do
+  [[ -f "$f" ]] && LOCKFILE="$f" && break
+done
+[[ -n "$LOCKFILE" ]] || { echo "No Node lockfile found"; exit 1; }
 
-git bisect run bash -c "
-  npm install ${PKG}@\$(git log --oneline -1 --format=%h -- ${PKG}) --save-exact 2>/dev/null || true
-  ${TEST_CMD[*]}
-"
+resolve_sha() {
+  local ver="$1" sha=""
+  # Allow raw SHAs when you already know the lockfile commits
+  if [[ "$ver" =~ ^[0-9a-f]{7,40}$ ]] && git cat-file -e "${ver}^{commit}" 2>/dev/null; then
+    echo "$ver"
+    return
+  fi
+  while read -r c; do
+    if git show "$c:$LOCKFILE" 2>/dev/null | grep -Fq "\"$PKG\"" \
+       && git show "$c:$LOCKFILE" 2>/dev/null | grep -Fq "\"$ver\""; then
+      sha="$c"
+      break
+    fi
+  done < <(git log -S "$ver" --pretty=format:%H -- "$LOCKFILE")
+  [[ -n "$sha" ]] || { echo "Could not resolve ${PKG}@${ver} to a lockfile commit"; exit 1; }
+  echo "$sha"
+}
+
+GOOD_SHA="$(resolve_sha "$GOOD_VER")"
+BAD_SHA="$(resolve_sha "$BAD_VER")"
+echo "Good: ${PKG}@${GOOD_VER} → ${GOOD_SHA}"
+echo "Bad:  ${PKG}@${BAD_VER} → ${BAD_SHA}"
+
+git bisect start "$BAD_SHA" "$GOOD_SHA"
+git bisect run bash -c 'npm ci --prefer-offline --no-audit && exec "$@"' _ "${TEST_CMD[@]}"
 git bisect reset
 ```
 
-Run it: `./bisect-dep.sh axios 1.6.2 1.6.3 npm test -- --testNamePattern="webhook"`. Git bisects *your* lockfile history, not the dependency's repo. The culprit commit in *your* tree pops out. You fix your code, not theirs.
+Run it: `./bisect-dep.sh axios 1.6.2 1.6.3 -- npm test -- --testNamePattern="webhook"`. Versions become lockfile commits; each bisect step installs from that commit's lockfile and runs your test. The culprit commit in *your* tree pops out. You fix your code, not theirs.
 
 One script. Zero CI log spelunking. Your Monday morning just got boring again.
 
@@ -535,27 +585,45 @@ Temporary pins belong in `package.json` with an expiration date that your CI enf
       "matchCurrentVersion": "!1.6.2",
       "groupName": "pinned-axios-1.6.2",
       "schedule": ["after 2025-03-15"],
+      "expires": "2025-03-15",
       "automerge": false
     }
   ]
 }
 ```
 
-The `schedule` field means "don't even show me this PR until March 15." Your CI gate (from Section 3) runs a tiny script that fails if any pinned package exceeds its expiry:
+`schedule` tells Renovate when to reopen the bump PR. `expires` is the ISO date *your* CI enforces — keep them aligned. The gate fails if any pin is past `expires`:
 
 ```bash
 #!/usr/bin/env bash
 # check-pin-expiry.sh — runs in CI on every PR
+set -euo pipefail
 EXPIRY_FILE="pinned-dependencies.json"
 if [[ ! -f "$EXPIRY_FILE" ]]; then exit 0; fi
 
-jq -r '.packageRules[] | select(.schedule[]) | "\(.matchPackageNames[]) \(.schedule[])"' "$EXPIRY_FILE" |
-while read -r pkg date; do
-  if [[ "$(date -d "$date" +%s)" -lt "$(date +%s)" ]]; then
-    echo "::error::Pin for $pkg expired on $date — update or extend"
-    exit 1
+to_epoch() {
+  local d="$1"
+  if date -d "$d" +%s >/dev/null 2>&1; then
+    date -d "$d" +%s
+  elif date -j -f "%Y-%m-%d" "$d" +%s >/dev/null 2>&1; then
+    date -j -f "%Y-%m-%d" "$d" +%s
+  else
+    echo "Cannot parse expires date: $d (want YYYY-MM-DD)" >&2
+    exit 2
   fi
-done
+}
+
+now="$(date +%s)"
+failed=0
+while IFS=$'\t' read -r pkg expires; do
+  [[ -z "${expires:-}" || "$expires" == "null" ]] && continue
+  if (( $(to_epoch "$expires") < now )); then
+    echo "::error::Pin for $pkg expired on $expires — update or extend"
+    failed=1
+  fi
+done < <(jq -r '.packageRules[] | select(.expires != null) | "\(.matchPackageNames[0])\t\(.expires)"' "$EXPIRY_FILE")
+
+exit "$failed"
 ```
 
 Add it to your `pre-merge` job. No more forgotten pins rotting for years.

@@ -58,7 +58,7 @@ app = Flask(__name__)
 def echo():
     # Filter noise; keep what caching cares about
     interesting = {
-        k: v for k, v in request.headers
+        k: v for k, v in request.headers.items()
         if k.lower() in {
             "host", "user-agent", "accept", "accept-encoding",
             "accept-language", "cache-control", "if-none-match",
@@ -87,7 +87,15 @@ As DevTools do seu navegador mentem. Elas mostram o que o navegador *recebeu* de
 Comece pelas flags que importam. `-v` (ou `-i` para só os headers) imprime a resposta completa. `--compressed` pede gzip/br e *descomprime automaticamente* — crítico porque CDNs frequentemente servem valores de `ETag` diferentes para respostas comprimidas versus identity. `-H 'Accept-Encoding: gzip, br'` sem `--compressed` deixa você inspecionar o `Content-Encoding` e o `Vary` crus. `--resolve example.com:443:1.2.3.4` força o SNI e o host header para a sua máquina de staging sem tocar em `/etc/hosts`. E o impressor de veredito:
 
 ```bash
--o /dev/null -w 'http=%{http_code} age=%{header_age} cache=%{header_x-cache} cf=%{header_cf-cache-status} etag=%{header_etag} vary=%{header_vary}\n'
+-o /dev/null -D - | awk 'BEGIN{IGNORECASE=1}
+  function trim(s){ sub(/\r$/, "", s); return s }
+  /^HTTP\//{code=trim($2)}
+  /^age:/{age=trim($2)}
+  /^x-cache:/{cache=trim($2)}
+  /^cf-cache-status:/{cf=trim($2)}
+  /^etag:/{etag=trim($2)}
+  /^vary:/{vary=$0; sub(/\r$/, "", vary); sub(/^vary:[[:space:]]*/, "", vary)}
+  END{printf "http=%s age=%s cache=%s cf=%s etag=%s vary=%s\n", code, age, cache, cf, etag, vary}'
 ```
 
 `Age` te diz quantos segundos o objeto ficou num cache compartilhado. `X-Cache` (ou `CF-Cache-Status`, `X-Served-By`, `Via`) revela *qual* camada serviu a resposta. `Vary` expõe se a chave de cache fragmenta em `Accept-Encoding`, `Accept`, ou o seu `X-Device-Type` customizado.
@@ -98,11 +106,18 @@ Empacote isso numa função de shell que você pode carregar no `.bashrc`:
 cache-debug() {
   local url="${1:?usage: cache-debug <url> [extra curl args]}"
   shift
-  curl -sS -o /dev/null \
+  curl -sS -D - -o /dev/null \
     -H 'Accept-Encoding: gzip, br' \
     --compressed \
-    -w 'http=%{http_code} age=%{header_age} cache=%{header_x-cache} cf=%{header_cf-cache-status} etag=%{header_etag} vary=%{header_vary}\n' \
-    "$@" "$url"
+    "$@" "$url" | awk 'BEGIN{IGNORECASE=1}
+      function trim(s){ sub(/\r$/, "", s); return s }
+      /^HTTP\//{code=trim($2)}
+      /^age:/{age=trim($2)}
+      /^x-cache:/{cache=trim($2)}
+      /^cf-cache-status:/{cf=trim($2)}
+      /^etag:/{etag=trim($2)}
+      /^vary:/{vary=$0; sub(/\r$/, "", vary); sub(/^vary:[[:space:]]*/, "", vary)}
+      END{printf "http=%s age=%s cache=%s cf=%s etag=%s vary=%s\n", code, age, cache, cf, etag, vary}'
 }
 ```
 
@@ -125,7 +140,7 @@ services:
     depends_on: [origin]
 ```
 
-`app.py` — um endpoint Flask que retorna um timestamp e um `ETag` baseado no mtime do arquivo:
+`app.py` — um endpoint Flask com corpo estável (para o `proxy_cache` poder dar HIT) e `ETag` a partir do mtime. `POST /mutate` reescreve o arquivo quando você quiser um miss de propósito:
 
 ```python
 from flask import Flask, make_response
@@ -135,15 +150,25 @@ PATH = "/tmp/asset.txt"
 
 @app.route("/asset")
 def asset():
-    with open(PATH, "w") as f:
-        f.write(str(time.time()))
+    # Stable body so ETag/proxy_cache can demonstrate HIT across requests
+    if not os.path.exists(PATH):
+        with open(PATH, "w") as f:
+            f.write("cache-lab-asset-v1\n")
+    with open(PATH) as f:
+        body = f.read()
     stat = os.stat(PATH)
     etag = f'W/"{stat.st_mtime_ns}-{stat.st_size}"'
-    resp = make_response(open(PATH).read())
+    resp = make_response(body)
     resp.headers["ETag"] = etag
     resp.headers["Cache-Control"] = "public, max-age=60, stale-while-revalidate=30"
     resp.headers["Last-Modified"] = time.strftime("%a, %d %b %Y %H:%M:%S GMT", time.gmtime(stat.st_mtime))
     return resp
+
+@app.route("/mutate", methods=["POST"])
+def mutate():
+    with open(PATH, "w") as f:
+        f.write(f"cache-lab-asset-{time.time()}\n")
+    return {"ok": True}
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080)

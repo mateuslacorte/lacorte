@@ -364,12 +364,20 @@ Usage:
 Exit codes: 0 = pass, 1 = header assertion failed, 2 = network error, 3 = usage error
 """
 import argparse
+import os
 import sys
-import urllib.request
 import urllib.error
-import re
+import urllib.parse
+import urllib.request
 from dataclasses import dataclass
 from typing import List, Optional
+from urllib.request import HTTPRedirectHandler
+
+
+class NoRedirect(HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None
+
 
 @dataclass
 class AuditResult:
@@ -385,7 +393,7 @@ class AuditResult:
 def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description="Audit cache headers across a URL list")
     p.add_argument("urls", nargs="+", help="URLs to audit, or a file with one URL per line")
-    p.add_argument("--origin-only", action="store_true", help="Bypass CDN: add Host header, skip edge")
+    p.add_argument("--origin-only", action="store_true", help="Hit ORIGIN_IP with Host: ORIGIN_HOST")
     p.add_argument("--follow-redirects", action="store_true", help="Follow 3xx (default: false)")
     p.add_argument("--expect-hit-rate", type=float, help="Fail if hit rate < threshold (0.0-1.0)")
     p.add_argument("--timeout", type=int, default=10, help="Request timeout seconds")
@@ -401,44 +409,73 @@ def load_urls(args: argparse.Namespace) -> List[str]:
             urls.append(u)
     return urls
 
+def age_seconds(headers) -> int:
+    raw = headers.get("Age")
+    if raw is None:
+        return 0
+    try:
+        return int(str(raw).strip())
+    except ValueError:
+        return 0
+
 def fetch(url: str, origin_only: bool, follow_redirects: bool, timeout: int) -> AuditResult:
-    req = urllib.request.Request(url, method="HEAD")
+    target = url
+    headers_extra = {}
     if origin_only:
-        # Assume you pass --origin-only with a Host header pointing to your origin IP
-        # In CI, set ORIGIN_HOST=api.internal and ORIGIN_IP=10.0.0.5
-        import os
-        if host := os.getenv("ORIGIN_HOST"):
-            req.add_header("Host", host)
-    opener = urllib.request.build_opener()
-    if not follow_redirects:
-        opener.add_handler(urllib.request.HTTPRedirectHandler())
+        # Bypass CDN: connect to ORIGIN_IP, send Host: ORIGIN_HOST
+        host = os.getenv("ORIGIN_HOST")
+        origin_ip = os.getenv("ORIGIN_IP")
+        if not host or not origin_ip:
+            return AuditResult(url, 0, None, None, None, None, False, [
+                "origin-only requires ORIGIN_HOST and ORIGIN_IP env vars",
+            ])
+        parsed = urllib.parse.urlparse(url)
+        path = parsed.path or "/"
+        if parsed.query:
+            path = f"{path}?{parsed.query}"
+        scheme = parsed.scheme or "http"
+        target = f"{scheme}://{origin_ip}{path}"
+        headers_extra["Host"] = host
+
+    req = urllib.request.Request(target, method="HEAD", headers=headers_extra)
+    if follow_redirects:
+        opener = urllib.request.build_opener()
+    else:
+        opener = urllib.request.build_opener(NoRedirect)
     errors = []
     try:
         with opener.open(req, timeout=timeout) as resp:
             headers = resp.headers
             status = resp.status
     except urllib.error.HTTPError as e:
-        return AuditResult(url, e.code, None, None, None, None, False, [f"HTTP {e.code}: {e.reason}"])
+        # 3xx with NoRedirect lands here — still readable headers
+        if 300 <= e.code < 400 and not follow_redirects:
+            headers = e.headers
+            status = e.code
+        else:
+            return AuditResult(url, e.code, None, None, None, None, False, [f"HTTP {e.code}: {e.reason}"])
     except Exception as e:
         return AuditResult(url, 0, None, None, None, None, False, [f"Network error: {e}"])
 
     cache_control = headers.get("Cache-Control")
     vary = headers.get("Vary")
     etag = headers.get("ETag")
-    # CDN-specific hit/miss headers
-    cache_status = (
+    age = age_seconds(headers)
+    # Prefer explicit CDN status; fall back to Age > 0 as evidence of a shared-cache hit
+    explicit = (
         headers.get("CF-Cache-Status")
         or headers.get("X-Cache")
         or headers.get("X-Vercel-Cache")
-        or headers.get("Age")  # Age > 0 implies hit somewhere
     )
-    is_hit = False
-    if cache_status:
-        cache_status = cache_status.upper()
-        is_hit = "HIT" in cache_status or (cache_status == "AGE" and headers.get("Age", "0") != "0")
-    elif headers.get("Age", "0") != "0":
+    if explicit:
+        cache_status = explicit.upper()
+        is_hit = "HIT" in cache_status
+    elif age > 0:
+        cache_status = f"AGE/{age}"
         is_hit = True
-        cache_status = "AGE"
+    else:
+        cache_status = None
+        is_hit = False
 
     # Assertions
     if cache_control and "no-store" in cache_control.lower():

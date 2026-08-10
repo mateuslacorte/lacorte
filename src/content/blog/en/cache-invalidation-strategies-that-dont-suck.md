@@ -57,7 +57,7 @@ app = Flask(__name__)
 def echo():
     # Filter noise; keep what caching cares about
     interesting = {
-        k: v for k, v in request.headers
+        k: v for k, v in request.headers.items()
         if k.lower() in {
             "host", "user-agent", "accept", "accept-encoding",
             "accept-language", "cache-control", "if-none-match",
@@ -86,7 +86,15 @@ Your browser's DevTools lie. They show what the browser *received* after the ser
 Start with the flags that matter. `-v` (or `-i` for headers-only) prints the full response. `--compressed` asks for gzip/br and *automatically decompresses* — critical because CDNs often serve different `ETag` values for compressed vs. identity responses. `-H 'Accept-Encoding: gzip, br'` without `--compressed` lets you inspect the raw `Content-Encoding` and `Vary` headers. `--resolve example.com:443:1.2.3.4` forces SNI and host header to your staging box without touching `/etc/hosts`. And the verdict printer:
 
 ```bash
--o /dev/null -w 'http=%{http_code} age=%{header_age} cache=%{header_x-cache} cf=%{header_cf-cache-status} etag=%{header_etag} vary=%{header_vary}\n'
+-o /dev/null -D - | awk 'BEGIN{IGNORECASE=1}
+  function trim(s){ sub(/\r$/, "", s); return s }
+  /^HTTP\//{code=trim($2)}
+  /^age:/{age=trim($2)}
+  /^x-cache:/{cache=trim($2)}
+  /^cf-cache-status:/{cf=trim($2)}
+  /^etag:/{etag=trim($2)}
+  /^vary:/{vary=$0; sub(/\r$/, "", vary); sub(/^vary:[[:space:]]*/, "", vary)}
+  END{printf "http=%s age=%s cache=%s cf=%s etag=%s vary=%s\n", code, age, cache, cf, etag, vary}'
 ```
 
 `Age` tells you how many seconds the object sat in a shared cache. `X-Cache` (or `CF-Cache-Status`, `X-Served-By`, `Via`) reveals *which* layer served it. `Vary` exposes whether the cache key fragments on `Accept-Encoding`, `Accept`, or your custom `X-Device-Type`.
@@ -97,11 +105,18 @@ Wrap it into a shell function you can source in `.bashrc`:
 cache-debug() {
   local url="${1:?usage: cache-debug <url> [extra curl args]}"
   shift
-  curl -sS -o /dev/null \
+  curl -sS -D - -o /dev/null \
     -H 'Accept-Encoding: gzip, br' \
     --compressed \
-    -w 'http=%{http_code} age=%{header_age} cache=%{header_x-cache} cf=%{header_cf-cache-status} etag=%{header_etag} vary=%{header_vary}\n' \
-    "$@" "$url"
+    "$@" "$url" | awk 'BEGIN{IGNORECASE=1}
+      function trim(s){ sub(/\r$/, "", s); return s }
+      /^HTTP\//{code=trim($2)}
+      /^age:/{age=trim($2)}
+      /^x-cache:/{cache=trim($2)}
+      /^cf-cache-status:/{cf=trim($2)}
+      /^etag:/{etag=trim($2)}
+      /^vary:/{vary=$0; sub(/\r$/, "", vary); sub(/^vary:[[:space:]]*/, "", vary)}
+      END{printf "http=%s age=%s cache=%s cf=%s etag=%s vary=%s\n", code, age, cache, cf, etag, vary}'
 }
 ```
 
@@ -124,7 +139,7 @@ services:
     depends_on: [origin]
 ```
 
-`app.py` — a Flask endpoint that returns a timestamp and `ETag` based on file mtime:
+`app.py` — a Flask endpoint with a stable body (so `proxy_cache` can HIT) and `ETag` from file mtime. `POST /mutate` rewrites the file when you want a deliberate miss:
 
 ```python
 from flask import Flask, make_response
@@ -134,15 +149,25 @@ PATH = "/tmp/asset.txt"
 
 @app.route("/asset")
 def asset():
-    with open(PATH, "w") as f:
-        f.write(str(time.time()))
+    # Stable body so ETag/proxy_cache can demonstrate HIT across requests
+    if not os.path.exists(PATH):
+        with open(PATH, "w") as f:
+            f.write("cache-lab-asset-v1\n")
+    with open(PATH) as f:
+        body = f.read()
     stat = os.stat(PATH)
     etag = f'W/"{stat.st_mtime_ns}-{stat.st_size}"'
-    resp = make_response(open(PATH).read())
+    resp = make_response(body)
     resp.headers["ETag"] = etag
     resp.headers["Cache-Control"] = "public, max-age=60, stale-while-revalidate=30"
     resp.headers["Last-Modified"] = time.strftime("%a, %d %b %Y %H:%M:%S GMT", time.gmtime(stat.st_mtime))
     return resp
+
+@app.route("/mutate", methods=["POST"])
+def mutate():
+    with open(PATH, "w") as f:
+        f.write(f"cache-lab-asset-{time.time()}\n")
+    return {"ok": True}
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080)
