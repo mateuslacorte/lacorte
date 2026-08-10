@@ -1,5 +1,5 @@
 ---
-title: 'Construindo um CSMS OCPP em Node.js: Do Zero até Falar com Estações'
+title: 'Montando um CSMS OCPP em Node.js: do zero até a estação responder'
 date: '2026-08-10'
 tags:
   - ocpp
@@ -9,23 +9,22 @@ tags:
   - typescript
   - tutorial
 description: >-
-  Introdução prática ao OCPP para quem desenvolve em Node. Entenda como
-  estações de carga falam com um Sistema Central, como funciona o framing
-  JSON sobre WebSocket e como evoluir um CSMS mínimo do BootNotification
-  até sessões reais.
+  Guia prático de OCPP para quem programa em Node. Como carregadores falam com
+  um Sistema Central, como funciona o framing JSON sobre WebSocket e como
+  evoluir um CSMS mínimo do BootNotification até sessões de verdade.
 ---
 
 
-Se você circulou por software de carregamento de veículos elétricos, provavelmente já viu a sigla **OCPP**. Ela significa Open Charge Point Protocol — a linguagem que a maioria dos carregadores públicos usa para falar com um backend. Esse backend costuma se chamar **CSMS** — Charging Station Management System (nos docs mais antigos você também vê “Central System”).
+Se você já mexeu com software de carregamento de carro elétrico, provavelmente esbarrou na sigla **OCPP**. É o Open Charge Point Protocol — a língua que a maior parte dos carregadores públicos usa para falar com o backend. Esse backend costuma se chamar **CSMS** (Charging Station Management System; em docs mais antigos aparece como “Central System”).
 
 
-Este post é para quem trabalha com Node.js e quer levantar um CSMS, ou está pesquisando como o OCPP se encaixa antes de escolher stack. Vamos ficar perto do protocolo: o que conecta, como as mensagens se parecem, quais ações importam primeiro e como crescer de “estação online” para “sessão iniciada e encerrada.” Os exemplos usam uma biblioteca Node pequena que implementa OCPP-J (JSON sobre WebSocket) nas versões 1.6, 2.0.1 e 2.1. Trate a biblioteca como o tubo; trate este guia como o mapa.
+Este post é para quem desenvolve em Node.js e quer subir um CSMS, ou está pesquisando como o OCPP se encaixa antes de fechar a stack. Vamos ficar perto do protocolo: o que conecta, como as mensagens se parecem, quais actions importam primeiro e como sair de “estação online” para “sessão começou e terminou”. Os exemplos usam uma biblioteca Node pequena que implementa OCPP-J (JSON sobre WebSocket) nas versões 1.6, 2.0.1 e 2.1. A biblioteca é o cano; este guia é o mapa.
 
 
 ## O que você está construindo de verdade
 
 
-Um CSMS não é uma API REST com alguns endpoints de carga. As estações abrem um **WebSocket de longa duração**, negociam a versão do protocolo e trocam **mensagens no estilo RPC**. Seu servidor aceita essas conexões, valida payloads contra os schemas oficiais, responde a chamadas iniciadas pela estação e, de vez em quando, inicia chamadas próprias (start remoto, reset, unlock do conector, e por aí).
+Um CSMS não é uma API REST com uns endpoints de carga. As estações abrem um **WebSocket de longa duração**, negociam a versão do protocolo e trocam **mensagens no estilo RPC**. Seu servidor aceita essas conexões, valida os payloads contra os schemas oficiais, responde às chamadas que a estação inicia e, de vez em quando, inicia as próprias (start remoto, reset, unlock do conector, etc.).
 
 
 Pense em três camadas:
@@ -36,20 +35,20 @@ Pense em três camadas:
 3. **Domínio** — quem pode carregar, IDs de transação, dados de medidor, tarifas, smart charging.
 
 
-Uma boa biblioteca OCPP cuida de (1) e (2). Você cuida de (3). Essa separação é o ponto todo: você não deveria reimplementar framing de mensagem toda vez que muda a regra de faturamento.
+Uma boa biblioteca OCPP resolve (1) e (2). Você resolve (3). Essa divisão é o ponto: você não deveria reimplementar framing toda vez que muda a regra de faturamento.
 
 
 ## Atores e vocabulário
 
 
-Dois papéis importam no primeiro dia:
+No primeiro dia, dois papéis importam:
 
 
-- **Charging Station** (historicamente *Charge Point*) — o hardware ou simulador no site.
-- **CSMS** — seu processo Node que aceita `ws://…/ocpp/:chargePointId` (ou `wss://` em produção).
+- **Charging Station** (antes *Charge Point*) — o hardware ou o simulador no site.
+- **CSMS** — o processo Node que aceita `ws://…/ocpp/:chargePointId` (ou `wss://` em produção).
 
 
-A identidade normalmente vem no path da URL. Uma estação conecta assim:
+A identidade em geral vai no path da URL. Uma estação conecta assim:
 
 
 ```text
@@ -57,7 +56,7 @@ wss://csms.example.com/ocpp/CP_001
 ```
 
 
-O segmento `CP_001` é o id da estação que seu registry vai indexar. A **versão OCPP não está no path**. Ela chega como oferta de subprotocolo WebSocket em `Sec-WebSocket-Protocol`:
+O `CP_001` é o id que o registry vai usar como chave. A **versão OCPP não fica no path**. Ela chega como oferta de subprotocolo WebSocket no `Sec-WebSocket-Protocol`:
 
 
 | Cliente oferece | Versão negociada |
@@ -67,16 +66,16 @@ O segmento `CP_001` é o id da estação que seu registry vai indexar. A **vers�
 | `ocpp2.1` | OCPP 2.1 |
 
 
-Um path compartilhado para todas as estações, uma lista de preferência no servidor, e a negociação escolhe o melhor match mútuo. Se nada casa, o upgrade deve falhar. Esse desenho permite frota mista — caixas 1.6 antigas e firmware 2.x novo — no mesmo endpoint.
+Um path só para todas as estações, uma lista de preferência no servidor, e a negociação escolhe o melhor acordo. Se não houver match, o upgrade deve falhar. Assim uma frota mista — equipamentos 1.6 antigos e firmware 2.x novo — pode bater no mesmo endpoint.
 
 
-Este tutorial cobre **somente OCPP-J** (JSON sobre WebSocket). O SOAP 1.6 clássico ainda existe no campo, mas CSMS moderno em Node quase sempre significa OCPP-J.
+Este tutorial cobre **só OCPP-J** (JSON sobre WebSocket). O SOAP 1.6 clássico ainda existe por aí, mas CSMS moderno em Node quase sempre significa OCPP-J.
 
 
 ## O envelope da mensagem
 
 
-Esqueça verbos REST por um momento. Toda mensagem OCPP-J é um **array** JSON:
+Esqueça verbos REST por um instante. Toda mensagem OCPP-J é um **array** JSON:
 
 
 | Tipo | Forma |
@@ -86,10 +85,10 @@ Esqueça verbos REST por um momento. Toda mensagem OCPP-J é um **array** JSON:
 | CALLERROR | `[4, uniqueId, errorCode, errorDescription, errorDetails]` |
 
 
-`uniqueId` correlaciona pedido com resultado ou erro. `action` é uma string como `BootNotification` ou `Authorize`. `payload` é um objeto JSON cujos campos vêm dos schemas da Open Charge Alliance para aquela versão.
+O `uniqueId` amarra pedido com resultado ou erro. `action` é uma string tipo `BootNotification` ou `Authorize`. `payload` é um objeto JSON cujos campos vêm dos schemas da Open Charge Alliance para aquela versão.
 
 
-Uma estação que acabou de ligar pode enviar:
+Uma estação que acabou de ligar pode mandar:
 
 
 ```json
@@ -100,10 +99,10 @@ Uma estação que acabou de ligar pode enviar:
 ```
 
 
-Esse formato de payload é OCPP **1.6**. Em 2.0.1 / 2.1 a mesma ação usa um objeto aninhado `chargingStation` e um campo `reason`. Seus handlers precisam ramificar na versão negociada quando os payloads divergem — mesmo nome de ação, contratos diferentes.
+Esse formato de payload é OCPP **1.6**. Em 2.0.1 / 2.1 a mesma action usa um objeto `chargingStation` aninhado e um campo `reason`. Quando o contrato muda, o handler precisa olhar a versão negociada — mesmo nome de action, payloads diferentes.
 
 
-Seu CSMS responde com um CALLRESULT reusando o mesmo `uniqueId`:
+O CSMS responde com um CALLRESULT reusando o mesmo `uniqueId`:
 
 
 ```json
@@ -115,13 +114,13 @@ Seu CSMS responde com um CALLRESULT reusando o mesmo `uniqueId`:
 ```
 
 
-`interval` diz à estação com que frequência enviar Heartbeat (segundos). Aceitar o boot é como colocar a estação na sua lista de “online e gerenciada.”
+O `interval` diz de quantos em quantos segundos a estação deve mandar Heartbeat. Aceitar o boot é o jeito de colocar a estação na lista de “online e sob gestão”.
 
 
 ## Instalação e um servidor mínimo
 
 
-Você precisa de Node 18+. Instale o pacote CSMS OCPP (e o host HTTP/WebSocket) via npm:
+Você precisa de Node 18+. Instale o pacote CSMS OCPP no npm:
 
 
 ```bash
@@ -129,7 +128,7 @@ npm install fastify-ocpp
 ```
 
 
-Registre a camada OCPP no servidor com as versões que pretende suportar. Preferir a mais nova primeiro é um default sensato:
+Registre a camada OCPP no servidor com as versões que você quer aceitar. Preferir a mais nova primeiro costuma ser um bom default:
 
 
 ```ts
@@ -142,24 +141,24 @@ await app.register(fastifyOcpp, {
 ```
 
 
-Depois do registro você ganha uma superfície `ocpp`: registrar handlers de entrada, enviar calls de saída, inspecionar o registry de conexões vivas. Configuração que vale conhecer cedo:
+Depois do register você ganha a superfície `ocpp`: handlers de entrada, calls de saída e o registry de conexões. Configuração que vale conhecer cedo:
 
 
-- **`versions`** — allow-list e ordem de preferência na negociação de subprotocolo.
-- **`path`** — prefixo compartilhado; `/:chargePointId` é anexado automaticamente.
+- **`versions`** — allow-list e ordem de preferência na negociação.
+- **`path`** — prefixo compartilhado; o `/:chargePointId` é acrescentado sozinho.
 - **`validateIncoming` / `validateOutgoing`** — validação contra schemas JSON da OCA (ligada por padrão).
-- **`callTimeoutMs`** — quanto tempo CALLs de saída esperam resultado.
-- **`rejectDuplicateConnections`** — se um segundo socket para o mesmo id é rejeitado.
-- **`onConnect` / `onDisconnect`** — hooks para log, métricas ou presença.
+- **`callTimeoutMs`** — quanto tempo a CALL de saída espera resposta.
+- **`rejectDuplicateConnections`** — se um segundo socket pro mesmo id é rejeitado.
+- **`onConnect` / `onDisconnect`** — hooks pra log, métrica ou presença.
 
 
-Validação de schema não é verniz opcional. Estações e implementações de CSMS discordam de formas sutis; rejeitar payloads malformados com CALLERROR é como permanecer interoperável em vez de depurar silêncio absurdo três semanas depois.
+Validação de schema não é detalhe cosmético. Estação e CSMS discordam de jeitos sutis; rejeitar payload ruim com CALLERROR é o que te mantém interoperável em vez de caçar silêncio estranho três semanas depois.
 
 
 ## Primeiros handlers: Boot e Heartbeat
 
 
-Toda relação saudável com uma estação começa com BootNotification e depois um ritmo de heartbeat. Registre isso antes de inventar billing:
+Toda relação saudável com uma estação começa com BootNotification e um ritmo de heartbeat. Registre isso antes de inventar billing:
 
 
 ```ts
@@ -176,10 +175,10 @@ app.ocpp.onAction('BootNotification', async (payload, ctx) => {
 ```
 
 
-O handler recebe o payload decodificado e um contexto com `chargePointId`, `version`, `uniqueId`, `action` e o socket. Retorne um objeto simples; a biblioteca empacota como CALLRESULT e valida.
+O handler recebe o payload decodificado e um contexto com `chargePointId`, `version`, `uniqueId`, `action` e o socket. Devolva um objeto simples; a biblioteca empacota como CALLRESULT e valida.
 
 
-Heartbeat é ainda menor — as estações pingam para você saber que o link está vivo:
+Heartbeat é ainda menor — a estação pinga pra você saber que o link está vivo:
 
 
 ```ts
@@ -189,13 +188,13 @@ app.ocpp.onAction('Heartbeat', async () => ({
 ```
 
 
-Suba o processo e aponte um simulador ou estação real para `ws://localhost:9000/ocpp/CP_001` com o subprotocolo adequado. Quando BootNotification chegar e Heartbeats seguirem no seu intervalo, o caminho de transporte está provado. Comemore em silêncio e então adicione lógica de domínio.
+Suba o processo e aponte um simulador (ou uma estação de verdade) pra `ws://localhost:9000/ocpp/CP_001` com o subprotocolo certo. Quando o BootNotification chegar e os Heartbeats seguirem no intervalo, o transporte está ok. Comemore baixo e aí sim mete lógica de domínio.
 
 
 ## Status e presença
 
 
-Estações reportam estado do conector com `StatusNotification` (Available, Preparing, Charging, Faulted, e companhia). Você ainda não precisa de regras de negócio profundas — guarde o último status por conector e mostre numa UI de operação:
+As estações reportam o estado do conector com `StatusNotification` (Available, Preparing, Charging, Faulted e companhia). Ainda não precisa de regra de negócio profunda — guarde o último status por conector e mostre numa UI de operação:
 
 
 ```ts
@@ -206,10 +205,10 @@ app.ocpp.onAction('StatusNotification', async (payload, ctx) => {
 ```
 
 
-Combine isso com hooks de ciclo de vida da conexão. `onConnect` / `onDisconnect` dizem quando o WebSocket aparece ou some; StatusNotification diz o que o hardware acha que cada conector está fazendo. Juntos respondem “esta estação está online, e alguém pode plugar?”
+Combine com os hooks de ciclo de vida. `onConnect` / `onDisconnect` dizem quando o WebSocket aparece ou some; StatusNotification diz o que o hardware acha que cada conector está fazendo. Juntos respondem: “essa estação está online, e dá pra plugar?”
 
 
-Liste sockets vivos no registry quando precisar de inventário:
+Liste os sockets vivos no registry quando precisar de inventário:
 
 
 ```ts
@@ -218,13 +217,13 @@ const only21 = app.ocpp.registry.list('2.1');
 ```
 
 
-Comandos de saída devem checar presença primeiro. Chamar uma estação que não está conectada deve falhar rápido na sua camada de API em vez de deixar o dashboard do operador pendurado.
+Comando de saída deve checar presença primeiro. Chamar estação desconectada tem que falhar rápido na sua API — não deixar o dashboard do operador pendurado.
 
 
 ## Autorização e uma sessão de carga 1.6
 
 
-Cartões RFID, tokens de app e listas locais de autorização passam por `Authorize` no fio. Seu handler decide Accept vs Invalid (e status relacionados) com base no seu próprio store de usuários:
+Cartão RFID, token de app e lista local de autorização passam por `Authorize` no fio. Seu handler decide Accept vs Invalid (e status relacionados) com base no seu store de usuários:
 
 
 ```ts
@@ -243,12 +242,12 @@ No OCPP **1.6**, uma sessão típica fica assim:
 
 
 1. `Authorize` — checagem de credencial.
-2. `StartTransaction` — você atribui um `transactionId` e Accept.
+2. `StartTransaction` — você gera um `transactionId` e dá Accept.
 3. `MeterValues` — amostras periódicas de energia enquanto carrega.
 4. `StopTransaction` — leitura final do medidor; você fecha a sessão.
 
 
-StartTransaction é onde seu CSMS vira mais do que um sumidouro de heartbeat:
+StartTransaction é onde o CSMS deixa de ser só um sumidouro de heartbeat:
 
 
 ```ts
@@ -269,7 +268,7 @@ app.ocpp.onAction('StartTransaction', async (payload, ctx) => {
 ```
 
 
-Mantenha `transactionId` como inteiro (1.6) sob seu controle. As estações vão ecoá-lo em MeterValues e StopTransaction. Persista amostras de medidor para faturar depois mesmo se a mensagem final de stop atrasar:
+Mantenha o `transactionId` como inteiro (1.6) sob o seu controle. A estação ecoa esse id em MeterValues e StopTransaction. Persista as amostras do medidor pra conseguir faturar depois, mesmo se o stop final atrasar:
 
 
 ```ts
@@ -280,7 +279,7 @@ app.ocpp.onAction('MeterValues', async (payload, ctx) => {
 ```
 
 
-StopTransaction finaliza energia e códigos de motivo:
+StopTransaction fecha energia e códigos de motivo:
 
 
 ```ts
@@ -300,13 +299,13 @@ app.ocpp.onAction('StopTransaction', async (payload, ctx) => {
 ```
 
 
-Esse loop de quatro ações já basta para demo de frota privada, lab ou piloto interno. Todo o resto — tarifas, recibos, roaming — se apoia em transações e histórico de medidor persistidos.
+Esse loop de quatro actions já dá pra demo de frota privada, lab ou piloto interno. O resto — tarifa, recibo, roaming — se apoia em transação e histórico de medidor persistidos.
 
 
 ## Handlers por versão e sessões 2.x
 
 
-Algumas ações existem em toda versão; outras não. Você pode registrar um handler para todas as versões habilitadas, ou fixar:
+Algumas actions existem em toda versão; outras não. Dá pra registrar um handler pra todas as versões habilitadas, ou fixar:
 
 
 ```ts
@@ -315,13 +314,13 @@ app.ocpp.onAction('Authorize', authorize16, '1.6');      // só 1.6
 ```
 
 
-OCPP **2.0.1 / 2.1** colapsa Start/Stop em **`TransactionEvent`** (Started / Updated / Ended) e renomeia start/stop remoto para **`RequestStartTransaction`** / **`RequestStopTransaction`**. Chaves de configuração viram um device model (`GetVariables` / `SetVariables`). O modelo mental continua o mesmo — a estação reporta ciclo de vida, o CSMS persiste e decide — mas nomes de campo e contagem de mensagens mudam.
+No OCPP **2.0.1 / 2.1**, Start/Stop viram **`TransactionEvent`** (Started / Updated / Ended) e o start/stop remoto vira **`RequestStartTransaction`** / **`RequestStopTransaction`**. Chaves de configuração viram device model (`GetVariables` / `SetVariables`). O modelo mental continua: a estação reporta o ciclo de vida, o CSMS persiste e decide — só mudam nomes de campo e quantidade de mensagens.
 
 
-Quando você compartilha um nome de handler entre versões (BootNotification é o caso clássico), ramifique em `ctx.version` e devolva o formato de resposta correto. Prefira adapters pequenos por versão a um mega-handler que conhece todo schema de cor.
+Quando o mesmo nome de handler vale pra várias versões (BootNotification é o clássico), ramifique em `ctx.version` e devolva o formato certo. Prefira adapters pequenos por versão a um mega-handler que decora todos os schemas.
 
 
-Registre um fallback para ações não implementadas falharem alto em vez de pendurar:
+Registre um fallback pra action sem implementação falhar alto em vez de travar:
 
 
 ```ts
@@ -331,13 +330,13 @@ app.ocpp.onAny(async (_payload, ctx) => {
 ```
 
 
-Erros lançados viram respostas CALLERROR. Isso é melhor do que drops silenciosos quando a estação manda `FirmwareStatusNotification` e você ainda não decidiu o que fazer.
+Erro lançado vira CALLERROR. Melhor do que sumir em silêncio quando a estação manda `FirmwareStatusNotification` e você ainda não decidiu o que fazer.
 
 
-## CSMS → estação: você chama elas
+## CSMS → estação: quem chama é você
 
 
-O tráfego é bidirecional. Operadores destravam conectores, fazem soft-reset e iniciam sessões pelo app. Isso são CALLs de saída:
+O tráfego é nos dois sentidos. Operador destrava conector, faz soft-reset e inicia sessão pelo app. Isso vira CALL de saída:
 
 
 ```ts
@@ -356,7 +355,7 @@ await app.ocpp.call('CP_001', 'RemoteStartTransaction', {
 ```
 
 
-No 2.x você chamaria `RequestStartTransaction` com o formato de payload 2.x. Também pode pegar o objeto de conexão quando precisa da versão negociada antes de escolher o nome da ação:
+No 2.x você chama `RequestStartTransaction` com o payload 2.x. Também dá pra pegar o objeto de conexão quando precisa da versão negociada antes de escolher o nome da action:
 
 
 ```ts
@@ -367,22 +366,22 @@ if (conn.version === '1.6') {
   await conn.call('RemoteStartTransaction', { idTag: 'USER_42', connectorId: 1 });
 } else {
   await conn.call('RequestStartTransaction', {
-    /* monte um payload 2.x para o seu produto */
+    /* monte um payload 2.x pro seu produto */
   });
 }
 ```
 
 
-Um padrão prático é uma fachada HTTP (ou fila) fina na frente de `call`: a UI do produto nunca fala arrays OCPP diretamente; ela posta “reset CP_001” e seu serviço traduz isso na ação certa para a versão viva.
+Um padrão que funciona bem: uma fachada HTTP (ou fila) magra na frente do `call`. A UI do produto nunca fala array OCPP direto; ela posta “reset CP_001” e o serviço traduz na action certa pra versão que está viva.
 
 
-## Um esqueleto de CSMS sensato
+## Um esqueleto de CSMS que faz sentido
 
 
-Resista à vontade de implementar todas as 90+ ações do 2.1 no dia um. Entregue um corte vertical:
+Resista à vontade de implementar as 90+ actions do 2.1 no dia um. Entregue um corte vertical:
 
 
-| Preocupação | Ações para tratar primeiro |
+| Preocupação | Actions pra tratar primeiro |
 |-------------|----------------------------|
 | Presença | BootNotification, Heartbeat, StatusNotification |
 | Acesso | Authorize |
@@ -390,7 +389,7 @@ Resista à vontade de implementar todas as 90+ ações do 2.1 no dia um. Entregu
 | Ops | Reset, UnlockConnector, RemoteStart/Stop (ou Request* no 2.x) |
 
 
-Depois adicione persistência (Postgres serve), uma lista admin de estações online e logs estruturados com `chargePointId`, `uniqueId` e `action`. Só então persiga perfis de smart charging, listas locais de auth, updates de firmware ou extras ISO 15118.
+Depois venha persistência (Postgres serve), lista admin de estações online e log estruturado com `chargePointId`, `uniqueId` e `action`. Só então vá atrás de perfil de smart charging, lista local de auth, update de firmware ou extra de ISO 15118.
 
 
 Limites sugeridos no código:
@@ -403,63 +402,63 @@ HTTP / fila de operadores  →  serviços de aplicação  →  ocpp.onAction / o
 ```
 
 
-Mantenha matemática de tarifa e stores de identidade fora da camada WebSocket. Handlers devem chamar serviços; serviços não devem parsear arrays CALL.
+Deixe matemática de tarifa e store de identidade fora da camada WebSocket. Handler chama serviço; serviço não parseia array CALL.
 
 
-## Testando sem um estacionamento
+## Testando sem ter um estacionamento
 
 
-Você não precisa de um carregador físico para aprender. Opções que funcionam bem cedo:
+Você não precisa de carregador físico pra aprender. Opções que funcionam cedo:
 
 
-- Padrões de smoke / servidor de exemplo do pacote — BootNotification contra um listener local.
+- Smoke / servidor de exemplo do pacote — BootNotification contra um listener local.
 - Simuladores open-source de estação que falam OCPP-J e deixam você escolher o subprotocolo.
-- Um cliente WebSocket mínimo num teste que manda um array CALL e asserta o CALLRESULT.
+- Um cliente WebSocket mínimo no teste que manda um array CALL e confere o CALLRESULT.
 
 
-Assert três coisas em testes automatizados: negociação de subprotocolo, rejeição por schema de payloads ruins, e resultados de handler para Authorize / Start / Stop. Conformance com hardware vem depois; cobertura unitária e de integração das suas decisões de domínio vem primeiro.
+Nos testes automatizados, assert três coisas: negociação de subprotocolo, rejeição por schema de payload ruim, e resultado de handler pra Authorize / Start / Stop. Conformance com hardware vem depois; cobertura unitária e de integração das suas decisões de domínio vem primeiro.
 
 
-## Notas de produção que salvam fins de semana
+## Notas de produção que salvam o fim de semana
 
 
-**Use `wss://` e autentique a estação.** O protocolo assume um canal confiável; coloque TLS e credenciais da estação (mTLS ou handshake de token antes do upgrade) na frente do path OCPP.
+**Use `wss://` e autentique a estação.** O protocolo assume canal confiável; coloque TLS e credencial da estação (mTLS ou handshake de token antes do upgrade) na frente do path OCPP.
 
 
-**Uma conexão por id de estação** é a regra usual. Sockets duplicados costumam significar corrida de reconnect instável — rejeitar a segunda conexão é mais claro do que dual heartbeats escrevendo status conflitante.
+**Uma conexão por id de estação** é a regra usual. Socket duplicado costuma ser corrida de reconnect instável — rejeitar o segundo é mais claro do que dois heartbeats brigando por status.
 
 
-**Sincronia de tempo importa.** Respostas de BootNotification e Heartbeat carregam `currentTime`; as estações usam isso. Prefira hosts alinhados a NTP e timestamps ISO-8601 em tudo que persistir.
+**Relógio importa.** Respostas de BootNotification e Heartbeat carregam `currentTime`; a estação usa isso. Prefira host alinhado a NTP e timestamp ISO-8601 em tudo que persistir.
 
 
-**Idempotência e reconnects.** Estações retentam. Desenhe a criação de transação para que StartTransaction duplicado com as mesmas credenciais não gere duas faturas sem revisão.
+**Idempotência e reconnect.** Estação retenta. Desenhe a criação de transação pra StartTransaction duplicado com a mesma credencial não virar duas faturas sem revisão.
 
 
-**Política de versão.** Suportar 1.6 + 2.x é realista para frotas mistas; só 2.1 serve para greenfield. Documente quais versões seu CSMS reivindica e teste a preferência de negociação de forma explícita.
+**Política de versão.** Suportar 1.6 + 2.x é realista em frota mista; só 2.1 serve pra greenfield. Documente o que seu CSMS afirma e teste a preferência de negociação de forma explícita.
 
 
-**Observabilidade.** Logue action, version, chargePointId e latência em todo CALL. Quando um site diz “o carregamento quebrou,” esses quatro campos são como achar a verdade em menos de um minuto.
+**Observabilidade.** Logue action, version, chargePointId e latência em todo CALL. Quando o site diz “carregamento quebrou”, esses quatro campos são o caminho mais curto da verdade.
 
 
-**Planeje estações offline.** Links caem. Desenhe a UX de operação para que “estação offline” seja um estado de primeira classe, enfileire comandos não urgentes com cuidado e nunca assuma que MeterValues chegou só porque StartTransaction chegou. Seu modelo de persistência deve tolerar lacunas e StopTransaction atrasado sem inventar energia que nunca passou no fio.
+**Planeje estação offline.** Link cai. Faça a UX de operação tratar “estação offline” como estado de primeira classe, enfileire comando não urgente com cuidado e nunca assuma que MeterValues chegou só porque StartTransaction chegou. O modelo de persistência precisa aguentar buraco e StopTransaction atrasado sem inventar energia que nunca passou no fio.
 
 
 ## O que a biblioteca não faz (de propósito)
 
 
-Bibliotecas OCPP não deveriam inventar o seu produto. Regras de auth, hubs de roaming, billing, balanceamento de carga no alimentador e apps de cliente são seus. As peças reutilizáveis valiosas são: formato do endpoint WebSocket, negociação de subprotocolo, framing CALL, validação de schema OCA, um registry de conexões e uma API limpa `onAction` / `call`.
+Biblioteca OCPP não inventa o seu produto. Regra de auth, hub de roaming, billing, balanceamento no alimentador e app do cliente são seus. As peças reutilizáveis que valem a pena: formato do endpoint WebSocket, negociação de subprotocolo, framing CALL, validação de schema OCA, registry de conexões e uma API limpa `onAction` / `call`.
 
 
-Se você se pegar forjando a biblioteca para mudar lógica de tarifa, pare — essa lógica pertence a um handler. Se você se pegar reimplementando framing de arrays, pare — isso pertence à biblioteca.
+Se você se pegar forjando a biblioteca pra mudar lógica de tarifa, pare — isso é handler. Se você se pegar reimplementando framing de array, pare — isso é biblioteca.
 
 
-## Para onde ir a seguir
+## Pra onde ir daqui
 
 
-Você agora tem o quadro do protocolo: estações conectam com um subprotocolo, falam arrays JSON, fazem boot, heartbeat, autorizam e rodam sessões. Você tem um conjunto mínimo de handlers e um caminho para controle de saída.
+Agora você tem o quadro do protocolo: estação conecta com subprotocolo, fala array JSON, faz boot, heartbeat, autoriza e roda sessão. Tem um conjunto mínimo de handlers e um caminho pra controle de saída.
 
 
-Os próximos passos dependem do seu objetivo. Quem explora em lab deve plugar um simulador e ver Boot → Authorize → Start → Meter → Stop nos logs. Times de produto devem escolher política de versão, desenhar o schema de transação e colocar uma API de operação na frente de `call`. Operadores de frota devem adicionar dashboards de StatusNotification e alertar heartbeats faltando antes de perseguir features exóticas do 2.1.
+O próximo passo depende do objetivo. Quem explora em lab pluga um simulador e acompanha Boot → Authorize → Start → Meter → Stop no log. Time de produto escolhe política de versão, desenha o schema de transação e coloca API de operação na frente do `call`. Operador de frota adiciona dashboard de StatusNotification e alerta heartbeat sumido antes de caçar feature exótica do 2.1.
 
 
-OCPP parece grande porque o catálogo completo de ações é grande. O caminho de entrada é pequeno: aceite um socket, responda BootNotification, ganhe Heartbeats, depois ganhe uma transação. Todo o resto é crescimento em cima de uma conversa estável entre o seu processo Node e um carregador que finalmente tem algo inteligente do outro lado do fio.
+OCPP parece enorme porque o catálogo completo de actions é enorme. A porta de entrada é pequena: aceite um socket, responda BootNotification, ganhe Heartbeats, depois ganhe uma transação. O resto é crescimento em cima de uma conversa estável entre o seu processo Node e um carregador que finalmente tem alguém inteligente do outro lado do fio.

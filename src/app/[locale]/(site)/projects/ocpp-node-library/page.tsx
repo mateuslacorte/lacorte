@@ -5,12 +5,12 @@ import { JsonLd, ProjectBreadcrumb } from '@/components/projects/ProjectPagePart
 import { parseLocale, t } from '@/i18n';
 import { localizePath } from '@/i18n/urlUtils';
 import {
-  OCPP_CSMS_GITHUB_URL,
-  OCPP_CSMS_ICON,
-  OCPP_CSMS_NPM_URL,
-  OCPP_CSMS_TUTORIAL_SLUG,
-  ocppCsmsProject as copy,
-} from '@/i18n/translations/projects-ocpp-csms';
+  OCPP_NODE_LIBRARY_GITHUB_URL,
+  OCPP_NODE_LIBRARY_ICON,
+  OCPP_NODE_LIBRARY_NPM_URL,
+  OCPP_NODE_LIBRARY_TUTORIAL_SLUG,
+  ocppNodeLibraryProject as copy,
+} from '@/i18n/translations/projects-ocpp-node-library';
 import { localeAlternates, localeOpenGraph } from '@/lib/localeMetadata';
 
 interface PageProps {
@@ -24,18 +24,18 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title,
     description,
-    alternates: localeAlternates('/projects/ocpp-csms', lang),
+    alternates: localeAlternates('/projects/ocpp-node-library', lang),
     openGraph: localeOpenGraph(lang, {
       title,
       description,
-      urlPath: '/projects/ocpp-csms',
+      urlPath: '/projects/ocpp-node-library',
     }),
   };
 }
 
-export default async function OcppCsmsProjectPage({ params }: PageProps) {
+export default async function OcppNodeLibraryProjectPage({ params }: PageProps) {
   const lang = parseLocale((await params).locale);
-  const tutorialHref = localizePath(`/posts/${OCPP_CSMS_TUTORIAL_SLUG}`, lang);
+  const tutorialHref = localizePath(`/posts/${OCPP_NODE_LIBRARY_TUTORIAL_SLUG}`, lang);
 
   return (
     <>
@@ -48,9 +48,9 @@ export default async function OcppCsmsProjectPage({ params }: PageProps) {
           applicationCategory: 'DeveloperApplication',
           operatingSystem: 'Any',
           offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-          url: OCPP_CSMS_NPM_URL,
-          codeRepository: OCPP_CSMS_GITHUB_URL,
-          image: OCPP_CSMS_ICON,
+          url: OCPP_NODE_LIBRARY_NPM_URL,
+          codeRepository: OCPP_NODE_LIBRARY_GITHUB_URL,
+          image: OCPP_NODE_LIBRARY_ICON,
         }}
       />
 
@@ -81,24 +81,24 @@ export default async function OcppCsmsProjectPage({ params }: PageProps) {
             <div>
               <div className="flex flex-wrap items-center gap-3 mb-6">
                 <Image
-                  src={OCPP_CSMS_ICON}
+                  src={OCPP_NODE_LIBRARY_ICON}
                   alt={t(copy.title, lang)}
                   width={56}
                   height={56}
                   className="rounded-2xl shadow-lg shadow-emerald-500/25"
                   priority
                 />
-                <span className="inline-flex items-center px-3 py-1 text-sm font-medium rounded-full bg-emerald-500/15 text-emerald-800 dark:text-emerald-200">
-                  {t(copy.badges.ocpp, lang)}
+                <span className="inline-flex items-center px-3 py-1 text-sm font-medium rounded-full bg-emerald-500/15 text-emerald-800 dark:text-emerald-200 font-mono">
+                  {t(copy.badges.package, lang)}
+                </span>
+                <span className="inline-flex items-center px-3 py-1 text-sm font-medium rounded-full bg-red-500/15 text-red-800 dark:text-red-200">
+                  {t(copy.badges.npm, lang)}
                 </span>
                 <span className="inline-flex items-center px-3 py-1 text-sm font-medium rounded-full bg-teal-500/20 text-teal-800 dark:text-teal-200">
                   {t(copy.badges.versions, lang)}
                 </span>
-                <span className="inline-flex items-center px-3 py-1 text-sm font-medium rounded-full bg-cyan-500/10 text-cyan-800 dark:text-cyan-200">
-                  {t(copy.badges.node, lang)}
-                </span>
                 <span className="inline-flex items-center px-3 py-1 text-sm font-medium rounded-full bg-[var(--color-card)] border border-[var(--color-border)] text-[var(--color-text-muted)]">
-                  {t(copy.badges.openSource, lang)}
+                  {t(copy.badges.license, lang)}
                 </span>
               </div>
 
@@ -114,29 +114,29 @@ export default async function OcppCsmsProjectPage({ params }: PageProps) {
 
               <div className="flex flex-wrap gap-3">
                 <Link
-                  href={tutorialHref}
+                  href={OCPP_NODE_LIBRARY_NPM_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="inline-flex items-center px-6 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow-lg shadow-emerald-500/25 transition-all hover:-translate-y-0.5"
                 >
-                  {t(copy.ctaTutorial, lang)}
+                  {t(copy.ctaNpm, lang)}
                   <span className="ml-2" aria-hidden>
-                    →
+                    ↗
                   </span>
                 </Link>
                 <Link
-                  href={OCPP_CSMS_NPM_URL}
+                  href={OCPP_NODE_LIBRARY_GITHUB_URL}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center px-6 py-3.5 rounded-xl border border-emerald-500/40 text-emerald-800 dark:text-emerald-200 hover:bg-emerald-500/10 font-medium transition-colors"
                 >
-                  {t(copy.ctaNpm, lang)}
+                  {t(copy.ctaGithub, lang)}
                 </Link>
                 <Link
-                  href={OCPP_CSMS_GITHUB_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  href={tutorialHref}
                   className="inline-flex items-center px-6 py-3.5 rounded-xl border border-[var(--color-border)] hover:bg-[var(--color-card-hover)] font-medium transition-colors"
                 >
-                  {t(copy.ctaGithub, lang)}
+                  {t(copy.ctaTutorial, lang)}
                 </Link>
               </div>
             </div>
@@ -144,7 +144,7 @@ export default async function OcppCsmsProjectPage({ params }: PageProps) {
             <figure className="rounded-2xl border border-emerald-500/20 bg-[var(--color-card)] p-5 md:p-6 shadow-xl shadow-emerald-500/10">
               <div className="flex items-center gap-3 mb-4">
                 <Image
-                  src={OCPP_CSMS_ICON}
+                  src={OCPP_NODE_LIBRARY_ICON}
                   alt=""
                   width={40}
                   height={40}
@@ -156,26 +156,25 @@ export default async function OcppCsmsProjectPage({ params }: PageProps) {
                     {t(copy.heroPanel.title, lang)}
                   </p>
                   <p className="font-semibold font-mono text-sm text-emerald-700 dark:text-emerald-300">
-                    OCPP-J
+                    {t(copy.heroPanel.packageName, lang)}
                   </p>
                 </div>
               </div>
               <div className="space-y-3 font-mono text-sm">
                 <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-bg)] p-4">
-                  <p className="text-[var(--color-text-muted)] text-xs mb-1">endpoint</p>
+                  <p className="text-[var(--color-text-muted)] text-xs mb-1">install</p>
                   <p className="text-emerald-600 dark:text-emerald-400 break-all">
-                    {t(copy.heroPanel.endpoint, lang)}
+                    {t(copy.heroPanel.install, lang)}
                   </p>
                 </div>
                 <div className="flex items-center justify-center text-[var(--color-text-muted)] text-xs">↓</div>
                 <div className="rounded-xl border border-teal-500/25 bg-teal-500/10 p-4">
-                  <p className="text-[var(--color-text-muted)] text-xs mb-1">call</p>
-                  <p>{t(copy.heroPanel.call, lang)}</p>
-                  <p className="text-teal-700 dark:text-teal-300 mt-1">{t(copy.heroPanel.result, lang)}</p>
+                  <p className="text-[var(--color-text-muted)] text-xs mb-1">register</p>
+                  <p className="break-all">{t(copy.heroPanel.register, lang)}</p>
                 </div>
                 <div className="rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 text-white p-4">
-                  <p className="text-white/70 text-xs mb-1">negotiate</p>
-                  <p className="break-all">{t(copy.heroPanel.subprotocol, lang)}</p>
+                  <p className="text-white/70 text-xs mb-1">api</p>
+                  <p className="break-all">{t(copy.heroPanel.api, lang)}</p>
                 </div>
               </div>
             </figure>
@@ -212,7 +211,7 @@ export default async function OcppCsmsProjectPage({ params }: PageProps) {
                 <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 text-white flex items-center justify-center font-bold mb-5 shadow-md shadow-emerald-500/20 group-hover:scale-105 transition-transform">
                   {index + 1}
                 </div>
-                <h3 className="text-xl font-semibold mb-2">{t(feature.title, lang)}</h3>
+                <h3 className="text-lg md:text-xl font-semibold mb-2 font-mono">{t(feature.title, lang)}</h3>
                 <p className="leading-relaxed text-[var(--color-text-muted)]">{t(feature.description, lang)}</p>
               </article>
             ))}
@@ -262,18 +261,18 @@ export default async function OcppCsmsProjectPage({ params }: PageProps) {
             </ol>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
-                href={tutorialHref}
-                className="inline-flex items-center px-5 py-2.5 rounded-xl border border-emerald-500/40 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/10 font-medium transition-colors"
-              >
-                {t(copy.ctaTutorial, lang)}
-              </Link>
-              <Link
-                href={OCPP_CSMS_GITHUB_URL}
+                href={OCPP_NODE_LIBRARY_NPM_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-medium transition-colors"
               >
-                {t(copy.ctaGithub, lang)}
+                {t(copy.ctaNpm, lang)}
+              </Link>
+              <Link
+                href={tutorialHref}
+                className="inline-flex items-center px-5 py-2.5 rounded-xl border border-emerald-500/40 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/10 font-medium transition-colors"
+              >
+                {t(copy.ctaTutorial, lang)}
               </Link>
             </div>
           </div>
@@ -369,7 +368,7 @@ export default async function OcppCsmsProjectPage({ params }: PageProps) {
           <div className="p-8 md:p-10 rounded-3xl bg-gradient-to-r from-emerald-600 via-teal-500 to-cyan-500 text-white flex flex-col md:flex-row md:items-center md:justify-between gap-8 shadow-xl shadow-emerald-500/20">
             <div className="flex items-start gap-5">
               <Image
-                src={OCPP_CSMS_ICON}
+                src={OCPP_NODE_LIBRARY_ICON}
                 alt=""
                 width={64}
                 height={64}
@@ -383,13 +382,15 @@ export default async function OcppCsmsProjectPage({ params }: PageProps) {
             </div>
             <div className="flex flex-wrap gap-3 shrink-0">
               <Link
-                href={tutorialHref}
+                href={OCPP_NODE_LIBRARY_NPM_URL}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="inline-flex items-center justify-center px-5 py-3 rounded-xl bg-white text-emerald-800 hover:bg-emerald-50 font-semibold transition-colors"
               >
-                {t(copy.ctaTutorial, lang)}
+                {t(copy.ctaNpm, lang)}
               </Link>
               <Link
-                href={OCPP_CSMS_GITHUB_URL}
+                href={OCPP_NODE_LIBRARY_GITHUB_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center px-5 py-3 rounded-xl border border-white/40 hover:bg-white/10 font-semibold transition-colors"

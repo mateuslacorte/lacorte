@@ -12,20 +12,20 @@ export interface ProjectCard {
 /** Live project catalog. Archived page sources live under src/archive/projects/. */
 export const projects: ProjectCard[] = [
   {
-    slug: 'ocpp-csms',
+    slug: 'ocpp-node-library',
     title: {
-      en: 'OCPP CSMS',
-      pt: 'CSMS OCPP',
+      en: 'OCPP Node Library',
+      pt: 'Biblioteca OCPP Node',
     },
     description: {
-      en: 'Node.js OCPP-J CSMS layer — WebSocket transport, negotiation, and schemas for 1.6, 2.0.1, and 2.1.',
-      pt: 'Camada CSMS OCPP-J em Node.js — transporte WebSocket, negociação e schemas para 1.6, 2.0.1 e 2.1.',
+      en: 'fastify-ocpp on npm — OCPP-J CSMS library with negotiation, framing, schemas, and onAction/call for 1.6–2.1.',
+      pt: 'fastify-ocpp no npm — biblioteca CSMS OCPP-J com negociação, framing, schemas e onAction/call para 1.6–2.1.',
     },
-    icon: '/projects/ocpp-csms-icon.png',
+    icon: '/projects/ocpp-node-library-icon.png',
     color: 'from-emerald-500 to-teal-500',
     badge: {
-      en: 'Library',
-      pt: 'Biblioteca',
+      en: 'npm',
+      pt: 'npm',
     },
   },
   {
