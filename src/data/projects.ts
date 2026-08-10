@@ -12,6 +12,23 @@ export interface ProjectCard {
 /** Live project catalog. Archived page sources live under src/archive/projects/. */
 export const projects: ProjectCard[] = [
   {
+    slug: 'ocpp-csms',
+    title: {
+      en: 'OCPP CSMS',
+      pt: 'CSMS OCPP',
+    },
+    description: {
+      en: 'Node.js OCPP-J CSMS layer — WebSocket transport, negotiation, and schemas for 1.6, 2.0.1, and 2.1.',
+      pt: 'Camada CSMS OCPP-J em Node.js — transporte WebSocket, negociação e schemas para 1.6, 2.0.1 e 2.1.',
+    },
+    icon: '/projects/ocpp-csms-icon.png',
+    color: 'from-emerald-500 to-teal-500',
+    badge: {
+      en: 'Library',
+      pt: 'Biblioteca',
+    },
+  },
+  {
     slug: 'nestjs-backend',
     title: {
       en: 'NestJS Backend',
