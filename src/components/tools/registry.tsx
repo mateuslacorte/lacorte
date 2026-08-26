@@ -21,6 +21,7 @@ import UrlEncoder from '@/components/tools/UrlEncoder';
 import LinkShortener from '@/components/tools/LinkShortener';
 import JwtDecoder from '@/components/tools/JwtDecoder';
 import BcryptTool from '@/components/tools/BcryptTool';
+import MyIp from '@/components/tools/MyIp';
 import CronGenerator from '@/components/tools/CronGenerator';
 import TimestampConverter from '@/components/tools/TimestampConverter';
 import LlmCostCalculator from '@/components/tools/LlmCostCalculator';
@@ -65,6 +66,7 @@ const toolComponents: Record<string, ToolComponentType> = {
   LinkShortener,
   JwtDecoder,
   BcryptTool,
+  MyIp,
   CronGenerator,
   TimestampConverter,
   LlmCostCalculator,

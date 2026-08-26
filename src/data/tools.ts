@@ -388,6 +388,45 @@ export const toolsConfig: ToolConfig[] = [
     },
   },
   {
+    slug: 'my-ip',
+    icon: '🌐',
+    category: 'developer',
+    component: 'MyIp',
+    seo: {
+      en: {
+        title: 'What Is My IP - Free Public IP Address Lookup',
+        description:
+          'See your public IP address instantly. Works behind Cloudflare. Free, no signup.',
+        keywords: [
+          'what is my ip',
+          'my ip',
+          'public ip',
+          'ip address lookup',
+          'show my ip',
+          ...seoKeywords.en,
+        ],
+      },
+      pt: {
+        title: 'Meu IP - Ver endereço IP público online',
+        description:
+          'Veja seu IP público na hora. Funciona atrás do Cloudflare. Grátis, sem cadastro.',
+        keywords: [
+          'meu ip',
+          'qual meu ip',
+          'ip público',
+          'ver meu ip',
+          'endereço ip',
+          'grátis',
+          'online',
+          'simples',
+          'rápido',
+          'sem instalação',
+          'web',
+        ],
+      },
+    },
+  },
+  {
     slug: 'cron',
     icon: '⏰',
     category: 'developer',

@@ -1010,11 +1010,41 @@ export const toolTranslations = {
     historyTitle: { en: '📜 History', pt: '📜 Histórico' },
   },
 
+  myIp: {
+    yourIp: { en: 'Your public IP', pt: 'Seu IP público' },
+    loading: { en: 'Detecting…', pt: 'Detectando…' },
+    unavailable: {
+      en: 'Could not detect your IP. Try refreshing.',
+      pt: 'Não foi possível detectar seu IP. Tente atualizar.',
+    },
+    refresh: { en: 'Refresh', pt: 'Atualizar' },
+    ipVersion: { en: 'IP version', pt: 'Versão do IP' },
+    ipv4: { en: 'IPv4', pt: 'IPv4' },
+    ipv6: { en: 'IPv6', pt: 'IPv6' },
+    country: { en: 'Country', pt: 'País' },
+    userAgent: { en: 'User agent', pt: 'User agent' },
+    acceptLanguage: { en: 'Accept-Language', pt: 'Accept-Language' },
+    notesTitle: { en: 'How it works', pt: 'Como funciona' },
+    note1: {
+      en: 'Your IP is read from the request that hits this site (Cloudflare CF-Connecting-IP when present).',
+      pt: 'Seu IP é lido da requisição que chega a este site (CF-Connecting-IP do Cloudflare quando presente).',
+    },
+    note2: {
+      en: 'The response is never cached by the CDN, so each visit shows your current address.',
+      pt: 'A resposta nunca é cacheada pelo CDN, então cada visita mostra seu endereço atual.',
+    },
+    note3: {
+      en: 'Nothing is stored. Country comes from Cloudflare when available.',
+      pt: 'Nada é armazenado. O país vem do Cloudflare quando disponível.',
+    },
+  },
+
   linkShortener: {
     intro: {
       en: 'Paste a long URL and get a short lacorte.dev/s/ link. History is saved in this browser only.',
       pt: 'Cole uma URL longa e receba um link curto lacorte.dev/s/. O histórico fica só neste navegador.',
     },
+
     urlPlaceholder: {
       en: 'https://example.com/very/long/path?with=params',
       pt: 'https://exemplo.com/caminho/muito/longo?com=params',
