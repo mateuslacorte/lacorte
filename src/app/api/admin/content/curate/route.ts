@@ -137,6 +137,7 @@ export async function GET(request: Request) {
     await requireAdminUser();
     const supabase = await createSupabaseServerClient();
     const jobId = new URL(request.url).searchParams.get('jobId');
+    const resume = new URL(request.url).searchParams.get('resume') === '1';
     const origin = new URL(request.url).origin;
 
     if (jobId) {
@@ -145,8 +146,8 @@ export async function GET(request: Request) {
         return NextResponse.json({ error: 'Job not found' }, { status: 404 });
       }
 
-      // Poll heartbeat: continue the post without worker→worker self-fetch.
-      if (shouldResumeCurationJob(job)) {
+      // Only resume when the client explicitly asked (after Generate now), not on passive loads.
+      if (resume && shouldResumeCurationJob(job)) {
         after(async () => {
           try {
             await kickCurationWorker(origin, job.id);

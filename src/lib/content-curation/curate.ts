@@ -1,5 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { loadUnusedRecentArticles, markArticlesConsumed } from '@/lib/content-curation/articles';
+import { loadExistingPostTitles } from '@/lib/content-curation/existingTitles';
 import { generateCurationIdea } from '@/lib/content-curation/openrouter';
 import { canRunCuration, logCurationCall } from '@/lib/content-curation/quota';
 import {
@@ -162,7 +163,11 @@ export async function runContentCuration(
   }
 
   try {
-    const { idea, inputPrompt, rawOutput } = await generateCurationIdea(articles);
+    const existingTitles = await loadExistingPostTitles(supabase);
+    const { idea, inputPrompt, rawOutput } = await generateCurationIdea(
+      articles,
+      existingTitles,
+    );
     const now = new Date();
     const id = candidateId(idea.title, now);
 

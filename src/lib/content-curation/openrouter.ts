@@ -77,6 +77,11 @@ function formatHeadlines(articles: RecentArticleInput[]): string {
     .join('\n');
 }
 
+function formatExistingTitles(titles: string[]): string {
+  if (titles.length === 0) return '(none yet)';
+  return titles.map((title, i) => `${i + 1}. ${title}`).join('\n');
+}
+
 export function extractJson(text: string): unknown {
   const trimmed = text.trim();
   try {
@@ -300,7 +305,10 @@ async function withRetries<T>(
   throw lastError instanceof Error ? lastError : new Error('LLM request failed');
 }
 
-export async function generateCurationPlan(articles: RecentArticleInput[]): Promise<{
+export async function generateCurationPlan(
+  articles: RecentArticleInput[],
+  existingTitles: string[] = [],
+): Promise<{
   plan: CurationPlan;
   inputPrompt: string;
   rawOutput: string;
@@ -315,7 +323,16 @@ export async function generateCurationPlan(articles: RecentArticleInput[]): Prom
 Recent RSS headlines (inspiration only — do NOT summarize news articles):
 ${formatHeadlines(articles)}
 
+Existing lacorte.dev posts and curated candidates (DO NOT duplicate these topics):
+${formatExistingTitles(existingTitles)}
+
 Task: Plan ONE original Markdown blog post for lacorte.dev. Do NOT write the full post yet.
+
+Hard requirement — avoid duplicates:
+- Do NOT reuse any title above (exact or near-paraphrase).
+- Do NOT cover the same core topic/angle as any existing post (e.g. another NestJS auth guide if one already exists).
+- Pick a clearly distinct subject the blog has not already taught.
+- If headlines only suggest already-covered topics, invent a fresh adjacent tutorial angle instead of repeating them.
 
 ${editorialRules()}
 
@@ -432,8 +449,14 @@ ${sectionBodies.map((body) => body.trim()).join('\n\n')}
 }
 
 /** @deprecated Prefer generateCurationPlan + generateCurationSection for background jobs. */
-export async function generateCurationIdea(articles: RecentArticleInput[]) {
-  const { plan, inputPrompt, rawOutput } = await generateCurationPlan(articles);
+export async function generateCurationIdea(
+  articles: RecentArticleInput[],
+  existingTitles: string[] = [],
+) {
+  const { plan, inputPrompt, rawOutput } = await generateCurationPlan(
+    articles,
+    existingTitles,
+  );
   const sectionBodies: string[] = [];
   const prompts = [inputPrompt];
   const raws = [rawOutput];

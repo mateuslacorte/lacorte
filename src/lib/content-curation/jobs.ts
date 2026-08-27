@@ -1,5 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { markArticlesConsumed } from '@/lib/content-curation/articles';
+import { loadExistingPostTitles } from '@/lib/content-curation/existingTitles';
 import {
   assembleMarkdownPost,
   generateCurationPlan,
@@ -418,7 +419,11 @@ export async function executeCurationJobStep(
         return { job: refreshed!, continue: false };
       }
 
-      const { plan, inputPrompt, rawOutput } = await generateCurationPlan(progress.articles);
+      const existingTitles = await loadExistingPostTitles(supabase);
+      const { plan, inputPrompt, rawOutput } = await generateCurationPlan(
+        progress.articles,
+        existingTitles,
+      );
       await logCurationCall(supabase, { trigger: job.trigger, success: true });
       progress = {
         ...progress,

@@ -46,6 +46,7 @@ export default function ContentCurationDashboard() {
   const [jobId, setJobId] = useState<string | null>(null);
   const [jobStatus, setJobStatus] = useState<string | null>(null);
   const [jobLabel, setJobLabel] = useState<string | null>(null);
+  const [pausedJobLabel, setPausedJobLabel] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async (opts?: { preserveError?: boolean }) => {
@@ -70,13 +71,19 @@ export default function ContentCurationDashboard() {
       setQuotaReason(quota.allowed ? null : (quota.reason ?? null));
       setCandidates(rows);
 
-      if (quota.activeJob?.id) {
-        setJobId(quota.activeJob.id);
+      if (jobId && quota.activeJob?.id === jobId) {
         setJobStatus(quota.activeJob.status ?? null);
         setJobLabel(quota.activeJob.progress?.label ?? null);
-        setGenerating(true);
-      } else if (
+        setPausedJobLabel(null);
+      } else if (!jobId && quota.activeJob?.id) {
+        setPausedJobLabel(quota.activeJob.progress?.label ?? quota.activeJob.status ?? 'pending');
+      } else {
+        setPausedJobLabel(null);
+      }
+
+      if (
         !opts?.preserveError &&
+        !jobId &&
         quota.lastJob?.status === 'failed' &&
         quota.lastJob.error
       ) {
@@ -87,7 +94,7 @@ export default function ContentCurationDashboard() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [jobId]);
 
   useEffect(() => {
     void load();
@@ -99,7 +106,9 @@ export default function ContentCurationDashboard() {
     let cancelled = false;
     const poll = async () => {
       try {
-        const res = await fetch(`/api/admin/content/curate?jobId=${encodeURIComponent(jobId)}`);
+        const res = await fetch(
+          `/api/admin/content/curate?jobId=${encodeURIComponent(jobId)}&resume=1`,
+        );
         const text = await res.text();
         let data: {
           error?: string;
@@ -159,6 +168,7 @@ export default function ContentCurationDashboard() {
 
   const generateNow = async () => {
     setGenerating(true);
+    setPausedJobLabel(null);
     setError(null);
     setJobStatus('pending');
     setJobLabel('Queuing…');
@@ -300,6 +310,11 @@ export default function ContentCurationDashboard() {
         {generating && (
           <p className="text-sm text-blue-600 dark:text-blue-400">
             {jobLabel ?? `Job ${jobStatus ?? 'pending'}`} — polls until done; safe to leave this page.
+          </p>
+        )}
+        {pausedJobLabel && !generating && (
+          <p className="text-sm text-amber-700 dark:text-amber-300">
+            Paused job: {pausedJobLabel}. Click Generate now to resume.
           </p>
         )}
         {quotaReason && (
