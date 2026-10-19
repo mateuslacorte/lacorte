@@ -2,15 +2,22 @@
 
 import React, { useRef, useState } from 'react';
 import { UploadCloud, FileUp, Loader2 } from 'lucide-react';
+import type { Language } from '@/i18n';
 
 interface FileDropzoneProps {
   onFilesSelected: (files: File[]) => void;
   isLoading: boolean;
+  lang?: Language;
 }
 
-export const FileDropzone: React.FC<FileDropzoneProps> = ({ onFilesSelected, isLoading }) => {
+export const FileDropzone: React.FC<FileDropzoneProps> = ({
+  onFilesSelected,
+  isLoading,
+  lang = 'en',
+}) => {
   const [isDragOver, setIsDragOver] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const isPt = lang === 'pt';
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -88,10 +95,18 @@ export const FileDropzone: React.FC<FileDropzoneProps> = ({ onFilesSelected, isL
           </div>
 
           <h2 className="text-lg font-semibold text-slate-800 text-center mb-1">
-            {isLoading ? 'Loading & parsing document...' : 'Upload your PDF document'}
+            {isLoading
+              ? isPt
+                ? 'Carregando e processando documento...'
+                : 'Loading & parsing document...'
+              : isPt
+              ? 'Envie seu documento PDF'
+              : 'Upload your PDF document'}
           </h2>
           <p className="text-sm text-slate-500 text-center mb-6">
-            Drag and drop your file here, or browse from your computer
+            {isPt
+              ? 'Arraste e solte seu arquivo aqui, ou selecione do seu computador'
+              : 'Drag and drop your file here, or browse from your computer'}
           </p>
 
           <button
@@ -99,7 +114,7 @@ export const FileDropzone: React.FC<FileDropzoneProps> = ({ onFilesSelected, isL
             disabled={isLoading}
             className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-xl shadow-sm transition disabled:opacity-50"
           >
-            Choose PDF File
+            {isPt ? 'Escolher Arquivo PDF' : 'Choose PDF File'}
           </button>
         </div>
       </div>

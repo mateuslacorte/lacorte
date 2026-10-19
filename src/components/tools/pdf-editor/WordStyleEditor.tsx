@@ -22,6 +22,7 @@ import confetti from 'canvas-confetti';
 import { PDFPageItem, ExtractedTextItem, ExtractedImageItem } from '@/types/pdf';
 import { exportPDFDocument } from '@/lib/pdf-engine';
 import { SignatureModal } from '@/components/tools/pdf-editor/SignatureModal';
+import type { Language } from '@/i18n';
 
 interface WordStyleEditorProps {
   pages: PDFPageItem[];
@@ -29,6 +30,7 @@ interface WordStyleEditorProps {
   onUpdatePages: (updatedPages: PDFPageItem[]) => void;
   onUploadMore: (files: File[]) => void;
   onReset: () => void;
+  lang?: Language;
 }
 
 export const WordStyleEditor: React.FC<WordStyleEditorProps> = ({
@@ -37,7 +39,10 @@ export const WordStyleEditor: React.FC<WordStyleEditorProps> = ({
   onUpdatePages,
   onUploadMore,
   onReset,
+  lang = 'en',
 }) => {
+  const isPt = lang === 'pt';
+
   const [selectedElement, setSelectedElement] = useState<{
     pageIndex: number;
     type: 'text' | 'image';
@@ -562,7 +567,7 @@ export const WordStyleEditor: React.FC<WordStyleEditorProps> = ({
       confetti({ particleCount: 70, spread: 60, origin: { y: 0.6 } });
     } catch (err: any) {
       console.error(err);
-      alert('Error generating PDF: ' + err.message);
+      alert((isPt ? 'Erro ao gerar PDF: ' : 'Error generating PDF: ') + err.message);
     } finally {
       setIsExporting(false);
     }
@@ -593,9 +598,10 @@ export const WordStyleEditor: React.FC<WordStyleEditorProps> = ({
             type="button"
             onClick={() => uploadMoreInputRef.current?.click()}
             className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg transition"
-            title="Combine another PDF into this document"
+            title={isPt ? 'Juntar outro PDF a este documento' : 'Combine another PDF into this document'}
           >
-            <Plus className="w-3.5 h-3.5 text-indigo-600" /> Add PDF (Combine)
+            <Plus className="w-3.5 h-3.5 text-indigo-600" />{' '}
+            {isPt ? 'Adicionar PDF (Juntar)' : 'Add PDF (Combine)'}
           </button>
           <input
             ref={uploadMoreInputRef}
@@ -613,9 +619,10 @@ export const WordStyleEditor: React.FC<WordStyleEditorProps> = ({
             type="button"
             onClick={() => imageInsertInputRef.current?.click()}
             className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg transition"
-            title="Insert image onto document"
+            title={isPt ? 'Inserir imagem no documento' : 'Insert image onto document'}
           >
-            <ImageIcon className="w-3.5 h-3.5 text-emerald-600" /> Insert Image
+            <ImageIcon className="w-3.5 h-3.5 text-emerald-600" />{' '}
+            {isPt ? 'Inserir Imagem' : 'Insert Image'}
           </button>
           <input
             ref={imageInsertInputRef}
@@ -633,9 +640,10 @@ export const WordStyleEditor: React.FC<WordStyleEditorProps> = ({
               setIsSignatureModalOpen(true);
             }}
             className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg transition"
-            title="Draw and place signature"
+            title={isPt ? 'Desenhar e inserir assinatura' : 'Draw and place signature'}
           >
-            <PenTool className="w-3.5 h-3.5 text-indigo-600" /> Add Signature
+            <PenTool className="w-3.5 h-3.5 text-indigo-600" />{' '}
+            {isPt ? 'Adicionar Assinatura' : 'Add Signature'}
           </button>
         </div>
 
@@ -647,7 +655,7 @@ export const WordStyleEditor: React.FC<WordStyleEditorProps> = ({
               value={activeText.fontFamily || 'Arial, Helvetica, sans-serif'}
               onChange={(e) => updateSelectedText({ fontFamily: e.target.value })}
               className="bg-white border border-slate-200 px-2 py-1 rounded text-xs font-medium text-slate-800 max-w-[140px] truncate outline-none focus:border-indigo-500 cursor-pointer"
-              title="Font Family"
+              title={isPt ? 'Família da Fonte' : 'Font Family'}
             >
               {/* Keep extracted PDF font stack if it's custom */}
               {![
@@ -668,11 +676,13 @@ export const WordStyleEditor: React.FC<WordStyleEditorProps> = ({
               ].includes(activeText.fontFamily) && (
                 <option value={activeText.fontFamily}>
                   {activeText.fontName
-                    ? `PDF Font (${activeText.fontName.replace(/^[A-Z]{6}\+/, '').split(/[-+,]/)[0]})`
+                    ? `${isPt ? 'Fonte PDF' : 'PDF Font'} (${activeText.fontName.replace(/^[A-Z]{6}\+/, '').split(/[-+,]/)[0]})`
+                    : isPt
+                    ? 'Fonte do Documento'
                     : 'Document Font'}
                 </option>
               )}
-              <optgroup label="Sans-Serif">
+              <optgroup label={isPt ? 'Sem Serifa (Sans-Serif)' : 'Sans-Serif'}>
                 <option value="'Arimo', Arial, Helvetica, sans-serif">Arial / Helvetica</option>
                 <option value="'Carlito', Calibri, 'Segoe UI', Arial, sans-serif">Calibri</option>
                 <option value="'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">Inter</option>
@@ -682,14 +692,14 @@ export const WordStyleEditor: React.FC<WordStyleEditorProps> = ({
                 <option value="'Montserrat', 'Arimo', Arial, sans-serif">Montserrat</option>
                 <option value="'Poppins', 'Arimo', Arial, sans-serif">Poppins</option>
               </optgroup>
-              <optgroup label="Serif">
+              <optgroup label={isPt ? 'Serifada (Serif)' : 'Serif'}>
                 <option value="'Tinos', 'Times New Roman', Times, serif">Times New Roman</option>
                 <option value="Georgia, 'Tinos', 'Times New Roman', serif">Georgia</option>
                 <option value="'Caladea', Cambria, Georgia, 'Times New Roman', serif">Cambria</option>
                 <option value="'EB Garamond', Garamond, 'Times New Roman', serif">Garamond</option>
                 <option value="'Merriweather', Georgia, 'Times New Roman', serif">Merriweather</option>
               </optgroup>
-              <optgroup label="Monospace">
+              <optgroup label={isPt ? 'Monoespaçada' : 'Monospace'}>
                 <option value="'Cousine', 'Courier New', Courier, monospace">Courier New</option>
               </optgroup>
             </select>
@@ -726,7 +736,7 @@ export const WordStyleEditor: React.FC<WordStyleEditorProps> = ({
                   ? 'bg-indigo-600 text-white border-indigo-600'
                   : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
               }`}
-              title="Bold"
+              title={isPt ? 'Negrito' : 'Bold'}
             >
               <Bold className="w-3.5 h-3.5" />
             </button>
@@ -740,7 +750,7 @@ export const WordStyleEditor: React.FC<WordStyleEditorProps> = ({
                   ? 'bg-indigo-600 text-white border-indigo-600'
                   : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
               }`}
-              title="Italic"
+              title={isPt ? 'Itálico' : 'Italic'}
             >
               <Italic className="w-3.5 h-3.5" />
             </button>
@@ -752,7 +762,7 @@ export const WordStyleEditor: React.FC<WordStyleEditorProps> = ({
                 value={activeText.color || '#000000'}
                 onChange={(e) => updateSelectedText({ color: e.target.value })}
                 className="w-6 h-6 rounded cursor-pointer border border-slate-300 p-0"
-                title="Change Color"
+                title={isPt ? 'Alterar Cor' : 'Change Color'}
               />
             </div>
 
@@ -763,7 +773,7 @@ export const WordStyleEditor: React.FC<WordStyleEditorProps> = ({
               type="button"
               onClick={handleRevertSelected}
               className="p-1.5 text-slate-500 hover:text-slate-800 rounded hover:bg-slate-100"
-              title="Revert text to original"
+              title={isPt ? 'Reverter texto para o original' : 'Revert text to original'}
             >
               <Undo2 className="w-3.5 h-3.5" />
             </button>
@@ -772,7 +782,7 @@ export const WordStyleEditor: React.FC<WordStyleEditorProps> = ({
               type="button"
               onClick={handleDeleteSelected}
               className="p-1.5 text-rose-500 hover:text-rose-600 rounded hover:bg-rose-50"
-              title="Delete / Erase text"
+              title={isPt ? 'Excluir / Apagar texto' : 'Delete / Erase text'}
             >
               <Trash2 className="w-3.5 h-3.5" />
             </button>
@@ -781,7 +791,13 @@ export const WordStyleEditor: React.FC<WordStyleEditorProps> = ({
           /* CONTEXTUAL IMAGE TOOLBAR */
           <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 px-3 py-1 rounded-xl shadow-xs animate-fadeIn">
             <span className="text-xs font-bold text-slate-700">
-              {activeImage.isSignature ? 'Signature' : 'Image'} Selected
+              {activeImage.isSignature
+                ? isPt
+                  ? 'Assinatura Selecionada'
+                  : 'Signature Selected'
+                : isPt
+                ? 'Imagem Selecionada'
+                : 'Image Selected'}
             </span>
 
             <button
@@ -789,7 +805,7 @@ export const WordStyleEditor: React.FC<WordStyleEditorProps> = ({
               onClick={() => imageReplaceInputRef.current?.click()}
               className="flex items-center gap-1 px-2.5 py-1 text-xs font-semibold bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 rounded-lg shadow-xs"
             >
-              <Upload className="w-3 h-3 text-indigo-600" /> Replace
+              <Upload className="w-3 h-3 text-indigo-600" /> {isPt ? 'Substituir' : 'Replace'}
             </button>
             <input
               ref={imageReplaceInputRef}
@@ -804,13 +820,17 @@ export const WordStyleEditor: React.FC<WordStyleEditorProps> = ({
               onClick={handleDeleteSelected}
               className="flex items-center gap-1 px-2.5 py-1 text-xs font-semibold bg-white border border-rose-200 hover:bg-rose-50 text-rose-600 rounded-lg shadow-xs"
             >
-              <Trash2 className="w-3 h-3" /> Delete
+              <Trash2 className="w-3 h-3" /> {isPt ? 'Excluir' : 'Delete'}
             </button>
           </div>
         ) : (
           <div className="text-xs text-slate-500 flex items-center gap-1.5">
             <MousePointer2 className="w-3.5 h-3.5 text-indigo-500" />
-            <span>Click text to edit • Drag elements to reposition</span>
+            <span>
+              {isPt
+                ? 'Clique no texto para editar • Arraste elementos para reposicionar'
+                : 'Click text to edit • Drag elements to reposition'}
+            </span>
           </div>
         )}
 
@@ -821,7 +841,7 @@ export const WordStyleEditor: React.FC<WordStyleEditorProps> = ({
               type="button"
               onClick={() => setZoomScale((z) => Math.max(0.4, Number((z - 0.1).toFixed(2))))}
               className="p-1 text-slate-600 hover:text-slate-900"
-              title="Zoom Out"
+              title={isPt ? 'Diminuir Zoom' : 'Zoom Out'}
             >
               <ZoomOut className="w-3.5 h-3.5" />
             </button>
@@ -832,7 +852,7 @@ export const WordStyleEditor: React.FC<WordStyleEditorProps> = ({
               type="button"
               onClick={() => setZoomScale((z) => Math.min(2.5, Number((z + 0.1).toFixed(2))))}
               className="p-1 text-slate-600 hover:text-slate-900"
-              title="Zoom In"
+              title={isPt ? 'Aumentar Zoom' : 'Zoom In'}
             >
               <ZoomIn className="w-3.5 h-3.5" />
             </button>
@@ -845,7 +865,13 @@ export const WordStyleEditor: React.FC<WordStyleEditorProps> = ({
             className="flex items-center gap-1.5 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold shadow-sm transition disabled:opacity-50"
           >
             <Download className="w-3.5 h-3.5" />
-            {isExporting ? 'Exporting...' : 'Export PDF'}
+            {isExporting
+              ? isPt
+                ? 'Exportando...'
+                : 'Exporting...'
+              : isPt
+              ? 'Exportar PDF'
+              : 'Export PDF'}
           </button>
         </div>
       </header>
@@ -856,9 +882,11 @@ export const WordStyleEditor: React.FC<WordStyleEditorProps> = ({
         <aside className="w-64 bg-white border-r border-slate-200 flex flex-col shrink-0 overflow-hidden shadow-xs">
           <div className="p-3.5 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
             <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">
-              Pages ({pages.length})
+              {isPt ? `Páginas (${pages.length})` : `Pages (${pages.length})`}
             </span>
-            <span className="text-[11px] text-slate-500">Drag after to reorder</span>
+            <span className="text-[11px] text-slate-500">
+              {isPt ? 'Arraste para reordenar' : 'Drag after to reorder'}
+            </span>
           </div>
 
           {/* Thumbnail list */}
@@ -889,15 +917,15 @@ export const WordStyleEditor: React.FC<WordStyleEditorProps> = ({
                       <div className="flex items-center gap-1 cursor-grab active:cursor-grabbing">
                         <GripVertical className="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-600" />
                         <span className="font-bold text-[11px] bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded">
-                          Page {index + 1}
+                          {isPt ? `Página ${index + 1}` : `Page ${index + 1}`}
                         </span>
                       </div>
                       <button
                         type="button"
                         onClick={(e) => handleDeletePage(index, e)}
                         className="p-1 rounded text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
-                        title={`Delete Page ${index + 1}`}
-                        aria-label={`Delete Page ${index + 1}`}
+                        title={isPt ? `Excluir Página ${index + 1}` : `Delete Page ${index + 1}`}
+                        aria-label={isPt ? `Excluir Página ${index + 1}` : `Delete Page ${index + 1}`}
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -953,7 +981,7 @@ export const WordStyleEditor: React.FC<WordStyleEditorProps> = ({
                 {page.thumbnailUrl && (
                   <img
                     src={page.thumbnailUrl}
-                    alt={`Page ${pIdx + 1}`}
+                    alt={isPt ? `Página ${pIdx + 1}` : `Page ${pIdx + 1}`}
                     className="w-full h-full object-contain pointer-events-none block"
                   />
                 )}
@@ -985,7 +1013,7 @@ export const WordStyleEditor: React.FC<WordStyleEditorProps> = ({
                           height: `${item.height * zoomScale}px`,
                         }}
                       >
-                        [Erased]
+                        {isPt ? '[Apagado]' : '[Erased]'}
                       </div>
                     );
                   }
@@ -1006,7 +1034,7 @@ export const WordStyleEditor: React.FC<WordStyleEditorProps> = ({
                           width: `${Math.max(16, item.width * zoomScale)}px`,
                           height: `${Math.max(12, item.height * zoomScale)}px`,
                         }}
-                        title="Click to edit text"
+                        title={isPt ? 'Clique para editar o texto' : 'Click to edit text'}
                       />
                     );
                   }
@@ -1104,7 +1132,11 @@ export const WordStyleEditor: React.FC<WordStyleEditorProps> = ({
                         transform: transformStyle,
                         willChange: isTransforming ? 'transform, width, height' : 'auto',
                       }}
-                      title="Drag to reposition, click to replace or delete"
+                      title={
+                        isPt
+                          ? 'Arraste para reposicionar, clique para substituir ou excluir'
+                          : 'Drag to reposition, click to replace or delete'
+                      }
                     >
                       {img.replacementDataUrl ? (
                         <img
@@ -1114,7 +1146,7 @@ export const WordStyleEditor: React.FC<WordStyleEditorProps> = ({
                         />
                       ) : (
                         <div className="w-full h-full border-2 border-dashed border-indigo-400 bg-indigo-50/40 flex items-center justify-center text-xs text-indigo-700 font-medium p-1 text-center">
-                          Image Frame
+                          {isPt ? 'Quadro de Imagem' : 'Image Frame'}
                         </div>
                       )}
 
@@ -1123,7 +1155,7 @@ export const WordStyleEditor: React.FC<WordStyleEditorProps> = ({
                         <>
                           <div
                             className="absolute -top-2.5 -left-2.5 w-5 h-5 bg-indigo-600 text-white rounded-full flex items-center justify-center cursor-move shadow-sm"
-                            title="Drag to move"
+                            title={isPt ? 'Arraste para mover' : 'Drag to move'}
                           >
                             <Move className="w-3 h-3" />
                           </div>
@@ -1145,7 +1177,11 @@ export const WordStyleEditor: React.FC<WordStyleEditorProps> = ({
                               };
                             }}
                             className="absolute -bottom-2.5 -right-2.5 w-5 h-5 bg-white border-2 border-indigo-600 rounded-full cursor-nwse-resize shadow-md hover:scale-125 transition-transform flex items-center justify-center"
-                            title="Drag to resize (keeps aspect ratio)"
+                            title={
+                              isPt
+                                ? 'Arraste para redimensionar (mantém proporção)'
+                                : 'Drag to resize (keeps aspect ratio)'
+                            }
                           >
                             <div className="w-1.5 h-1.5 bg-indigo-600 rounded-full pointer-events-none" />
                           </div>
@@ -1158,14 +1194,14 @@ export const WordStyleEditor: React.FC<WordStyleEditorProps> = ({
                 {/* Page number watermark badge + delete page action */}
                 <div className="absolute bottom-3 right-4 flex items-center gap-1.5 bg-white/90 border border-slate-200/80 px-2 py-0.5 rounded shadow-xs z-20">
                   <span className="text-[11px] font-semibold text-slate-500">
-                    Page {pIdx + 1}
+                    {isPt ? `Página ${pIdx + 1}` : `Page ${pIdx + 1}`}
                   </span>
                   <button
                     type="button"
                     onClick={(e) => handleDeletePage(pIdx, e)}
                     className="p-0.5 text-slate-400 hover:text-rose-600 rounded hover:bg-rose-50 transition-colors"
-                    title={`Delete Page ${pIdx + 1}`}
-                    aria-label={`Delete Page ${pIdx + 1}`}
+                    title={isPt ? `Excluir Página ${pIdx + 1}` : `Delete Page ${pIdx + 1}`}
+                    aria-label={isPt ? `Excluir Página ${pIdx + 1}` : `Delete Page ${pIdx + 1}`}
                   >
                     <Trash2 className="w-3 h-3" />
                   </button>
@@ -1181,6 +1217,7 @@ export const WordStyleEditor: React.FC<WordStyleEditorProps> = ({
         isOpen={isSignatureModalOpen}
         onClose={() => setIsSignatureModalOpen(false)}
         onSave={handleInsertSignature}
+        lang={lang}
       />
     </div>
   );

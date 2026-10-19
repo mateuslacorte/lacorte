@@ -2,22 +2,26 @@
 
 import React, { useRef, useState, useEffect } from 'react';
 import { X, Check, RotateCcw, PenTool } from 'lucide-react';
+import type { Language } from '@/i18n';
 
 interface SignatureModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (dataUrl: string) => void;
+  lang?: Language;
 }
 
 export const SignatureModal: React.FC<SignatureModalProps> = ({
   isOpen,
   onClose,
   onSave,
+  lang = 'en',
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [hasDrawn, setHasDrawn] = useState(false);
   const [strokeColor, setStrokeColor] = useState('#0f172a');
+  const isPt = lang === 'pt';
 
   useEffect(() => {
     if (isOpen) {
@@ -102,7 +106,9 @@ export const SignatureModal: React.FC<SignatureModalProps> = ({
             <div className="w-7 h-7 rounded-lg bg-indigo-600 text-white flex items-center justify-center">
               <PenTool className="w-3.5 h-3.5" />
             </div>
-            <h3 className="text-sm font-bold text-slate-800">Draw Your Signature</h3>
+            <h3 className="text-sm font-bold text-slate-800">
+              {isPt ? 'Desenhe sua Assinatura' : 'Draw Your Signature'}
+            </h3>
           </div>
           <button
             onClick={onClose}
@@ -130,7 +136,7 @@ export const SignatureModal: React.FC<SignatureModalProps> = ({
             />
             {!hasDrawn && (
               <div className="absolute inset-0 flex items-center justify-center text-xs text-slate-400 pointer-events-none">
-                Sign with mouse or touch here
+                {isPt ? 'Assine aqui com o mouse ou toque' : 'Sign with mouse or touch here'}
               </div>
             )}
           </div>
@@ -138,7 +144,7 @@ export const SignatureModal: React.FC<SignatureModalProps> = ({
           {/* Color & Clear Options */}
           <div className="w-full flex items-center justify-between mt-3 text-xs">
             <div className="flex items-center gap-2">
-              <span className="text-slate-500 font-medium">Color:</span>
+              <span className="text-slate-500 font-medium">{isPt ? 'Cor:' : 'Color:'}</span>
               {['#0f172a', '#1e40af', '#047857'].map((c) => (
                 <button
                   key={c}
@@ -157,7 +163,7 @@ export const SignatureModal: React.FC<SignatureModalProps> = ({
               onClick={handleClear}
               className="flex items-center gap-1 text-slate-500 hover:text-slate-800 font-semibold"
             >
-              <RotateCcw className="w-3.5 h-3.5" /> Clear
+              <RotateCcw className="w-3.5 h-3.5" /> {isPt ? 'Limpar' : 'Clear'}
             </button>
           </div>
         </div>
@@ -169,7 +175,7 @@ export const SignatureModal: React.FC<SignatureModalProps> = ({
             onClick={onClose}
             className="px-3.5 py-1.5 text-xs font-semibold text-slate-600 hover:text-slate-800 rounded-lg hover:bg-slate-200/60"
           >
-            Cancel
+            {isPt ? 'Cancelar' : 'Cancel'}
           </button>
           <button
             type="button"
@@ -177,7 +183,7 @@ export const SignatureModal: React.FC<SignatureModalProps> = ({
             disabled={!hasDrawn}
             className="flex items-center gap-1.5 px-4 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold shadow-xs transition disabled:opacity-40"
           >
-            <Check className="w-3.5 h-3.5" /> Insert Signature
+            <Check className="w-3.5 h-3.5" /> {isPt ? 'Inserir Assinatura' : 'Insert Signature'}
           </button>
         </div>
       </div>

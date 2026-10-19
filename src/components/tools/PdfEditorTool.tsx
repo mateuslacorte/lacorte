@@ -10,8 +10,11 @@ import {
 } from '@/lib/pdf-engine';
 import { FileDropzone } from '@/components/tools/pdf-editor/FileDropzone';
 import { WordStyleEditor } from '@/components/tools/pdf-editor/WordStyleEditor';
+import { useTranslation } from '@/i18n/useTranslation';
+import type { Language } from '@/i18n';
 
-export default function PdfEditorTool() {
+export default function PdfEditorTool({ lang: routeLang }: { lang?: Language }) {
+  const { lang } = useTranslation(routeLang);
   const [pages, setPages] = useState<PDFPageItem[]>([]);
   const [fileMap, setFileMap] = useState<Map<string, ArrayBuffer>>(new Map());
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -69,11 +72,12 @@ export default function PdfEditorTool() {
       setPages((prev) => [...prev, ...newPages]);
     } catch (err: any) {
       console.error(err);
-      alert('Error loading PDF: ' + (err.message || 'Unknown error'));
+      const prefix = lang === 'pt' ? 'Erro ao carregar o PDF: ' : 'Error loading PDF: ';
+      alert(prefix + (err.message || (lang === 'pt' ? 'Erro desconhecido' : 'Unknown error')));
     } finally {
       setIsLoading(false);
     }
-  }, [fileMap]);
+  }, [fileMap, lang]);
 
   const handleReset = () => {
     setPages([]);
@@ -89,7 +93,7 @@ export default function PdfEditorTool() {
       }}
     >
       {pages.length === 0 ? (
-        <FileDropzone onFilesSelected={handleFilesSelected} isLoading={isLoading} />
+        <FileDropzone onFilesSelected={handleFilesSelected} isLoading={isLoading} lang={lang} />
       ) : (
         <WordStyleEditor
           pages={pages}
@@ -97,6 +101,7 @@ export default function PdfEditorTool() {
           onUpdatePages={setPages}
           onUploadMore={handleFilesSelected}
           onReset={handleReset}
+          lang={lang}
         />
       )}
     </div>
