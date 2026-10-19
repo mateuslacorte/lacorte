@@ -33,6 +33,21 @@ export default function Footer({ lang = defaultLang }: FooterProps) {
           <nav aria-label={t(pf.siteInfo, lang)}>
             <ul className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm text-[var(--color-text-muted)]">
               <li>
+                <Link href={localizePath('/tools/pdf-editor', lang)} className="text-primary-600 dark:text-primary-400 font-medium hover:underline">
+                  {lang === 'pt' ? 'Editor de PDF' : 'PDF Editor'}
+                </Link>
+              </li>
+              <li>
+                <Link href={localizePath('/tools', lang)} className="hover:text-[var(--color-text)] hover:underline">
+                  {lang === 'pt' ? 'Ferramentas' : 'Tools'}
+                </Link>
+              </li>
+              <li>
+                <Link href={localizePath('/posts', lang)} className="hover:text-[var(--color-text)] hover:underline">
+                  {lang === 'pt' ? 'Artigos' : 'Blog'}
+                </Link>
+              </li>
+              <li>
                 <Link href={localizePath('/about', lang)} className="hover:text-[var(--color-text)] hover:underline">
                   {t(pf.about, lang)}
                 </Link>
