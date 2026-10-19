@@ -107,6 +107,7 @@ export function PopularToolsSection() {
   const idx = translations.common.index;
 
   const tools = [
+    { href: '/tools/pdf-editor', icon: '📄', name: idx.pdfEditor },
     { href: '/tools/json', icon: '{ }', name: idx.jsonFormatter },
     { href: '/tools/qr-code', icon: '📱', name: idx.qrCode },
     { href: '/tools/color', icon: '🌈', name: idx.colorConverter },
@@ -114,7 +115,6 @@ export function PopularToolsSection() {
     { href: '/tools/base64', icon: '🔄', name: idx.base64 },
     { href: '/tools/utm', icon: '📊', name: idx.utmBuilder },
     { href: '/tools/regex', icon: '🔍', name: idx.regexTester },
-    { href: '/tools/password', icon: '🔐', name: idx.passwordGenerator },
   ];
 
   return (

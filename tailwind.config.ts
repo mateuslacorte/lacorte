@@ -36,8 +36,15 @@ export default {
         sans: ['Pretendard', 'system-ui', 'sans-serif'],
         mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
       },
+      boxShadow: {
+        xs: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
+      },
+      backdropBlur: {
+        xs: '2px',
+      },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-out',
+        fadeIn: 'fadeIn 0.2s ease-out',
         'slide-up': 'slideUp 0.5s ease-out',
         gradient: 'gradient 8s ease infinite',
       },

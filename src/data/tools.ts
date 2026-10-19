@@ -22,6 +22,43 @@ const seoKeywords = {
 };
 
 export const toolsConfig: ToolConfig[] = [
+  // Productivity / Documents
+  {
+    slug: 'pdf-editor',
+    icon: '📄',
+    category: 'productivity',
+    component: 'PdfEditorTool',
+    seo: {
+      en: {
+        title: 'PDF Editor - Free Online PDF Editor, Merge & Sign Tool',
+        description:
+          'Free online client-side PDF editor. Edit text in-place, insert images, draw signatures, reorder pages, and combine PDFs directly in your browser.',
+        keywords: [
+          'pdf editor',
+          'edit pdf',
+          'merge pdf',
+          'combine pdf',
+          'sign pdf',
+          'pdf tool',
+          ...seoKeywords.en,
+        ],
+      },
+      pt: {
+        title: 'Editor de PDF - Editar, Juntar e Assinar PDF Online Grátis',
+        description:
+          'Editor de PDF online grátis no navegador. Edite textos, insira imagens, desenhe assinaturas, reordene páginas e junte arquivos PDF com privacidade.',
+        keywords: [
+          'editor de pdf',
+          'editar pdf',
+          'juntar pdf',
+          'combinar pdf',
+          'assinar pdf',
+          'pdf online',
+          ...seoKeywords.pt,
+        ],
+      },
+    },
+  },
   // Generators
   {
     slug: 'qr-code',

@@ -118,6 +118,6 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     // Skip Next internals and common static file extensions under /public
-    '/((?!_next/static|_next/image|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|txt|xml|woff2?)$).*)',
+    '/((?!_next/static|_next/image|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|txt|xml|woff2?|mjs)$).*)',
   ],
 };

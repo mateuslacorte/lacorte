@@ -44,9 +44,11 @@ import DdayCalculator from '@/components/tools/DdayCalculator';
 import DutchPayCalculator from '@/components/tools/DutchPayCalculator';
 import CoinFlip from '@/components/tools/CoinFlip';
 import DiceRoller from '@/components/tools/DiceRoller';
+import PdfEditorTool from '@/components/tools/PdfEditorTool';
 import { toolsConfig } from '@/data/tools';
 
 const toolComponents: Record<string, ToolComponentType> = {
+  PdfEditorTool,
   QRCodeGenerator,
   PasswordGenerator,
   UuidGenerator,

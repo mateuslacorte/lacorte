@@ -149,6 +149,7 @@ export const commonTranslations = {
     noProjectsHint: { en: 'Check back later — new work will show up when it is ready to share.', pt: 'Volte mais tarde — novos trabalhos aparecem quando estiverem prontos pra compartilhar.' },
     browseGames: { en: 'Browse games', pt: 'Explorar jogos' },
     // Tool names
+    pdfEditor: { en: 'PDF Editor', pt: 'Editor de PDF' },
     jsonFormatter: { en: 'JSON Formatter', pt: 'Formatador JSON' },
     qrCode: { en: 'QR Code', pt: 'QR Code' },
     colorConverter: { en: 'Color Converter', pt: 'Conversor de cores' },

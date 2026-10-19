@@ -42,6 +42,10 @@ export default function ToolPageClient({
     return null;
   }
 
+  if (slug === 'pdf-editor') {
+    return <ToolComponent lang={lang} />;
+  }
+
   return (
     <section className="py-8 px-4">
       <div className="max-w-4xl mx-auto">

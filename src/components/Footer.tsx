@@ -1,7 +1,10 @@
+'use client';
+
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { SiteLogoMark } from '@/components/SiteLogoMark';
 import { defaultLang, t, type Language } from '@/i18n';
-import { localizePath } from '@/i18n/urlUtils';
+import { localizePath, stripLocalePrefix } from '@/i18n/urlUtils';
 import { pageTranslations } from '@/i18n/translations/pages';
 import { SITE_NAME } from '@/lib/site';
 
@@ -10,6 +13,11 @@ interface FooterProps {
 }
 
 export default function Footer({ lang = defaultLang }: FooterProps) {
+  const pathname = usePathname() ?? '/';
+  if (stripLocalePrefix(pathname) === '/tools/pdf-editor') {
+    return null;
+  }
+
   const currentYear = new Date().getFullYear();
   const pf = pageTranslations.footer;
 

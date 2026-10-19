@@ -67,6 +67,30 @@ export default function Header() {
     localStorage.setItem('theme', theme);
   };
 
+  if (basePath === '/tools/pdf-editor') {
+    return (
+      <header
+        className="h-8 bg-[#1d2327] text-[#f0f0f1] border-b border-black/30 px-3 flex items-center z-50 shrink-0 select-none text-xs font-sans"
+        style={{ colorScheme: 'dark' }}
+      >
+        <nav aria-label="Blog navigation" className="w-full overflow-x-auto">
+          <ul className="flex items-center gap-0.5 whitespace-nowrap">
+            {navItems.map((item) => (
+              <li key={item.href}>
+                <Link
+                  href={localizePath(item.href, lang)}
+                  className="px-2.5 py-1 rounded-sm text-[12px] leading-none font-medium text-[#f0f0f1] hover:bg-[#2c3338] hover:text-[#72aee6] transition-colors inline-block"
+                >
+                  {t(nav[item.labelKey])}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </header>
+    );
+  }
+
   return (
     <header className="sticky top-0 z-50 bg-[var(--color-bg)]/80 backdrop-blur-lg border-b border-[var(--color-border)]">
       <nav className="max-w-4xl mx-auto px-6 h-16 flex items-center justify-between">

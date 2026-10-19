@@ -16,15 +16,17 @@ export const LOCALE_EXCLUDED_PREFIXES = [
   '/_next',
   '/favicon',
   '/images',
+  '/pdfjs',
   '/opengraph-image',
 ] as const;
 
-const STATIC_FILE_RE = /\.(?:svg|png|jpg|jpeg|gif|webp|ico|txt|xml|woff2?|css|js|map)$/i;
+const STATIC_FILE_RE = /\.(?:svg|png|jpg|jpeg|gif|webp|ico|txt|xml|woff2?|css|m?js|map)$/i;
 
 /** True for files served from /public (must not be locale-rewritten). */
 export function isStaticAssetPath(pathname: string): boolean {
   if (STATIC_FILE_RE.test(pathname)) return true;
   if (pathname === '/images' || pathname.startsWith('/images/')) return true;
+  if (pathname === '/pdfjs' || pathname.startsWith('/pdfjs/')) return true;
   if (pathname === '/favicon' || pathname.startsWith('/favicon.') || pathname.startsWith('/favicon/')) {
     return true;
   }
