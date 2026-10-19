@@ -100,6 +100,7 @@ export function webApplicationJsonLd(input: {
   name: string;
   description: string;
   applicationCategory: string;
+  featureList?: string[];
 }) {
   const url = absoluteUrl(localizePath(input.path, input.lang));
   return {
@@ -111,6 +112,7 @@ export function webApplicationJsonLd(input: {
     applicationCategory: input.applicationCategory,
     operatingSystem: 'Any',
     browserRequirements: 'Requires JavaScript',
+    ...(input.featureList ? { featureList: input.featureList } : {}),
     offers: {
       '@type': 'Offer',
       price: '0',
@@ -119,5 +121,22 @@ export function webApplicationJsonLd(input: {
     author: personSchema(),
     publisher: organizationSchema(),
     inLanguage: input.lang === 'pt' ? 'pt-BR' : 'en',
+  };
+}
+
+export function faqJsonLd(
+  questions: { question: string; answer: string }[],
+) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: questions.map((q) => ({
+      '@type': 'Question',
+      name: q.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: q.answer,
+      },
+    })),
   };
 }

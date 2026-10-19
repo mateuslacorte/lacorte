@@ -331,6 +331,37 @@ export const WordStyleEditor: React.FC<WordStyleEditorProps> = ({
     setDragOverIndex(null);
   };
 
+  // Delete a page from the PDF document
+  const handleDeletePage = (indexToDelete: number, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+
+    if (pages.length <= 1) {
+      setSelectedElement(null);
+      onReset();
+      return;
+    }
+
+    const updatedPages = pages
+      .filter((_, idx) => idx !== indexToDelete)
+      .map((p, idx) => ({
+        ...p,
+        pageNumber: idx + 1,
+      }));
+
+    if (selectedElement) {
+      if (selectedElement.pageIndex === indexToDelete) {
+        setSelectedElement(null);
+      } else if (selectedElement.pageIndex > indexToDelete) {
+        setSelectedElement({
+          ...selectedElement,
+          pageIndex: selectedElement.pageIndex - 1,
+        });
+      }
+    }
+
+    onUpdatePages(updatedPages);
+  };
+
   // Determine which page is primarily visible in the continuous scroll view
   const getVisiblePageIndex = (): number => {
     const mainEl = mainContainerRef.current;
@@ -861,6 +892,15 @@ export const WordStyleEditor: React.FC<WordStyleEditorProps> = ({
                           Page {index + 1}
                         </span>
                       </div>
+                      <button
+                        type="button"
+                        onClick={(e) => handleDeletePage(index, e)}
+                        className="p-1 rounded text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                        title={`Delete Page ${index + 1}`}
+                        aria-label={`Delete Page ${index + 1}`}
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
                     </div>
 
                     {/* Thumbnail preview image */}
@@ -1115,9 +1155,20 @@ export const WordStyleEditor: React.FC<WordStyleEditorProps> = ({
                   );
                 })}
 
-                {/* Page number watermark badge */}
-                <div className="absolute bottom-3 right-4 text-[11px] font-semibold text-slate-400 bg-white/80 px-2 py-0.5 rounded shadow-xs">
-                  Page {pIdx + 1}
+                {/* Page number watermark badge + delete page action */}
+                <div className="absolute bottom-3 right-4 flex items-center gap-1.5 bg-white/90 border border-slate-200/80 px-2 py-0.5 rounded shadow-xs z-20">
+                  <span className="text-[11px] font-semibold text-slate-500">
+                    Page {pIdx + 1}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={(e) => handleDeletePage(pIdx, e)}
+                    className="p-0.5 text-slate-400 hover:text-rose-600 rounded hover:bg-rose-50 transition-colors"
+                    title={`Delete Page ${pIdx + 1}`}
+                    aria-label={`Delete Page ${pIdx + 1}`}
+                  >
+                    <Trash2 className="w-3 h-3" />
+                  </button>
                 </div>
               </div>
             );
