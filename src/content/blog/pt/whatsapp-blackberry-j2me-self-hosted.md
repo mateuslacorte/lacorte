@@ -66,7 +66,7 @@ PORT=8085 NODE_PATH="$(command -v node)" ./target/release/baileys-j2me
 
 Execute a partir da pasta do repositório. O binário inicia o processo Node por `node-bridge/bridge.js`, então copiar apenas o executável Rust não basta. Também são necessárias as dependências Node e uma pasta `sessions/` com permissão de escrita. Se a compilação apontar bibliotecas de sistema ausentes, instale os pacotes de desenvolvimento exigidos pela crate indicada para sua distribuição.
 
-Por padrão, o servidor escuta em **todas as interfaces na porta 8085**. Antes de iniciá-lo em uma VPS, restrinja essa porta no firewall local ou do provedor; permita que o proxy reverso a acesse localmente. Esta versão não tem middleware de autenticação protegendo a API de dispositivos: o ID do aparelho não é uma senha. Mantenha a instalação em uma rede privada confiável ou adicione restrições de acesso compatíveis com seu celular antes de disponibilizá-la remotamente. TLS sozinho não controla quem acessa a API.
+Por padrão, o servidor escuta em **todas as interfaces na porta 8085**. Mantenha essa porta fechada para a internet e permita que o proxy reverso a acesse localmente. Configure o usuário e a senha no Nginx conforme os passos abaixo antes de conectar o celular.
 
 Para uma primeira verificação local, abra outro terminal no servidor:
 
@@ -116,10 +116,24 @@ Mantenha `sessions/` privada. Ela contém credenciais da conta e dados de mensag
 
 Use um hostname que resolva para seu servidor. Para acesso fora da rede local, configure DNS e as regras necessárias no roteador ou firewall. Coloque um proxy reverso na frente da ponte, com HTTPS e um certificado aceito pelo aparelho.
 
+Crie primeiro as credenciais do proxy:
+
+```bash
+sudo apt install -y apache2-utils
+sudo htpasswd -c /etc/nginx/baileys.htpasswd bridge-user
+sudo chown root:www-data /etc/nginx/baileys.htpasswd
+sudo chmod 640 /etc/nginx/baileys.htpasswd
+```
+
+Troque `bridge-user` pelo seu usuário e informe a senha quando solicitado. Use caracteres ASCII imprimíveis e nenhum dois-pontos no usuário. Ajuste o grupo do arquivo ao grupo dos processos do Nginx (`www-data` no Debian/Ubuntu). Para trocar uma senha ou adicionar outro usuário depois, omita `-c` para preservar o arquivo existente.
+
 Dentro de um bloco `server` do Nginx que já tenha um certificado TLS funcionando, esta configuração encaminha a API pela raiz do domínio:
 
 ```nginx
 location / {
+    auth_basic "WhatsApp J2ME bridge";
+    auth_basic_user_file /etc/nginx/baileys.htpasswd;
+    proxy_set_header Authorization "";
     proxy_pass http://127.0.0.1:8085/;
     proxy_http_version 1.1;
     proxy_buffering off;
@@ -131,9 +145,9 @@ location / {
 }
 ```
 
-Aplique suas restrições de acesso de rede também a esse virtual host. Execute `sudo nginx -t` antes de `sudo systemctl reload nginx`. Esse trecho configura o encaminhamento; ele não é uma configuração completa de TLS ou controle de acesso.
+Aplique suas restrições de acesso de rede também a esse virtual host. Execute `sudo nginx -t` antes de `sudo systemctl reload nginx`. Esse trecho inclui Basic Auth; mantenha-o no virtual host HTTPS e redirecione o tráfego HTTP da API para HTTPS.
 
-Nesse cenário, os dados do cliente são **host: seu hostname; porta: 443; protocolo: HTTPS; caminho da API: `/`**. Teste uma requisição a `https://seu-hostname/api/device/setup-check/status` em um computador autorizado antes de compilar o aplicativo.
+Nesse cenário, os dados do cliente são **host: seu hostname; porta: 443; protocolo: HTTPS; caminho da API: `/`**. Confira se `curl -o /dev/null -w '%{http_code}\n' https://seu-hostname/api/device/setup-check/status` retorna **401** sem credenciais. Depois execute `curl --user bridge-user https://seu-hostname/api/device/setup-check/status`, informe a senha quando solicitado e confirme uma resposta JSON com status **200**.
 
 Os certificados e o TLS dos BlackBerry antigos podem ser a parte mais trabalhosa. Confira data e hora do celular, cadeia de confiança e suporte ao protocolo negociado. Um certificado que funciona no notebook ainda pode falhar no aparelho. Alguns modelos exigem importar um certificado em formato DER. O [README da ponte](https://github.com/mateuslacorte/baileys-j2me#readme) aborda cenários de certificados e proxies antigos; habilitar TLS obsoleto ou cifras mais fracas reduz a segurança, então isole qualquer endpoint legado necessário. HTTP sem criptografia expõe o tráfego entre o celular e a ponte e deve ficar restrito a uma rede de testes confiável e isolada.
 
@@ -148,16 +162,17 @@ Para essa etapa, mantenho um [compilador de WhatsApp J2ME na minha área de memb
 1. Abra o compilador e informe o hostname ou IP, sem o prefixo de protocolo no campo de host.
 2. Escolha a porta e o protocolo publicados pelo seu proxy.
 3. Use `/` como caminho da API para a configuração na raiz mostrada acima. Uma instalação em subpasta exige uma rota correspondente no proxy e no cliente.
-4. Confira o endereço final; depois entre na conta e ative a assinatura para compilar.
-5. Baixe e extraia o ZIP com `WhatsApp.jar`, `WhatsApp.jad` e `MANIFEST.MF`.
+4. Escolha o idioma do app e informe o mesmo **Usuário da API** e a mesma **Senha da API** criados com `htpasswd`.
+5. Confira o endereço final; depois entre na conta e ative a assinatura para compilar. As credenciais não ficam no rascunho do navegador; informe-as novamente após entrar.
+6. Baixe e extraia o ZIP com `WhatsApp.jar`, `WhatsApp.jad` e `MANIFEST.MF`.
 
-Se mudar o endereço da ponte depois, gere uma nova compilação com os novos dados.
+Se mudar o endereço da ponte ou as credenciais depois, gere e instale uma nova compilação. As credenciais ficam no JAR, então mantenha o ZIP e os arquivos de instalação privados. Use HTTPS nas chamadas autenticadas da API.
 
 ## 3. Instale no BlackBerry
 
 Mantenha o JAR e o JAD gerados juntos. Em um BlackBerry OS compatível, tente abrir o JAD pelo navegador do aparelho em um endereço acessível por ele. O JAD aponta para o JAR, então preserve a localização relativa dos arquivos e não altere o JAR após a compilação: o descritor inclui seu tamanho em bytes.
 
-Se hospedar os arquivos, use `text/vnd.sun.j2me.app-descriptor` para `.jad` e `application/java-archive` para `.jar`. Publique apenas os arquivos de instalação em uma pasta de downloads separada, nunca o repositório da ponte ou `sessions/`. Dependendo do modelo e firmware, a instalação local também pode estar disponível; siga o método aceito pelo seu aparelho. Ter um pacote JAR/JAD não garante que todo BlackBerry vá aceitá-lo.
+Se hospedar os arquivos, use `text/vnd.sun.j2me.app-descriptor` para `.jad` e `application/java-archive` para `.jar`. Mantenha os downloads de instalação privados, pois as compilações personalizadas contêm suas credenciais da API. Use uma pasta de downloads protegida e nunca publique o repositório da ponte ou `sessions/`. Dependendo do modelo e firmware, a instalação local também pode estar disponível; siga o método aceito pelo seu aparelho. Ter um pacote JAR/JAD não garante que todo BlackBerry vá aceitá-lo.
 
 Autorize o acesso à rede quando o aplicativo solicitar. Políticas corporativas, permissões de aplicativos, configurações de APN e diferenças no transporte de rede podem impedir a conexão mesmo com o app instalado. Teste primeiro pelo Wi-Fi, quando disponível, e investigue os dados móveis separadamente.
 
