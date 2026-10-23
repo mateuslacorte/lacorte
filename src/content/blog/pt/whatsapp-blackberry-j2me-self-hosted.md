@@ -34,8 +34,6 @@ Quer manter a ponte funcionando sem deixar o computador de casa ligado? Um Dropl
 
 **[Crie sua conta na DigitalOcean e prepare seu Droplet →](https://m.do.co/c/7a280b0839a3)**
 
-[![DigitalOcean Referral Badge](https://web-platforms.sfo2.cdn.digitaloceanspaces.com/WWW/Badge%201.svg)](https://www.digitalocean.com/?refcode=7a280b0839a3&utm_campaign=Referral_Invite&utm_medium=Referral_Program&utm_source=badge)
-
 *Este é meu link de indicação. Posso receber crédito de indicação se você se cadastrar e atender às condições do programa da DigitalOcean. Confira a oferta e os preços atuais antes de criar recursos pagos; a hospedagem é cobrada separadamente da minha assinatura.*
 
 1. Acesse o link acima e crie sua conta ou faça login.

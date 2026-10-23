@@ -34,8 +34,6 @@ Want to keep the bridge running without leaving your home computer on? A Digital
 
 **[Create your DigitalOcean account and set up a Droplet →](https://m.do.co/c/7a280b0839a3)**
 
-[![DigitalOcean Referral Badge](https://web-platforms.sfo2.cdn.digitaloceanspaces.com/WWW/Badge%201.svg)](https://www.digitalocean.com/?refcode=7a280b0839a3&utm_campaign=Referral_Invite&utm_medium=Referral_Program&utm_source=badge)
-
 *This is my referral link. I may receive referral credit if you sign up and qualify under DigitalOcean's referral terms. Check the offer and current pricing before creating paid resources; hosting is billed separately from my membership.*
 
 1. Follow the link above and create your account, or sign in.
