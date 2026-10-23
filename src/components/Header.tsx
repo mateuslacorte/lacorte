@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { ArrowUpRight, UsersRound } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { SiteLogoMark } from '@/components/SiteLogoMark';
 import { useTranslation } from '@/i18n/useTranslation';
@@ -93,7 +94,7 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 bg-[var(--color-bg)]/80 backdrop-blur-lg border-b border-[var(--color-border)]">
-      <nav className="max-w-4xl mx-auto px-6 h-16 flex items-center justify-between">
+      <nav className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
         <Link
           href={localizePath('/', lang)}
           className="flex items-center gap-3 font-bold text-lg group"
@@ -103,7 +104,7 @@ export default function Header() {
         </Link>
 
         <div className="flex items-center gap-1">
-          <ul className="hidden sm:flex items-center">
+          <ul className="hidden xl:flex items-center">
             {navItems.map((item) => (
               <li key={item.href}>
                 <Link
@@ -119,6 +120,16 @@ export default function Header() {
               </li>
             ))}
           </ul>
+
+          <Link
+            href="/login"
+            aria-current={basePath === '/login' ? 'page' : undefined}
+            className="group/members ml-2 inline-flex shrink-0 items-center gap-2 rounded-full border border-white/15 bg-gradient-to-br from-primary-500 to-primary-700 px-3 py-2 text-sm font-semibold text-white shadow-md shadow-primary-500/20 transition duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary-500/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-bg)] motion-reduce:transform-none sm:px-4"
+          >
+            <UsersRound className="h-4 w-4" aria-hidden="true" />
+            <span>{t({ en: 'Members', pt: 'Membros' })}</span>
+            <ArrowUpRight className="hidden h-3.5 w-3.5 opacity-70 transition-transform group-hover/members:-translate-y-0.5 group-hover/members:translate-x-0.5 motion-reduce:transform-none sm:block" aria-hidden="true" />
+          </Link>
 
           <div
             className="ml-2 flex items-center gap-0.5 rounded-lg border border-[var(--color-border)] p-0.5"
@@ -161,7 +172,7 @@ export default function Header() {
           <button
             type="button"
             onClick={() => setMobileOpen((open) => !open)}
-            className="sm:hidden p-2 rounded-lg text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-card-hover)] transition-colors"
+            className="xl:hidden p-2 rounded-lg text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-card-hover)] transition-colors"
             aria-label={t({ en: 'Toggle menu', pt: 'Abrir menu' })}
           >
             {mobileOpen ? (
@@ -178,7 +189,7 @@ export default function Header() {
       </nav>
 
       {mobileOpen && (
-        <div className="sm:hidden border-t border-[var(--color-border)] bg-[var(--color-bg)]">
+        <div className="xl:hidden border-t border-[var(--color-border)] bg-[var(--color-bg)]">
           <ul className="px-4 py-3 space-y-1">
             {navItems.map((item) => (
               <li key={item.href}>
