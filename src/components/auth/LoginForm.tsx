@@ -48,7 +48,6 @@ export function LoginForm() {
         {busy ? 'Signing in…' : 'Sign in'}
       </button>
       {error && <p className="text-sm text-red-500 auth-error" role="alert">{error}</p>}
-      <p className="text-sm auth-footnote">Use the same email and password for Lacorte Blog and Membership.</p>
     </form>
   );
 }
