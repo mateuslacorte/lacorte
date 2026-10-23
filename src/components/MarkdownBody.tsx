@@ -82,7 +82,7 @@ const components = {
 /** Shared MDX renderer with GFM, Shiki highlighting, and Mermaid. */
 export default function MarkdownBody({ source }: { source: string }) {
   return (
-    <div className="prose prose-neutral dark:prose-invert max-w-none">
+    <div className="prose">
       <MDXRemote source={source} options={mdxOptions} components={components} />
     </div>
   );

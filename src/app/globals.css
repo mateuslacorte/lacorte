@@ -108,12 +108,20 @@
     @apply font-bold text-[var(--color-text)] scroll-mt-20;
   }
 
+  .prose h1 {
+    @apply text-3xl mt-12 mb-6 leading-tight;
+  }
+
   .prose h2 {
-    @apply text-2xl mt-12 mb-4 pb-2 border-b border-[var(--color-border)];
+    @apply text-2xl mt-12 mb-6 leading-snug;
   }
 
   .prose h3 {
-    @apply text-xl mt-8 mb-3;
+    @apply text-xl mt-10 mb-6 leading-snug;
+  }
+
+  .prose h4, .prose h5, .prose h6 {
+    @apply text-lg font-semibold mt-8 mb-4 leading-snug;
   }
 
   .prose a {
@@ -123,12 +131,11 @@
   }
 
   .prose img {
-    @apply rounded-xl shadow-lg ring-1 ring-[var(--color-border)];
+    @apply my-8 rounded-lg;
   }
 
   .prose blockquote {
-    @apply border-l-4 border-primary-500 pl-6 py-1 my-6
-           bg-primary-500/5 rounded-r-lg
+    @apply border-l-2 border-[var(--color-border)] pl-6 my-8
            text-[var(--color-text-muted)];
   }
 
