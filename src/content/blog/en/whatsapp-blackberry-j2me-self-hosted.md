@@ -32,9 +32,9 @@ The bridge handles the modern WhatsApp connection and exposes an API the old cli
 
 Want to keep the bridge running without leaving your home computer on? A DigitalOcean Droplet gives you a Linux server for this part of the setup. Create it first, then return here when it is ready to deploy the bridge.
 
-**[Create your DigitalOcean account and set up a Droplet →](https://m.do.co/c/7a280b0839a3)**
+You can [create a DigitalOcean Droplet through my referral link](https://m.do.co/c/7a280b0839a3).
 
-*This is my referral link. I may receive referral credit if you sign up and qualify under DigitalOcean's referral terms. Check the offer and current pricing before creating paid resources; hosting is billed separately from my membership.*
+I may receive referral credit for qualifying signups. Check the current pricing before creating your server; hosting is billed separately from my membership.
 
 1. Follow the link above and create your account, or sign in.
 2. Create a Droplet with a supported Ubuntu LTS image. Choose a region near you and a plan with enough memory for Rust compilation and the Node bridge; builds can need more memory than the running service.
@@ -42,7 +42,7 @@ Want to keep the bridge running without leaving your home computer on? A Digital
 4. Configure the cloud firewall: allow SSH only from your administrative IP, and allow your authorized devices or network to reach the proxy on HTTPS. Keep port **8085 closed to the public internet**.
 5. Wait for provisioning to finish and copy the Droplet's public IP. You can point your bridge hostname at this address when you configure DNS below.
 
-**Droplet ready? Continue here.** Open a terminal on your computer and connect, replacing the example address with your Droplet's IP:
+Once your Droplet is ready, open a terminal on your computer and connect, replacing the example address with your Droplet's IP:
 
 ```bash
 ssh root@YOUR_DROPLET_IP

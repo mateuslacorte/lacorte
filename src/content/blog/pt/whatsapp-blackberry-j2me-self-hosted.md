@@ -32,9 +32,9 @@ A ponte mantém a conexão moderna com o WhatsApp e oferece uma API que o client
 
 Quer manter a ponte funcionando sem deixar o computador de casa ligado? Um Droplet da DigitalOcean oferece um servidor Linux para essa parte da configuração. Crie o seu primeiro e volte aqui quando ele estiver pronto para receber a ponte.
 
-**[Crie sua conta na DigitalOcean e prepare seu Droplet →](https://m.do.co/c/7a280b0839a3)**
+Você pode [criar um Droplet na DigitalOcean pelo meu link de indicação](https://m.do.co/c/7a280b0839a3).
 
-*Este é meu link de indicação. Posso receber crédito de indicação se você se cadastrar e atender às condições do programa da DigitalOcean. Confira a oferta e os preços atuais antes de criar recursos pagos; a hospedagem é cobrada separadamente da minha assinatura.*
+Posso receber crédito por cadastros que atendam às condições do programa. Confira os preços atuais antes de criar seu servidor; a hospedagem é cobrada separadamente da minha assinatura.
 
 1. Acesse o link acima e crie sua conta ou faça login.
 2. Crie um Droplet com uma imagem Ubuntu LTS ainda mantida. Escolha uma região próxima de você e um plano com memória suficiente para compilar o Rust e executar a ponte Node; a compilação pode exigir mais memória que o serviço em execução.
@@ -42,7 +42,7 @@ Quer manter a ponte funcionando sem deixar o computador de casa ligado? Um Dropl
 4. Configure o firewall da nuvem: permita SSH apenas pelo seu IP administrativo e libere o HTTPS do proxy para seus dispositivos ou sua rede autorizada. Mantenha a porta **8085 fechada para a internet pública**.
 5. Aguarde o fim da criação e copie o IP público do Droplet. Você poderá apontar o hostname da ponte para esse endereço ao configurar o DNS mais adiante.
 
-**Droplet pronto? Continue daqui.** Abra um terminal no seu computador e conecte-se, substituindo o endereço de exemplo pelo IP do Droplet:
+Quando o Droplet estiver pronto, abra um terminal no seu computador e conecte-se, substituindo o endereço de exemplo pelo IP do Droplet:
 
 ```bash
 ssh root@IP_DO_SEU_DROPLET

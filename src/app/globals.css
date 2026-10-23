@@ -41,7 +41,11 @@
 
 @layer components {
   .prose {
-    @apply max-w-none;
+    @apply max-w-none leading-relaxed;
+  }
+
+  .prose p {
+    @apply my-6;
   }
 
   .prose pre {
@@ -133,11 +137,23 @@
   }
 
   .prose ul, .prose ol {
-    @apply my-4 pl-6;
+    @apply my-8 pl-6;
+  }
+
+  .prose ol {
+    @apply list-decimal;
+  }
+
+  .prose ul {
+    @apply list-disc;
   }
 
   .prose li {
-    @apply my-1;
+    @apply my-4 pl-1;
+  }
+
+  .prose li > p {
+    @apply my-3;
   }
 
   .prose table {
