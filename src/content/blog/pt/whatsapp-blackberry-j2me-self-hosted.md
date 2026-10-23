@@ -28,6 +28,34 @@ Você também precisa de uma conta atual do WhatsApp no Android ou iOS, um compu
 
 A ponte mantém a conexão moderna com o WhatsApp e oferece uma API que o cliente antigo consegue utilizar. Ela precisa ficar ligada enquanto você quiser trocar mensagens pelo BlackBerry.
 
+### Dê ao seu BlackBerry um servidor próprio
+
+Quer manter a ponte funcionando sem deixar o computador de casa ligado? Um Droplet da DigitalOcean oferece um servidor Linux para essa parte da configuração. Crie o seu primeiro e volte aqui quando ele estiver pronto para receber a ponte.
+
+**[Crie sua conta na DigitalOcean e prepare seu Droplet →](https://m.do.co/c/7a280b0839a3)**
+
+[![DigitalOcean Referral Badge](https://web-platforms.sfo2.cdn.digitaloceanspaces.com/WWW/Badge%201.svg)](https://www.digitalocean.com/?refcode=7a280b0839a3&utm_campaign=Referral_Invite&utm_medium=Referral_Program&utm_source=badge)
+
+*Este é meu link de indicação. Posso receber crédito de indicação se você se cadastrar e atender às condições do programa da DigitalOcean. Confira a oferta e os preços atuais antes de criar recursos pagos; a hospedagem é cobrada separadamente da minha assinatura.*
+
+1. Acesse o link acima e crie sua conta ou faça login.
+2. Crie um Droplet com uma imagem Ubuntu LTS ainda mantida. Escolha uma região próxima de você e um plano com memória suficiente para compilar o Rust e executar a ponte Node; a compilação pode exigir mais memória que o serviço em execução.
+3. Adicione sua chave pública SSH durante a criação e mantenha a chave privada no seu computador. Dê um nome fácil de identificar, como `blackberry-bridge`.
+4. Configure o firewall da nuvem: permita SSH apenas pelo seu IP administrativo e libere o HTTPS do proxy para seus dispositivos ou sua rede autorizada. Mantenha a porta **8085 fechada para a internet pública**.
+5. Aguarde o fim da criação e copie o IP público do Droplet. Você poderá apontar o hostname da ponte para esse endereço ao configurar o DNS mais adiante.
+
+**Droplet pronto? Continue daqui.** Abra um terminal no seu computador e conecte-se, substituindo o endereço de exemplo pelo IP do Droplet:
+
+```bash
+ssh root@IP_DO_SEU_DROPLET
+```
+
+Se você configurou outro usuário administrativo, use esse nome no lugar de `root`. Na primeira conexão, confira a chave de identificação SSH do servidor por um canal confiável. Prepare um usuário de serviço sem privilégios e instale os pré-requisitos Linux abaixo antes de iniciar a ponte; o serviço mostrado mais adiante roda como `baileys`.
+
+Já tem um servidor Linux? Continue com as mesmas etapas de instalação. A ponte não depende da DigitalOcean.
+
+### Instale e inicie a ponte
+
 Em uma máquina Linux com Git, Rust/Cargo e uma versão do Node.js ainda mantida e compatível com as dependências da ponte:
 
 ```bash

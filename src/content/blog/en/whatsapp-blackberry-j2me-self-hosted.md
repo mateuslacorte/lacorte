@@ -28,6 +28,34 @@ You will also need a current WhatsApp account on Android or iOS, a computer or L
 
 The bridge handles the modern WhatsApp connection and exposes an API the old client can use. Keep it running whenever you want the BlackBerry to exchange messages.
 
+### Give your BlackBerry a server of its own
+
+Want to keep the bridge running without leaving your home computer on? A DigitalOcean Droplet gives you a Linux server for this part of the setup. Create it first, then return here when it is ready to deploy the bridge.
+
+**[Create your DigitalOcean account and set up a Droplet →](https://m.do.co/c/7a280b0839a3)**
+
+[![DigitalOcean Referral Badge](https://web-platforms.sfo2.cdn.digitaloceanspaces.com/WWW/Badge%201.svg)](https://www.digitalocean.com/?refcode=7a280b0839a3&utm_campaign=Referral_Invite&utm_medium=Referral_Program&utm_source=badge)
+
+*This is my referral link. I may receive referral credit if you sign up and qualify under DigitalOcean's referral terms. Check the offer and current pricing before creating paid resources; hosting is billed separately from my membership.*
+
+1. Follow the link above and create your account, or sign in.
+2. Create a Droplet with a supported Ubuntu LTS image. Choose a region near you and a plan with enough memory for Rust compilation and the Node bridge; builds can need more memory than the running service.
+3. Add your SSH public key during creation and keep the private key on your computer. Give the server a recognizable name, such as `blackberry-bridge`.
+4. Configure the cloud firewall: allow SSH only from your administrative IP, and allow your authorized devices or network to reach the proxy on HTTPS. Keep port **8085 closed to the public internet**.
+5. Wait for provisioning to finish and copy the Droplet's public IP. You can point your bridge hostname at this address when you configure DNS below.
+
+**Droplet ready? Continue here.** Open a terminal on your computer and connect, replacing the example address with your Droplet's IP:
+
+```bash
+ssh root@YOUR_DROPLET_IP
+```
+
+If you configured another administrative user, use that username instead. Verify the server's SSH host key through a trusted channel on the first connection. Prepare an unprivileged service user and install the Linux prerequisites below before starting the bridge; the service later in this guide runs as `baileys`.
+
+Already have a Linux server? Continue with the same deployment steps. The bridge does not require DigitalOcean.
+
+### Install and start the bridge
+
 On a Linux machine with Git, Rust/Cargo, and a currently supported Node.js release compatible with the bridge dependencies installed:
 
 ```bash
