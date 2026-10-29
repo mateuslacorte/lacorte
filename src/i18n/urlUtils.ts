@@ -8,6 +8,8 @@ export const LOCALE_EXCLUDED_PREFIXES = [
   '/s',
   '/admin',
   '/login',
+  '/forgot-password',
+  '/reset-password',
   '/auth',
   '/rss.xml',
   '/sitemap.xml',

@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, type FormEvent } from 'react';
+import Link from 'next/link';
 import { Recaptcha, getRecaptchaToken } from '@/lib/auth/recaptcha';
 
-export function LoginForm() {
+export function LoginForm({ nextPath = '/admin' }: { nextPath?: string }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [captchaReady, setCaptchaReady] = useState(false);
@@ -43,6 +44,7 @@ export function LoginForm() {
         <span className="mb-1 block text-sm font-medium">Password</span>
         <input type="password" name="password" autoComplete="current-password" required maxLength={1024} value={password} onChange={(e) => setPassword(e.target.value)} className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] px-4 py-3 outline-none focus:border-primary-500" />
       </label>
+      <p className="text-sm"><Link className="underline" href={'/forgot-password?next=' + encodeURIComponent(nextPath)}>Forgot your password?</Link></p>
       <Recaptcha onReady={setCaptchaReady} />
       <button type="submit" disabled={busy || !captchaReady} className="w-full rounded-xl bg-primary-600 px-4 py-3 font-medium text-primary-950 disabled:opacity-60">
         {busy ? 'Signing in…' : 'Sign in'}

@@ -10,6 +10,7 @@
     "verify:content-quality": "node scripts/verify-content-quality.mjs",
     "import:blog": "node scripts/import-blog-posts.mjs ../blog",
     "verify": "npm run verify:content-quality",
+    "test:password-reset": "node scripts/test-password-reset.mjs",
     "test:auth": "node scripts/test-auth.mjs"
   },
   "dependencies": {
