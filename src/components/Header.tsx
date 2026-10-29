@@ -121,15 +121,14 @@ export default function Header() {
             ))}
           </ul>
 
-          <Link
-            href="/login"
-            aria-current={basePath === '/login' ? 'page' : undefined}
+          <a
+            href={lang === 'pt' ? 'https://members.lacorte.dev/pt' : 'https://members.lacorte.dev'}
             className="group/members ml-2 inline-flex shrink-0 items-center gap-2 rounded-full border border-white/15 bg-gradient-to-br from-primary-500 to-primary-700 px-3 py-2 text-sm font-semibold text-white shadow-md shadow-primary-500/20 transition duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary-500/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-bg)] motion-reduce:transform-none sm:px-4"
           >
             <UsersRound className="h-4 w-4" aria-hidden="true" />
             <span>{t({ en: 'Members', pt: 'Membros' })}</span>
             <ArrowUpRight className="hidden h-3.5 w-3.5 opacity-70 transition-transform group-hover/members:-translate-y-0.5 group-hover/members:translate-x-0.5 motion-reduce:transform-none sm:block" aria-hidden="true" />
-          </Link>
+          </a>
 
           <div
             className="ml-2 flex items-center gap-0.5 rounded-lg border border-[var(--color-border)] p-0.5"
