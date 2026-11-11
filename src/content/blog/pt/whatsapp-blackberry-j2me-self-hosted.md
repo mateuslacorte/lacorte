@@ -12,7 +12,7 @@ tags:
 
 Digitar uma mensagem no teclado de um BlackBerry tem uma sensação que a tela de toque nunca substituiu muito bem. Se você ainda guarda um desses aparelhos, o WhatsApp J2ME é uma forma experimental de colocar esse teclado para trabalhar de novo.
 
-A configuração tem duas partes: o **whatsapp-j2me**, cliente Java ME instalado no celular, e o **baileys-j2me**, a ponte que roda em um computador ou servidor. Seu Android ou iPhone atual autoriza a conexão com a conta do WhatsApp por QR code. O BlackBerry se comunica com essa ponte.
+Você pode colocar o WhatsApp para funcionar de duas formas: direto pelo **Orbit**, loja retrô de aplicativos pronta para uso sem precisar de servidor, ou autohospedando a ponte de conexão de código aberto (**baileys-j2me**) na sua própria máquina. Em ambos os casos, seu Android ou iPhone atual autoriza a conta escaneando um QR code exibido na tela do BlackBerry.
 
 É um projeto independente, sem vínculo com WhatsApp ou Meta. Ele não restaura o aplicativo oficial do BlackBerry. Compatibilidade e recursos dependem do aparelho, firmware, rede e servidor; encare como uma experiência de computação retrô, sem depender dele como única forma de receber mensagens.
 
@@ -28,7 +28,7 @@ Você também precisa de uma conta atual do WhatsApp no Android ou iOS e um ende
 
 Você pode colocar o WhatsApp para funcionar no seu BlackBerry de duas maneiras:
 
-1. **O caminho mais rápido (Recomendado): Usar o app já compilado pelo Orbit.** Você não precisa compilar código, configurar ambientes antigos de desenvolvimento Java nem manter um servidor próprio. Pelo **Orbit** ([orbit.lacorte.dev](https://orbit.lacorte.dev)), uma loja de aplicativos retrô para celulares clássicos, você instala o cliente do WhatsApp J2ME já compilado direto no aparelho. Ele já vem configurado para a ponte pública oficial, com atualizações automáticas via OTA (Over-The-Air), criptografia local AES-256 e sincronização de contatos.
+1. **O caminho mais rápido (Recomendado): Usar o app já compilado pelo Orbit.** Você não precisa compilar código, configurar ambientes antigos de desenvolvimento Java nem manter um servidor próprio. Pelo **Orbit** ([orbit.lacorte.dev](https://orbit.lacorte.dev)), uma loja de aplicativos retrô para celulares clássicos, você instala o cliente do WhatsApp J2ME já compilado direto no aparelho. Ele funciona totalmente pronto para uso, com atualizações automáticas via OTA (Over-The-Air), criptografia local AES-256 e sincronização de contatos.
 2. **O caminho autohospedado: Hospedar sua própria ponte Baileys.** Se você prefere controle total sobre sua infraestrutura de mensagens e credenciais, pode rodar a ponte em seu próprio servidor Linux ou VPS, protegê-la com Nginx e autenticação HTTP Basic Auth, e compilar um build personalizado com as configurações do seu servidor.
 
 ---
@@ -41,16 +41,16 @@ Se o seu objetivo é simplesmente digitar no teclado físico sem precisar config
 
 O [Orbit](https://orbit.lacorte.dev) é uma loja nativa de aplicativos Java ME inspirada nos catálogos da era de 2010. Construído na mesma base MIDP 2.0 / CLDC 1.1 e com o mesmo motor gráfico em Canvas do WhatsApp J2ME, o Orbit roda direto no celular antigo sem navegadores modernos ou JavaScript.
 
-O WhatsApp J2ME é distribuído pelo Orbit como um aplicativo pré-compilado e pronto para uso, conectado à ponte oficial (`bridge.orbit.lacorte.dev`). Essa versão inclui:
+O WhatsApp J2ME é distribuído pelo Orbit como um aplicativo pré-compilado e pronto para uso. Essa versão inclui:
 
 - **Compilações prontas:** Disponíveis em Português do Brasil e Inglês.
 - **Criptografia dinâmica AES-256 no aparelho:** As mensagens salvas no Record Management System (RMS) do celular são criptografadas com uma chave única por aparelho, enviada via cabeçalho `X-Device-Key`.
 - **Busca e sincronização de contatos:** Catálogo de contatos dedicado (`ContactsCanvas`) com filtro de busca em tempo real e opção de iniciar conversa com números não salvos na agenda.
 - **Atualizações Over-The-Air (OTA):** Gerenciador de atualizações integrado (`OTAManager`) que consulta o catálogo do Orbit ao abrir o app e pela opção **Configurações → Verificar Atualização**, permitindo atualizar o cliente com um clique sempre que uma nova versão for publicada.
 
-### Passo 1: Instale o certificado raiz da ponte Orbit
+### Passo 1: Instale o certificado raiz do Orbit
 
-Os repositórios de certificados do BlackBerry OS foram congelados há anos e não reconhecem as autoridades certificadoras modernas da web. Para que o aparelho estabeleça conexões seguras HTTPS com o Orbit e com a ponte do WhatsApp, instale o certificado primeiro:
+Os repositórios de certificados do BlackBerry OS foram congelados há anos e não reconhecem as autoridades certificadoras modernas da web. Para que o aparelho estabeleça conexões seguras HTTPS com o Orbit, instale seu certificado raiz primeiro:
 
 1. Abra o navegador nativo do BlackBerry e acesse a página legada de instalação:
    ```text
@@ -69,7 +69,7 @@ Os repositórios de certificados do BlackBerry OS foram congelados há anos e n�
 ### Passo 3: Baixe o WhatsApp J2ME pelo Orbit
 
 1. Abra o **Orbit** no menu do BlackBerry e autorize o acesso à rede quando solicitado.
-2. O Orbit se conecta automaticamente ao catálogo em `bridge.orbit.lacorte.dev`.
+2. O Orbit carrega o catálogo ao vivo automaticamente.
 3. Na loja, navegue até a categoria **Social** ou use a busca no cabeçalho (tecla `#`) para encontrar o **WhatsApp**.
 4. Na tela de detalhes do app, escolha o idioma desejado (Português ou Inglês) e clique em **Install** (ou GET).
 5. O Orbit envia o descritor JAD diretamente para o instalador nativo do BlackBerry. Confirme a instalação.
@@ -230,13 +230,13 @@ Transfira ambos os arquivos para o BlackBerry e instale o JAD pelo navegador do 
 
 ## 3. Conecte sua conta do WhatsApp
 
-Inicie a ponte (ou utilize a ponte do Orbit) e abra o aplicativo do WhatsApp instalado no BlackBerry. Quando conseguir acessar o servidor, a tela de conexão exibe um QR code em tempo real.
+Se você estiver autohospedando, certifique-se de que sua ponte está em execução. Abra o aplicativo do WhatsApp instalado no BlackBerry. A tela de conexão exibe um QR code em tempo real.
 
 No Android ou iPhone que já tem sua conta ativa:
 
 1. Abra o **WhatsApp → Configurações → Aparelhos conectados** (ou menu de três pontos → **Aparelhos conectados**).
 2. Toque em **Conectar um aparelho** e aponte a câmera para o QR code exibido na tela do BlackBerry.
-3. Aguarde alguns segundos para a ponte registrar a sessão e sincronizar as conversas iniciais.
+3. Aguarde alguns segundos para o aplicativo registrar a sessão e sincronizar as conversas iniciais.
 4. Envie uma mensagem de teste para um contato de confiança ou peça para alguém responder.
 
 O celular moderno autoriza a sessão vinculada. Não é um novo cadastro por SMS no BlackBerry, nem exige transferir seu chip ou número para o aparelho antigo. O histórico pode sincronizar apenas conversas recentes; comece testando mensagens de texto novas. Não presuma suporte a chamadas ou mídias pesadas em um aparelho J2ME clássico.
@@ -247,9 +247,9 @@ Se o QR code expirar, selecione **Atualizar QR** (ou reabra o aplicativo). Quand
 
 ## Se alguma etapa falhar
 
-- **Erro de certificado ou TLS no Orbit / ponte:** Aparelhos BlackBerry antigos precisam do certificado raiz da ponte Orbit. Reacesse `https://orbit.lacorte.dev/legacy` pelo navegador do celular, baixe o arquivo `.cer` ou `.der` e salve-o como autoridade confiável para SSL. Confira também se a data e a hora do celular estão corretas.
+- **Erro de certificado ou TLS no Orbit:** Aparelhos BlackBerry antigos precisam do certificado raiz do Orbit. Reacesse `https://orbit.lacorte.dev/legacy` pelo navegador do celular, baixe o arquivo `.cer` ou `.der` e salve-o como autoridade confiável para SSL. Confira também se a data e a hora do celular estão corretas.
 - **Erro HTTP 401:** Na ponte própria, confira se o usuário e a senha compilados no app coincidem com os dados salvos no `htpasswd` do servidor.
-- **O QR code não aparece:** Confira os logs do serviço (`journalctl -u baileys-j2me`), caminho do executável Node, dependências instaladas e permissões de escrita na pasta `sessions/`.
+- **O QR code não aparece:** Em instalações próprias, confira os logs do serviço (`journalctl -u baileys-j2me`), caminho do executável Node, dependências instaladas e permissões de escrita na pasta `sessions/`.
 - **Funciona no computador, mas não no BlackBerry:** Confira o acesso pela rede do celular (Wi-Fi ou dados móveis/APN), permissões do app nas configurações do BlackBerry e compatibilidade das cifras TLS do proxy.
 - **A instalação pelo JAD falha:** Verifique se o JAR está no mesmo diretório, se seu tamanho bate com `MIDlet-Jar-Size` no JAD e se o celular aceita o perfil MIDP 2.0 / CLDC 1.1.
 - **A atualização OTA falha:** Verifique a conexão com a internet. Você também pode baixar a versão atualizada novamente pelo Orbit ou pela página `https://orbit.lacorte.dev/legacy`.
