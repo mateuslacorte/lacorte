@@ -168,7 +168,7 @@ sudo systemctl status baileys-j2me
 sudo journalctl -u baileys-j2me -n 50 --no-pager
 ```
 
-Keep `sessions/` private. It contains account credentials and message data; it must never be served as website content or committed to Git. The bridge operator can access messages handled by the bridge, so use a server you control and trust.
+Keep `sessions/` private. It contains session authentication tokens; it must never be served as website content or committed to Git. Chat stores saved in this directory are encrypted with AES-256 using the handset's device key, protecting message contents on disk.
 
 ### Give the phone a reachable address
 

@@ -168,7 +168,7 @@ sudo systemctl status baileys-j2me
 sudo journalctl -u baileys-j2me -n 50 --no-pager
 ```
 
-Mantenha `sessions/` privada. Ela contém credenciais da conta e dados de mensagens; nunca deve ser servida como conteúdo do site nem enviada ao Git. Quem administra a ponte pode acessar as mensagens que passam por ela, então use um servidor sob seu controle e em que você confia.
+Mantenha `sessions/` privada. Ela contém tokens de autenticação da sessão vinculada e nunca deve ser servida como conteúdo público nem enviada ao Git. O histórico de mensagens salvo nessa pasta é protegido com criptografia AES-256 usando a chave exclusiva do aparelho.
 
 ### Crie um endereço que o celular consiga acessar
 
